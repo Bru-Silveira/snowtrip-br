@@ -21,86 +21,107 @@ function App() {
       .catch((err) => console.error("Erro no fetch:", err));
   }, []);
 
+  function isDataValida(dataChegada, dataPartida, dataDisponibilidade) {
+    if (dataDisponibilidade.length === 0) {
+      return true;
+    }
+
+    if (!dataChegada || !dataPartida) {
+      return false;
+    }
+
+    if (Array.isArray(dataDisponibilidade)) {
+      return dataDisponibilidade.some(sejour => {
+        const inicio = new Date(sejour.date_debut);
+        const fim = new Date(sejour.date_fin);
+        return new Date(dataChegada) >= inicio && new Date(dataPartida) <= fim;
+      });
+    }
+    else {
+      const inicio = new Date(dataDisponibilidade.date_debut);
+      const fim = new Date(dataDisponibilidade.date_fin);
+      return new Date(dataChegada) >= inicio && new Date(dataPartida) <= fim;
+    }
+  }
+
   const filtrarImoveis = () => {
     console.log("Filtrar clicado");
-  
+    console.log("Qtde Imoveis:", imoveis.length);
     const filtrados = imoveis.filter(imovel => {
-      console.log("Imóvel sendo testado:", imovel);
-      
+      //console.log("Imóvel sendo testado:", imovel);
+
       // Cidade
       const cidadeInput = cidade?.toLowerCase();
       const cidadeImovel = imovel.resumo.ville?.toLowerCase();
       const cidadeValida = cidadeInput ? cidadeImovel?.includes(cidadeInput) : true;
-      console.log("Cidade válida?", cidadeValida);
-      console.log("Cidade informada:", cidade);
-      console.log("Cidade no imóvel:", imovel.resumo.ville);
-      
-      // Log completo do objeto para inspecionar
-      console.log("🔍 Imóvel completo:", JSON.stringify(imovel, null, 2));
+      //console.log("Cidade válida?", cidadeValida);
+      //console.log("Cidade informada:", cidade);
+      //console.log("Cidade no imóvel:", imovel.resumo.ville);
 
-            // Log do objeto imovel para verificar a estrutura completa
-      console.log("Objeto imovel:", imovel);
+      // Log completo do objeto para inspecionar
+      //console.log("🔍 Imóvel completo:", JSON.stringify(imovel, null, 2));
+
+      // Log do objeto imovel para verificar a estrutura completa
+      //console.log("Objeto imovel:", imovel);
 
       // Pessoas
       // Garantir que nb_adultes e nb_enfants não sejam nulos ou undefined
       const nbAdultes = (imovel.detalhes.detail.nb_adultes !== undefined && imovel.detalhes.detail.nb_adultes !== null) ? parseInt(imovel.detalhes.detail.nb_adultes) : 0;
       const nbEnfants = (imovel.detalhes.detail.nb_enfants !== undefined && imovel.detalhes.detail.nb_enfants !== null) ? parseInt(imovel.detalhes.detail.nb_enfants) : 0;
-      console.log("Somando nb_adultes + nb_enfants:", nbAdultes, "+", nbEnfants);
+      //console.log("Somando nb_adultes + nb_enfants:", nbAdultes, "+", nbEnfants);
       // Verifica se a capacidade é suficiente para as pessoas solicitadas
       const quantidadeDePessoas = isNaN(parseInt(quantidadePessoas, 10)) ? 0 : parseInt(quantidadePessoas, 10);
       const pessoasValida = nbAdultes >= quantidadeDePessoas;
       // Logs finais
-      console.log("Quantidade de pessoas solicitadas:", quantidadePessoas);
-      console.log("→ pessoasValida?", pessoasValida);
+      //console.log("Quantidade de pessoas solicitadas:", quantidadePessoas);
+      //console.log("→ pessoasValida?", pessoasValida);
 
       // Dados obrigatórios
       const dadosValidos =
         imovel.resumo.titre &&
         imovel.resumo.ville &&
         (imovel.resumo.prix || imovel.resumo.prix_ete || imovel.resumo.prix_hiver);
-      console.log("Dados válidos?", dadosValidos);
-  
+      //console.log("Dados válidos?", dadosValidos);
+
       // Data
       let dataDisponibilidade = [];
       try {
-        let sejoursRaw = imovel.disponibilidade?.sejours;
-  
+        let sejoursRaw = imovel.disponibilidade?.sejours.sejour;
+
         if (typeof sejoursRaw === "string") {
           // Ajuste para parse correto
           sejoursRaw = sejoursRaw
             .replace(/'/g, '"')
             .replace(/\bNone\b/g, 'null');
-  
+
           const sejoursParsed = JSON.parse(sejoursRaw);
-  
+          //console.log("Sejours parsed:", sejoursParsed);
           dataDisponibilidade = sejoursParsed?.sejour
             ? Array.isArray(sejoursParsed.sejour)
               ? sejoursParsed.sejour
               : [sejoursParsed.sejour]
             : [];
+        } else {
+          dataDisponibilidade = sejoursRaw;
+          //console.log("Sejours não é string, usando valores diretos:", dataDisponibilidade);
+          //console.log("Type of", typeof dataDisponibilidade);
+          //console.log("Data de disponibilidade legth:", dataDisponibilidade.length);
         }
       } catch (error) {
         console.error("Erro ao parsear sejours:", error);
       }
-  
-      const dataValida =
-        dataDisponibilidade.length === 0 ||
-        (dataChegada && dataPartida &&
-          dataDisponibilidade.some(sejour => {
-            const inicio = new Date(sejour.date_debut);
-            const fim = new Date(sejour.date_fin);
-            return new Date(dataChegada) <= fim && new Date(dataPartida) >= inicio;
-          }));
-      console.log("Data válida?", dataValida);
-  
+
+      const dataValida = isDataValida(dataChegada, dataPartida, dataDisponibilidade);
+      //console.log("Data válida?", dataValida);
+
       return cidadeValida && dataValida && pessoasValida && dadosValidos;
     });
-  
+
     console.log("Imóveis filtrados:", filtrados);
     setImoveisFiltrados(filtrados);
     setPesquisado(true);
   };
-  
+
   return (
     <div className="container">
       <h1>Imóveis disponíveis</h1>
@@ -116,7 +137,7 @@ function App() {
           <option value="Courchevel">Courchevel</option>
           <option value="Morzine">Morzine</option>
           <option value="Megève">Megève</option>
-          
+
         </select>
 
         <input
@@ -144,9 +165,9 @@ function App() {
           imoveisFiltrados.length > 0 ? (
             imoveisFiltrados.map((imovel, index) => (
               <div className="card" key={index}>
-                <img 
-                  src={imovel.resumo.image ? imovel.resumo.image : "https://via.placeholder.com/150"} 
-                  alt={imovel.resumo.titre || "Sem título"} 
+                <img
+                  src={imovel.resumo.image ? imovel.resumo.image : "https://via.placeholder.com/150"}
+                  alt={imovel.resumo.titre || "Sem título"}
                 />
                 <h2>{imovel.resumo.titre || "Título indisponível"}</h2>
                 <p>{imovel.resumo.ville || "Cidade não informada"}</p>
