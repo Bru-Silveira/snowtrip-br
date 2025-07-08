@@ -1,0 +1,76 @@
+/* Vídeo full background */
+.hero-fullscreen {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.55)
+}
+
+.swiper-slide-inner-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* Título centralizado */
+.swiper-slide-inner-txt-2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.hero-heading-home {
+  font-size: 4rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Header com logo e menu */
+.hero-header {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.hero-logo {
+  height: 40px;
+}
+
+.hero-nav {
+  display: flex;
+  gap: 25px;
+}
+
+.hero-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.hero-nav a:hover {
+  color: #ffcc00;
+}
+
+/* Scroll indicator */
+.scroll-indicator-home {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}

@@ -1,0 +1,49 @@
+.filtro-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  margin: 30px auto;
+  max-width: 1200px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filtro-input {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  min-width: 180px;
+  flex: 1;
+}
+
+.filtro-button {
+  padding: 12px 25px;
+  background-color: #f7b500;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.filtro-button:hover {
+  background-color: #e3a600;
+}
+
+/* Mobile responsivo */
+@media (max-width: 768px) {
+  .filtro-container {
+    flex-direction: column;
+  }
+
+  .filtro-input, .filtro-button {
+    width: 100%;
+  }
+}

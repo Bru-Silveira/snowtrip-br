@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import './App.css';
+import '../assets/styles/App.css';
 
 function Reserva() {
   const { id } = useParams();  // Pega o ID da URL
