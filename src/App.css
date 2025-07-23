@@ -64,29 +64,3 @@
   color: #fff;
 }
 
-/* fundo escuro para a coluna */
-.col-lg-12 {
-  background-color: #2e2e2e;
-}
-
-/* remover margem e fundo branco das dividers */
-.divider-l, .the-line {
-  background-color: #2e2e2e;
-  margin: 0;
-  border: none;
-  height: 1px;
-}
-
-/* container geral */
-.wrapper-full-width {
-  background-color: #2e2e2e;
-  padding: 40px 0;
-  width: 100%;
-}
-
-/* container centralizado com padding */
-.wrapper-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
