@@ -1,0 +1,92 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px 27px;
+  padding: 80px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.card h2 {
+  font-weight: 700;
+  font-size: 18px;
+  color: #4a4a4a; /* tom marrom escuro do design */
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.card p {
+  font-weight: 400;
+  font-size: 14px;
+  color: #555555;
+  margin: 2px 0;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.card p strong {
+  font-weight: 700;
+  color: #333333;
+}
+
+.card button {
+  margin-top: auto;
+  background: transparent;
+  border: 2px dashed black; /* rosa da linha */
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  font-weight: 700;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.card button:hover {
+  background-color: grey;
+  color: #fff;
+}
+
+/* fundo escuro para a coluna */
+.col-lg-12 {
+  background-color: #2e2e2e;
+}
+
+/* remover margem e fundo branco das dividers */
+.divider-l, .the-line {
+  background-color: #2e2e2e;
+  margin: 0;
+  border: none;
+  height: 1px;
+}
+
+/* container geral */
+.wrapper-full-width {
+  background-color: #2e2e2e;
+  padding: 40px 0;
+  width: 100%;
+}
+
+/* container centralizado com padding */
+.wrapper-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
