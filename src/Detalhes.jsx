@@ -73,7 +73,7 @@ function Detalhes() {
                                     <div className="swiper-slide">
                                         <div className="swiper-slide-inner">
                                             <div className="swiper-slide-inner-bg bg-img-1 overlay overlay-dark">
-                                                <video playsinline autoplay muted loop>
+                                                <video playsInline autoPlay={true} muted loop>
                                                     <source src="https://www.11-76.com/html5-videos-22/luxex/luxex-3.mp4" type="video/mp4"></source>
                                                 </video>
                                             </div>
