@@ -16,7 +16,6 @@ function App() {
   const [imoveisFiltrados, setImoveisFiltrados] = useState([]);
   const [pesquisado, setPesquisado] = useState(false);
   
-
   const checkinRef = useRef(null);
   const checkoutRef = useRef(null);
 
@@ -106,7 +105,8 @@ function App() {
   const handleSubmit = (e) => {
   e.preventDefault();
   console.log("Form submetido");
-  const resultados = filtrarImoveis();
+  // const resultados = filtrarImoveis();
+  console.log("IMOVEIS", imoveis)
   setImoveisFiltrados(imoveis);
   setPesquisado(true);
   };
@@ -135,8 +135,13 @@ function App() {
             <div className="navbar-header fadeIn-element">
               <div className="logo">
                 <a className="navbar-brand logo" href="index.html">
-                  <img alt="Logo" className="logo-light" src="img/logo-light.png"/>
-                  <img alt="Logo" className="logo-dark" src="img/logo-dark.png"/>
+                  <img 
+                    alt="Logo" 
+                    className="logo-light" 
+                    src='/img/logo-snowtrip.png'
+                    style={{ position: 'absolute', top: 0, left: 0, width: '230px', height: '110px' }}
+                  />
+                  {/* <img alt="Logo" className="logo-dark" src="img/logo-dark.png"/> */}
                 </a>
               </div>
             </div>
@@ -173,10 +178,24 @@ function App() {
                     <div className="swiper-wrapper">
                       <div className="swiper-slide">
                         <div className="swiper-slide-inner">
-                          <div className="swiper-slide-inner-bg" style={{ backgroundColor: 'grey', width: '100%', height: '100%' }}>
-                            <video playsinline autoplay muted loop>
-                              <source src="https://www.11-76.com/html5-videos-22/luxex/luxex-3.mp4" type="video/mp4"/>
-                            </video>
+                          <div className="swiper-slide-inner-bg bg-img-1" style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <video
+                              src="/videos/videoplayback.mp4"
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              preload="auto"
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                zIndex: 0,
+                              }}
+                            />
                           </div>
                           <div className="swiper-slide-inner-txt-2">
                             <div className="divider-m"></div>
@@ -339,10 +358,11 @@ function App() {
                               src={imovel.resumo.image ? imovel.resumo.image : "https://via.placeholder.com/150"}
                               alt={imovel.resumo.titre || "Sem título"}
                             />
-                            <h2>{imovel.resumo.titre || "Título indisponível"}</h2>
-                            <p>{imovel.resumo.ville || "Cidade não informada"}</p>
-                            <p>Preço: {imovel.resumo.prix_hiver || "N/A"}</p>
-                            <p><strong>Detalhes:</strong> {imovel.detalhes.detail.gastronomie || "Detalhe não informado"}</p>
+                            <h2>{imovel.resumo?.titre || "Nome da Hospedagem"}</h2>
+                            <p>{imovel.resumo?.ville || "Cidade"} - {imovel.detalhes?.detail?.secteur[0] || "Setor"}</p>
+                            <p>{imovel.detalhes?.detail?.nb_adultes || "xx"} adultos | {imovel.detalhes?.detail?.nb_enfants || "xx"} crianças</p>
+                            <p> {imovel.detalhes?.detail?.nombre_chambres || "xx"} quartos | {imovel.detalhes?.detail?.nombre_sdb || "xx"} banheiros | {imovel.detalhes?.detail?.surface || "xx"} m²</p>
+                            <p>{imovel.detalhes?.detail?.piste_distance_m || "xx"} metros da estação de esqui</p>
 
                             {imovel.resumo.id && (
                               <Link to={`/reserva/${imovel.resumo.id}`}>

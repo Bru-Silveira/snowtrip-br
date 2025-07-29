@@ -12,9 +12,6 @@ code {
     monospace;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  background-color: #2e2e2e ; /* cinza escuro */
-  margin: 0;
-}
+/* html, body {
+  background-color: #5e5e5e;
+}  */
