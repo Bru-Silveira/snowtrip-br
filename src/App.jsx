@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from 'react-router-dom';
 import "./App.css";
-import "./css/style.css";
-import $ from "jquery";
-import 'jquery-ui/ui/widgets/datepicker';
+//import $ from "jquery";
+//import 'jquery-ui/ui/widgets/datepicker';
 
 function App() {
   const [imoveis, setImoveis] = useState([]);
@@ -30,28 +29,28 @@ function App() {
       .catch((err) => console.error("Erro no fetch:", err));
   }, []);
 
-  useEffect(() => {
-    if (checkinRef.current) {
-      $(checkinRef.current).datepicker({
-        dateFormat: "dd/mm/yy",
-        onSelect: (dateText) => {
-          const [day, month, year] = dateText.split("/");
-          const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-          setDataChegada(selectedDate);
-        },
-      });
-    }
-    if (checkoutRef.current) {
-      $(checkoutRef.current).datepicker({
-        dateFormat: "dd/mm/yy",
-        onSelect: (dateText) => {
-          const [day, month, year] = dateText.split("/");
-          const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-          setDataPartida(selectedDate);
-        },
-      });
-    }
-  }, []);
+//  useEffect(() => {
+//    if (checkinRef.current) {
+//      $(checkinRef.current).datepicker({
+//        dateFormat: "dd/mm/yy",
+//        onSelect: (dateText) => {
+//          const [day, month, year] = dateText.split("/");
+//          const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+//          setDataChegada(selectedDate);
+//        },
+//      });
+//    }
+//    if (checkoutRef.current) {
+//      $(checkoutRef.current).datepicker({
+//        dateFormat: "dd/mm/yy",
+//        onSelect: (dateText) => {
+//          const [day, month, year] = dateText.split("/");
+//         const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+//          setDataPartida(selectedDate);
+//        },
+//      });
+//    }
+//  }, []);
 
   const filtrarImoveis = () => {
   const inicio = dataChegada;
@@ -173,8 +172,8 @@ function App() {
                     <div className="swiper-wrapper">
                       <div className="swiper-slide">
                         <div className="swiper-slide-inner">
-                          <div className="swiper-slide-inner-bg" style={{ backgroundColor: 'grey', width: '100%', height: '100%' }}>
-                            <video playsinline autoplay muted loop>
+                          <div className="swiper-slide-inner-bg bg-img-1 overlay overlay-dark" style={{ backgroundColor: 'grey', width: '100%', height: '100%' }}>
+                            <video playsInline autoPlay={true} muted loop>
                               <source src="https://www.11-76.com/html5-videos-22/luxex/luxex-3.mp4" type="video/mp4"/>
                             </video>
                           </div>
@@ -213,12 +212,15 @@ function App() {
             </div>
           </div>
         </div>
+        {/* reservation form wrapper start */}
         <div>
+          {/* reservation form start */}
           <div className="reservation-wrapper reservation-wrapper-home fadeIn-element">
+            {/* container start */}
             <div className="container">
               <div className="extra-margin-container">
                 <div className="reservation-inner clearfix">
-                  <form id="form-2" className="form-2" onSubmit={handleSubmit}>
+                  <form id="form-2" className="form-2" onSubmit={handleSubmit} name="send">
                     <div className="col-1 c-1">
                       <div className="input-wrapper">
                         <label>Check-In</label>

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import "./css/style.css";
-import "./css/plugins.css"
 import logoLight from './img/logo-light.png';
 import logoDark from './img/logo-dark.png';
 
@@ -25,20 +23,20 @@ function Detalhes() {
     }, [id]);
 
     const listWelcomeServices = imovel.resumo?.welcomeServices?.map((service) =>
-        <li>{service}</li>) || "Nenhum serviço de boas-vindas encontrado";
+        <li key={service}>{service}</li>) || "Nenhum serviço de boas-vindas encontrado";
 
     const listHousekeeping = imovel.resumo?.housekeeping?.map((service) =>
-        <li>{service}</li>) || "Nenhum serviço de limpeza e roupas de cama encontrado";
+        <li key={service}>{service}</li>) || "Nenhum serviço de limpeza e roupas de cama encontrado";
 
     const listGeneralEquipment = imovel.resumo?.generalEquipment?.map((equipment) =>
-        <li>{equipment}</li>) || "Nenhum equipamento geral encontrado";
+        <li key={equipment}>{equipment}</li>) || "Nenhum equipamento geral encontrado";
 
     const homeAppliances = imovel.resumo?.homeAppliances?.map((appliance) =>
-        <li>{appliance}</li>) || "Nenhum eletrodoméstico encontrado";
+        <li key={appliance}>{appliance}</li>) || "Nenhum eletrodoméstico encontrado";
 
     const notIncluded = imovel.resumo?.notIncluded?.map((item) =>
-        <li>{item}</li>) || "Nenhum item não incluído encontrado"; 
-    
+        <li key={item}>{item}</li>) || "Nenhum item não incluído encontrado"; 
+
     return (
         <>
             <div className="tst-line-t"></div>
