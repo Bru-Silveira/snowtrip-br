@@ -177,7 +177,7 @@ function App() {
                     <div className="swiper-wrapper">
                       <div className="swiper-slide">
                         <div className="swiper-slide-inner">
-                          <div className="swiper-slide-inner-bg bg-img-1" style={{ position: 'relative', width: '100%', height: '100%' }}>
+                          <div className="swiper-slide-inner-bg bg-img-1 overlay overlay-dark" style={{ position: 'relative', width: '100%', height: '100%' }}>
                             <video
                               src="/videos/videoplayback.mp4"
                               autoPlay
