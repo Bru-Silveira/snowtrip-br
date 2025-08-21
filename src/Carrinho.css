@@ -1,0 +1,240 @@
+/* ===== Layout principal ===== */
+.carrinho-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+/* ===== Serviços (em cima, largura toda) ===== */
+.carrinho-servicos {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.lista-servicos {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Wrapper segura o card e o botão */
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centraliza o botão */
+  flex: 0 1 100px;     /* mesma largura para todos */
+  gap: 20px;
+}
+
+/* Card agora só cuida da imagem + textos */
+.card-servico {
+  width: 160px;
+  height: 160px;               /* altura fixa p/ padronizar */
+  border-radius: 12px;
+  position: relative;          /* para o overlay funcionar */
+  overflow: hidden;
+  display: flex;               /* textos no rodapé do card */
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 15px;
+  text-align: center;
+  color: #fff;
+  transition: transform 0.2s;
+  background-size: cover;
+  background-position: center;
+}
+
+.card-servico:hover {
+  transform: translateY(-3px);
+}
+
+/* Overlay em degradê p/ garantir legibilidade do texto */
+.card-servico::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  transition: background 0.3s;
+  z-index: 0;
+}
+
+.card-servico:hover::before {
+  background: rgba(0,0,0,0.7);
+}
+
+/* Garantir que os textos fiquem acima do overlay */
+.card-servico > * { position: relative; z-index: 1; }
+
+.servico-nome {
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+.servico-tipo {
+  font-size: 13px;
+  color: #fff;
+  margin: 0;
+}
+
+/* ===== Imagens por serviço (mapeadas por classe) =====
+   Coloque seus arquivos em /public/img/cards/ e ajuste os nomes abaixo
+*/
+.card-wrapper.card-hospedagem .card-servico { 
+  background-image: url("./img/cards/hospedagem.jpg"); 
+}
+/* .card-wrapper.card-aulas-ski .card-servico { 
+  background-image: url("/img/cards/aulas-ski.jpg"); 
+}
+.card-wrapper.card-equip-ski .card-servico { 
+  background-image: url("/img/cards/equip-ski.jpg"); 
+}
+.card-wrapper.card-equip-snow .card-servico { 
+  background-image: url("/img/cards/equip-snow.jpg"); 
+}
+.card-wrapper.card-ski-pass .card-servico { 
+  background-image: url("/img/cards/ski-pass.jpg"); 
+}
+.card-wrapper.card-transfer .card-servico { 
+  background-image: url("/img/cards/transfer.jpg"); 
+}
+.card-wrapper.card-concierge .card-servico { 
+  background-image: url("/img/cards/concierge.jpg"); 
+} */
+
+/* ===== Responsivo opcional ===== */
+/* @media (min-width: 768px) {
+  .card-wrapper { flex: 0 1 200px; }  /* aumenta um pouco nos tablets/desktop */
+  /* .card-servico { height: 220px; }
+} */
+
+
+/* Botão circular "Adicionar" */
+.btn-adicionar {
+  margin-top: auto;
+  align-self: center;   
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 2px dashed #999;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  color: #444;
+  transition: all 0.3s;
+}
+
+.btn-adicionar:hover {
+  background: grey;
+  color: #fff;
+  /* border: 1px solid black; */
+}
+
+/* ===== Parte de baixo: 2 colunas ===== */
+.carrinho-inferior {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+}
+
+/* ===== Coluna esquerda - detalhes da viagem ===== */
+.carrinho-detalhes {
+  background: #f2f2f2;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.carrinho-dias {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.carrinho-pessoas {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.carrinho-total {
+  margin-top: 25px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+}
+
+.carrinho-reservar {
+  margin-top: 15px;
+  width: 100%;
+  background: #ffcc00;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.carrinho-reservar:hover {
+  background: #e6b800;
+}
+
+/* ===== Coluna direita - carrinho ===== */
+.carrinho-lista {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.titulo-carrinho {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.lista-carrinho {
+  margin-top: 10px;
+  list-style: none;
+  padding: 0;
+  border-top: 2px solid #eee;
+}
+
+.item-carrinho {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.carrinho-info {
+  color: #333;
+}
+
+.carrinho-preco {
+  text-align: right;
+  font-weight: bold;
+}
+
+.btn-remover {
+  background: transparent;
+  border: none;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+.btn-remover:hover {
+  color: darkred;
+}

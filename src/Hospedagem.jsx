@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from 'react-router-dom';
 import "./App.css";
+//import $ from "jquery";
+//import 'jquery-ui/ui/widgets/datepicker';
 
 function App() {
   const [imoveis, setImoveis] = useState([]);
@@ -25,6 +27,29 @@ function App() {
       })
       .catch((err) => console.error("Erro no fetch:", err));
   }, []);
+
+  //  useEffect(() => {
+  //    if (checkinRef.current) {
+  //      $(checkinRef.current).datepicker({
+  //        dateFormat: "dd/mm/yy",
+  //        onSelect: (dateText) => {
+  //          const [day, month, year] = dateText.split("/");
+  //          const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  //          setDataChegada(selectedDate);
+  //        },
+  //      });
+  //    }
+  //    if (checkoutRef.current) {
+  //      $(checkoutRef.current).datepicker({
+  //        dateFormat: "dd/mm/yy",
+  //        onSelect: (dateText) => {
+  //          const [day, month, year] = dateText.split("/");
+  //         const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  //          setDataPartida(selectedDate);
+  //        },
+  //      });
+  //    }
+  //  }, []);
 
   const filtrarImoveis = () => {
     const inicio = dataChegada;
