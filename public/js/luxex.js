@@ -26,7 +26,7 @@
   19. reservation form
   20. blog comment form
 */
-
+function runLuxexScripts() {
 $(function () {
     "use strict";
 
@@ -509,3 +509,7 @@ $(function () {
 
 
 });
+
+}
+
+window.runLuxexScripts = runLuxexScripts;

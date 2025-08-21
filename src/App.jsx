@@ -19,6 +19,12 @@ function App() {
   const checkoutRef = useRef(null);
 
   useEffect(() => {
+        if(window.runLuxexScripts) {
+            window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
+        }
+    }, []);
+
+  useEffect(() => {
     fetch("http://localhost:5000/api/imoveis")
       .then((res) => res.json())
       .then((data) => {
