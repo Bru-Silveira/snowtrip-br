@@ -1,30 +1,84 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./Carrinho.css";
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 
-function Carrinho () {
-    const [carrinho, setCarrinho] = useState([]);
+function Carrinho() {
+  const [carrinho, setCarrinho] = useState([]);
+  const [servicoSelecionado, setServicoSelecionado] = useState(null); // serviço clicado
+  const [mostrarModal, setMostrarModal] = useState(false); // controle do modal
+  const [opcaoSelecionada, setOpcaoSelecionada] = useState(null); // pacote/detalhe escolhido
+  const [dataSelecionada, setDataSelecionada] = useState(""); // data escolhida
 
-    const servicos = [
-      { id: 1, slug: "hospedagem", nome: "Hospedagem XYZ", preco: 5000, imagem: hospedagemImg },
-      { id: 2, slug: "aulas-ski", nome: "Aulas de Ski", preco: 2000 },
-      { id: 3, slug: "equip-ski", nome: "Equipamentos de Ski", preco: 1500 },
-      { id: 4, slug: "equip-snow", nome: "Equipamentos de Snow Board", preco: 2000 },
-      { id: 5, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
-      { id: 6, slug: "transfer", nome: "Transfer", preco: 2000 },
-      { id: 7, slug: "concierge", nome: "Concierge", preco: 2000 },
-    ];
+  const servicos = [
+    { id: 1, slug: "hospedagem", nome: "Hospedagem XYZ", preco: 5000, imagem: hospedagemImg },
+    { id: 2, slug: "aulas-ski", nome: "Aulas de Ski" },
+    { id: 3, slug: "equip-ski", nome: "Equipamentos de Ski", preco: 1500 },
+    { id: 4, slug: "equip-snow", nome: "Equipamentos de Snow Board", preco: 2000 },
+    { id: 5, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
+    { id: 6, slug: "transfer", nome: "Transfer", preco: 2000 },
+    { id: 7, slug: "concierge", nome: "Concierge", preco: 2000 },
+  ];
 
-    const adicionarAoCarrinho = (servico) => {
-    setCarrinho([...carrinho, servico]);
+  const pacotesSki = [
+    { id: "p1", nome: "Pacote 1 - Full Day", descricao: "6 horas de aula", preco: 1200 },
+    { id: "p2", nome: "Pacote 2 - Part Day", descricao: "4 horas de aula (09:00 às 13:00)", preco: 900 },
+  ];
+
+  const abrirModal = (servico) => {
+    if (servico.slug === "aulas-ski") {
+      setServicoSelecionado(servico);
+      setMostrarModal(true);
+    } else {
+      // serviços normais vão direto pro carrinho
+      setCarrinho([...carrinho, servico]);
+    }
+  };
+
+  const concluirModal = () => {
+    if (!opcaoSelecionada || !dataSelecionada) {
+      alert("Selecione a data e o pacote!");
+      return;
+    }
+
+    const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
+
+    const servicoComDetalhes = {
+      ...servicoSelecionado,
+      nome: `${servicoSelecionado.nome} - ${pacote.nome}`,
+      preco: pacote.preco,
+      data: dataSelecionada,
     };
 
-    const removerDoCarrinho = (id) => {
+    setCarrinho([...carrinho, servicoComDetalhes]);
+
+    // resetar modal
+    setServicoSelecionado(null);
+    setOpcaoSelecionada(null);
+    setDataSelecionada("");
+    setMostrarModal(false);
+  };
+
+  const removerDoCarrinho = (id) => {
     setCarrinho(carrinho.filter((item, index) => index !== id));
-    };
+  };
 
-    const total = carrinho.reduce((acc, item) => acc + item.preco, 0);
+  const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+
+  useEffect(() => {
+    if (window.runLuxexScripts) {
+      window.runLuxexScripts();
+    }
+
+    const timer = setTimeout(() => {
+      const preloader = document.getElementById("preloader");
+      if (preloader) {
+        preloader.style.display = "none";
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
 return (
   <>
@@ -158,9 +212,55 @@ return (
         </div>
       </div>
     </div>
+
+     {/* --- Modal --- */}
+      {mostrarModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>{servicoSelecionado?.nome}</h2>
+
+            <label>
+              Data da aula:
+              <input
+                type="date"
+                value={dataSelecionada}
+                onChange={(e) => setDataSelecionada(e.target.value)}
+              />
+            </label>
+
+            <div className="modal-pacotes">
+              {pacotesSki.map((p) => (
+                <div key={p.id} className="pacote-opcao">
+                  <input
+                    type="radio"
+                    name="pacote"
+                    value={p.id}
+                    checked={opcaoSelecionada === p.id}
+                    onChange={() => setOpcaoSelecionada(p.id)}
+                  />
+                  <span>
+                    <strong>{p.nome}</strong> - {p.descricao} - R${" "}
+                    {p.preco.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={concluirModal} className="btn-concluir">
+              Concluir
+            </button>
+            <button
+              onClick={() => setMostrarModal(false)}
+              className="btn-cancelar"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
     <div className="carrinho-container">
-    
-        {/* Serviços em cima */}
+      {/* Serviços em cima */}
         <div className="carrinho-servicos">
           <div className="lista-servicos">
             {servicos.map((servico) => (
@@ -170,7 +270,7 @@ return (
                   <small className="servico-tipo">{servico.tipo}</small>
                 </div>
                 <button
-                  onClick={() => adicionarAoCarrinho(servico)}
+                  onClick={() => abrirModal(servico)}
                   className="btn-adicionar"
                 >
                   Adicionar
