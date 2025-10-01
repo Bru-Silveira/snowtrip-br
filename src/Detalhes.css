@@ -135,3 +135,11 @@ div#menu-3.menu-visible {
 .dot.active {
   background-color: #333;
 }
+
+.menu-detalhes{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    row-gap: 30px;
+}

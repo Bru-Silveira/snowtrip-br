@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { usePreloadImages } from "./hooks/UsePreloadImages"; 
+
 import logoLight from './img/logo-light.png';
 import logoDark from './img/logo-dark.png';
 import './Detalhes.css';
@@ -31,13 +33,14 @@ function Detalhes() {
 
                 //Pega as imagens do imóvel
                 const imageObj = data.detalhes?.detail?.node_photo?.photo || {};
-                setImagens(Object.values(imageObj).map((image) => image.url)); 
+                const originalUrls = Object.values(imageObj).map((image) => image.url);
+                setImagens(originalUrls); 
             })
             .catch((err) => console.error("Erro no fetch:", err));
     }, [id]);
 
-
-
+    const imagesLoaded = usePreloadImages(imagens); // Usa o hook para pré-carregar as imagens
+    console.log("Imagens carregadas:", imagesLoaded);
     const nextSlide = () => {
         console.log("Next");
         setCurrent((prev) => (prev + 1) % imagens.length);
@@ -315,7 +318,7 @@ function Detalhes() {
                                     <div className="row">
                                         {/* col start */}
                                         <div className="col-lg-12">
-                                            <ul className="nav navbar-nav navbar-right">
+                                            <ul className="nav navbar-nav text-center menu-detalhes">
                                                 {/* items selector start */}
                                                 <li className="item-selector">
                                                     <a href="#" className="item-button" data-target="menu-1">Serviços Inclusos</a>
