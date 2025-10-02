@@ -10,12 +10,12 @@
   background: #fff;
   border-radius: 8px;
   border: 2px solid grey;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .card img {
@@ -27,7 +27,7 @@
 }
 
 .card h2 {
-  font-family:'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: bold;
   font-size: 18px;
   color: #4a4a4a; /* tom marrom escuro do design */
@@ -36,7 +36,7 @@
 }
 
 .card p {
-  font-family:'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: semi-bold;
   font-size: 14px;
   color: #555555;
@@ -57,7 +57,7 @@
   border-radius: 50%;
   width: 80px;
   height: 80px;
-  font-family:'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 700;
   color: #2e2e2e;
   cursor: pointer;
@@ -68,5 +68,3 @@
   background-color: grey;
   color: #fff;
 }
-
-

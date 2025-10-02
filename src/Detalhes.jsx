@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePreloadImages } from "./hooks/UsePreloadImages"; 
 
-import logoLight from './img/logo-light.png';
-import logoDark from './img/logo-dark.png';
+import logoLight from './img/logo-snowtrip.png';
+import logoDark from './img/logo-snowtrip.png';
 import './Detalhes.css';
 
 // Imports das imagens de menu
@@ -151,9 +151,9 @@ function Detalhes() {
                 <div className="container-fluid nopadding">
                     <div className="navbar-header fadeIn-element">
                         <div className="logo">
-                            <a className="navbar-brand logo" href="index.html">
-                                <img alt="Logo" className="logo-light" src={logoLight}></img>
-                                <img alt="Logo" className="logo-dark" src={logoDark}></img>
+                            <a className="navbar-brand logo" href="http://localhost:3000">
+                                <img alt="Logo" className="logo-light" src={logoLight} style={{ position: 'relative', top: -40, left: 0, width: '250px', height: '150px', fontWeight: 'bold' }}></img>
+                                {/*<img alt="Logo" className="logo-dark" src={logoDark}></img>*/}
                             </a>
                         </div>
                     </div>
@@ -192,7 +192,7 @@ function Detalhes() {
                                             <div className="swiper-slide-inner">
                                                 <div className="swiper-slide-inner-bg bg-img-1 overlay overlay-dark">
                                                     <video playsInline autoPlay={true} muted loop>
-                                                        <source src="https://www.11-76.com/html5-videos-22/luxex/luxex-3.mp4" type="video/mp4"></source>
+                                                        <source src='/videos/videoplayback.mp4' type="video/mp4"></source>
                                                     </video>
                                                 </div>
                                                 <div className="swiper-slide-inner-txt-2">
@@ -318,7 +318,7 @@ function Detalhes() {
                                     <div className="row">
                                         {/* col start */}
                                         <div className="col-lg-12">
-                                            <ul className="nav navbar-nav text-center menu-detalhes">
+                                            <ul id="menu-detalhes" className="nav navbar-nav text-center menu-detalhes">
                                                 {/* items selector start */}
                                                 <li className="item-selector">
                                                     <a href="#" className="item-button" data-target="menu-1">Serviços Inclusos</a>
