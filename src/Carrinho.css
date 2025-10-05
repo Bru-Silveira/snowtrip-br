@@ -1,95 +1,105 @@
 /* ===== Layout principal ===== */
 .carrinho-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding: 30px;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #333;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333;
 }
 
 /* ===== Serviços (em cima, largura toda) ===== */
 .carrinho-servicos {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .lista-servicos {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 /* Wrapper segura o card e o botão */
 .card-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* centraliza o botão */
-  flex: 0 1 100px;     /* mesma largura para todos */
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* centraliza o botão */
+    flex: 0 1 100px;
+    /* mesma largura para todos */
+    gap: 20px;
 }
 
 /* Card agora só cuida da imagem + textos */
 .card-servico {
-  width: 160px;
-  height: 160px;               /* altura fixa p/ padronizar */
-  border-radius: 12px;
-  position: relative;          /* para o overlay funcionar */
-  overflow: hidden;
-  display: flex;               /* textos no rodapé do card */
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 15px;
-  text-align: center;
-  color: #fff;
-  transition: transform 0.2s;
-  background-size: cover;
-  background-position: center;
+    width: 160px;
+    height: 160px;
+    /* altura fixa p/ padronizar */
+    border-radius: 12px;
+    position: relative;
+    /* para o overlay funcionar */
+    overflow: hidden;
+    display: flex;
+    /* textos no rodapé do card */
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+    transition: transform 0.2s;
+    background-size: cover;
+    background-position: center;
 }
 
 .card-servico:hover {
-  transform: translateY(-3px);
+    transform: translateY(-3px);
 }
 
 /* Overlay em degradê p/ garantir legibilidade do texto */
 .card-servico::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  transition: background 0.3s;
-  z-index: 0;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    transition: background 0.3s;
+    z-index: 0;
 }
 
 .card-servico:hover::before {
-  background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 /* Garantir que os textos fiquem acima do overlay */
-.card-servico > * { position: relative; z-index: 1; }
+.card-servico>* {
+    position: relative;
+    z-index: 1;
+}
 
 .servico-nome {
-  font-size: 15px;
-  font-weight: bold;
-  color: #fff;
-  margin: 0 0 4px 0;
-  text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 0 4px 0;
+    text-align: center;
 }
+
 .servico-tipo {
-  font-size: 13px;
-  color: #fff;
-  margin: 0;
+    font-size: 13px;
+    color: #fff;
+    margin: 0;
 }
 
 /* ===== Imagens por serviço (mapeadas por classe) =====
    Coloque seus arquivos em /public/img/cards/ e ajuste os nomes abaixo
 */
-.card-wrapper.card-hospedagem .card-servico { 
-  background-image: url("./img/cards/hospedagem.jpg"); 
+.card-wrapper.card-hospedagem .card-servico {
+    background-image: url("./img/cards/hospedagem.jpg");
 }
+
 /* .card-wrapper.card-aulas-ski .card-servico { 
   background-image: url("/img/cards/aulas-ski.jpg"); 
 }
@@ -112,171 +122,398 @@
 /* ===== Responsivo opcional ===== */
 /* @media (min-width: 768px) {
   .card-wrapper { flex: 0 1 200px; }  /* aumenta um pouco nos tablets/desktop */
-  /* .card-servico { height: 220px; }
+/* .card-servico { height: 220px; }
 } */
 
 
 /* Botão circular "Adicionar" */
 .btn-adicionar {
-  margin-top: auto;
-  align-self: center;   
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 2px dashed #999;
-  background: transparent;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  color: #444;
-  transition: all 0.3s;
+    margin-top: auto;
+    align-self: center;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px dashed #999;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    color: #444;
+    transition: all 0.3s;
 }
 
 .btn-adicionar:hover {
-  background: grey;
-  color: #fff;
-  /* border: 1px solid black; */
+    background: grey;
+    color: #fff;
+    /* border: 1px solid black; */
 }
 
 /* ===== Parte de baixo: 2 colunas ===== */
 .carrinho-inferior {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 30px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
 }
 
 /* ===== Coluna esquerda - detalhes da viagem ===== */
 .carrinho-detalhes {
-  background: #f2f2f2;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    background: #f2f2f2;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .carrinho-dias {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 5px;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .carrinho-pessoas {
-  text-align: center;
-  font-size: 14px;
-  color: #555;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
 }
 
 .carrinho-total {
-  margin-top: 25px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #000;
+    margin-top: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
 }
 
 .carrinho-reservar {
-  margin-top: 15px;
-  width: 100%;
-  background: #ffcc00;
-  border: none;
-  padding: 14px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
+    margin-top: 15px;
+    width: 100%;
+    background: #ffcc00;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
 }
+
 .carrinho-reservar:hover {
-  background: #e6b800;
+    background: #e6b800;
 }
 
 /* ===== Coluna direita - carrinho ===== */
 .carrinho-lista {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .titulo-carrinho {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* ===== Estilos do Modal Ski Pass ===== */
+.ski-pass-modal {
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ski-pass-modal h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 22px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.radio-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.area-option {
+    flex: 1;
+    position: relative;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.area-option.selected {
+    background-color: #f0f8ff;
+    border-color: #007bff;
+}
+
+.area-option input {
+    position: static !important;
+    opacity: 1 !important;
+}
+
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.half {
+    flex: 1;
+}
+
+.date-input,
+.days-select,
+.pass-type-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.pass-type-container {
+    display: flex;
+    align-items: center;
+}
+
+.btn-add-person {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.family-flex-notice {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.pessoa-form {
+    border: none;
+    padding: 5px 0;
+    margin-bottom: 5px;
+    border-radius: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.pessoa-form h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.btn-add-crianca,
+.btn-remove {
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.btn-remove {
+    background-color: transparent;
+    color: #999;
+    font-size: 18px;
+    margin-left: 5px;
+    padding: 0 5px;
+}
+
+.seguro {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.seguro-options {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.tooltip-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: #999;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.aviso-legal {
+    font-size: 11px;
+    color: #999;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.total-ski-pass {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 15px;
+    text-align: right;
+    margin-bottom: 15px;
 }
 
 .lista-carrinho {
-  margin-top: 10px;
-  list-style: none;
-  padding: 0;
-  border-top: 2px solid #eee;
+    margin-top: 10px;
+    list-style: none;
+    padding: 0;
+    border-top: 2px solid #eee;
 }
 
 .item-carrinho {
-  display: grid;
-  grid-template-columns: 2fr 1fr auto;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
 }
 
 .carrinho-info {
-  color: #333;
+    color: #333;
 }
 
 .carrinho-preco {
-  text-align: right;
-  font-weight: bold;
+    text-align: right;
+    font-weight: bold;
 }
 
 .btn-remover {
-  background: transparent;
-  border: none;
-  color: red;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 16px;
-  transition: color 0.3s;
+    background: transparent;
+    border: none;
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s;
 }
+
 .btn-remover:hover {
-  color: darkred;
+    color: darkred;
 }
 
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
 }
 
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 600px;
+    max-width: 90%;
 }
 
+
 .btn-concluir {
-  margin-top: 15px;
-  margin-right: 10px;
-  padding: 8px 16px;
-  background: #0077ff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+    padding: 8px 16px;
+    background: #0077ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 .btn-cancelar {
-  margin-top: 15px;
-  padding: 8px 16px;
-  background: #aaa;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: #aaa;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Força os radio buttons a voltarem ao estilo padrão */
+input[type="radio"] {
+    appearance: auto;
+    -webkit-appearance: radio;
+    accent-color: #333;
+    /* cor da bolinha — opcional */
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+/* Força os radio buttons a voltarem ao estilo padrão */
+input[type="radio"] {
+    appearance: auto;
+    -webkit-appearance: radio;
+    accent-color: #333;
+    /* cor da bolinha — opcional */
+    margin-right: 6px;
+    cursor: pointer;
 }
