@@ -32,6 +32,11 @@ function App() {
       .catch((err) => console.error("Erro no fetch:", err));
   }, []);
 
+  const handleCidade = (e) => {
+    console.log("Cidade selecionada:", e.target.value);
+    setCidade(e.target.value);
+  } 
+
   const filtrarImoveis = () => {
     const inicio = dataChegada;
     const fim = dataPartida;
@@ -39,6 +44,13 @@ function App() {
     const numCriancas = parseInt(criancas) || 0;
     const numeroPessoas = numAdultos + numCriancas;
     const faixaPreco = [0, Infinity]; // ou defina como quiser futuramente
+
+    console.log("Início:", inicio);
+    console.log("Fim:", fim);
+    console.log("Número de Pessoas:", numeroPessoas);
+    console.log("Faixa de Preço:", faixaPreco);
+    console.log("Cidade:", cidade);
+    console.log(`🏠 Filtrando entre ${imoveis.length} imóveis...`);
 
     const imoveisFiltrados = imoveis.filter((imovel, index) => {
       // Filtro por cidade (normalizado)
@@ -68,10 +80,10 @@ function App() {
       })();
 
       // Debug logs para validação
-      console.log(`[${index}] Cidade válida?`, cidadeValida);
-      console.log(`[${index}] Pessoas válidas?`, pessoasValidas);
-      console.log(`[${index}] Dados válidos?`, total.toFixed(2));
-      console.log(`[${index}] Data válida?`, dataValida);
+      //console.log(`[${index}] Cidade válida?`, cidadeValida);
+      //console.log(`[${index}] Pessoas válidas?`, pessoasValidas);
+      //console.log(`[${index}] Dados válidos?`, total.toFixed(2));
+      //console.log(`[${index}] Data válida?`, dataValida);
 
       return cidadeValida && pessoasValidas && dadosValidos && dataValida;
     });
@@ -258,13 +270,13 @@ function App() {
                   <div className="col-2 c-3">
                     <div className="select-wrapper">
                       <label>Cidade</label>
-                      <div className="select-inner">
+                      <div>
                         <select
-                          className="requiredField-r city select2 select"
+                          className="requiredField-r city select-hospedagem"
                           id="city"
                           name="city"
                           value={cidade}
-                          onChange={(e) => setCidade(e.target.value)}>
+                          onChange={(e) => handleCidade(e)}>
                           <option className="">Cidade</option>
                           <option value="Chamonix">Chamonix</option>
                           <option value="Courchevel">Courchevel</option>
