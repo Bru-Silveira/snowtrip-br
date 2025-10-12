@@ -3,6 +3,13 @@ import { Link } from "react-router-dom";
 import "./Carrinho.css";
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 
+let tabelaImg;
+try {
+  tabelaImg = require("./img/tabela-ski.jpg");
+} catch (e) {
+  tabelaImg = "/img/tabela-ski.jpg"; // fallback para public/img
+}
+
 function Carrinho() {
   const [carrinho, setCarrinho] = useState([]);
   const [servicoSelecionado, setServicoSelecionado] = useState(null);
@@ -20,24 +27,11 @@ function Carrinho() {
   const [snowCategoria, setSnowCategoria] = useState("");
   const [snowTamanho, setSnowTamanho] = useState("");
   const [snowDias, setSnowDias] = useState(1);
-  
-  // Estados para Ski Pass
-  const [skiPassArea, setSkiPassArea] = useState("courchevel");
-  const [skiPassDataInicio, setSkiPassDataInicio] = useState("");
-  const [skiPassDias, setSkiPassDias] = useState(1);
-  const [skiPassTipo, setSkiPassTipo] = useState("");
-  const [skiPassAdultos, setSkiPassAdultos] = useState([{ nome: "", dataNasc: "" }, { nome: "", dataNasc: "" }]);
-  const [skiPassCriancas, setSkiPassCriancas] = useState([]);
-  const [skiPassSeguro, setSkiPassSeguro] = useState(false);
+
+  // entradas cumulativas de Ski Pass no modal
+  const [skiPassEntries, setSkiPassEntries] = useState([]);
   const [skiPassTotal, setSkiPassTotal] = useState(0);
-  
-  // Atualizar o valor total do Ski Pass sempre que os parâmetros mudarem
-  useEffect(() => {
-    if (skiPassTipo) {
-      const novoTotal = calcularPrecoSkiPass();
-      setSkiPassTotal(novoTotal);
-    }
-  }, [skiPassTipo, skiPassArea, skiPassDias, skiPassAdultos, skiPassCriancas, skiPassSeguro]);
+  const [skiPassDataInicio, setSkiPassDataInicio] = useState("");
 
   const servicos = [
     {
@@ -87,101 +81,157 @@ function Carrinho() {
     { id: "sb2", nome: "Bota de Snowboard", preco: { 1: 100, 2: 150, 3: 200 } },
     { id: "sb3", nome: "Capacete", preco: { 1: 120, 2: 170, 3: 220 } },
   ];
-  
-  // Tabela de preços para Ski Pass
+
   const skiPassPrecos = {
     courchevel: {
-      adulto: {
-        1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455
-      },
-      crianca: {
-        1: 52, 2: 104, 3: 156, 4: 208, 5: 260, 6: 312, 7: 364
-      },
-      family: {
-        5: 405, 6: 486, 7: 567
-      }
+      adulto: { 1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455 },
+      crianca: { 1: 52, 2: 104, 3: 156, 4: 208, 5: 260, 6: 312, 7: 364 },
+      family: { 5: 405, 6: 486, 7: 567 },
     },
     "3vallees": {
-      adulto: {
-        1: 66, 2: 132, 3: 198, 4: 264, 5: 330, 6: 396, 7: 462
-      },
-      crianca: {
-        1: 53, 2: 106, 3: 159, 4: 212, 5: 265, 6: 318, 7: 371
-      },
-      family: {
-        5: 818, 6: 981, 7: 1144
-      }
-    }
+      adulto: { 1: 66, 2: 132, 3: 198, 4: 264, 5: 330, 6: 396, 7: 462 },
+      crianca: { 1: 53, 2: 106, 3: 159, 4: 212, 5: 265, 6: 318, 7: 371 },
+      family: { 5: 818, 6: 981, 7: 1144 },
+    },
   };
 
   const abrirModal = (servico) => {
-    if (
-      servico.slug === "aulas-ski" ||
-      servico.slug === "equip-ski" ||
-      servico.slug === "equip-snow" ||
-      servico.slug === "ski-pass"
+    if (servico.slug === "ski-pass") {
+      setServicoSelecionado(servico);
+      setMostrarModal(true);
+      if (skiPassEntries.length === 0) {
+        setSkiPassEntries([
+          {
+            id: Date.now(),
+            area: "courchevel",
+            dataInicio: "",
+            dias: 1,
+            tipo: "",
+            adultos: [],
+            criancas: [],
+            seguro: false,
+          },
+        ]);
+      }
+    } else if (
+      ["aulas-ski", "equip-ski", "equip-snow"].includes(servico.slug)
     ) {
       setServicoSelecionado(servico);
       setMostrarModal(true);
     } else {
-      setCarrinho([...carrinho, servico]);
+      setCarrinho((prev) => [...prev, servico]);
     }
   };
 
-  // Função para calcular o preço do Ski Pass
-  const calcularPrecoSkiPass = () => {
-    let precoTotal = 0;
-    
-    if (skiPassTipo === "family") {
-      // Preço base do Family Flex
-      precoTotal = skiPassPrecos[skiPassArea][skiPassTipo][skiPassDias] || 0;
-    } else if (skiPassTipo === "adulto") {
-      // Preço por adulto * número de adultos
-      const precoUnitario = skiPassPrecos[skiPassArea][skiPassTipo][skiPassDias] || 0;
-      precoTotal = precoUnitario * skiPassAdultos.length;
-    } else if (skiPassTipo === "crianca") {
-      // Preço por criança * número de crianças
-      const precoUnitario = skiPassPrecos[skiPassArea][skiPassTipo][skiPassDias] || 0;
-      precoTotal = precoUnitario * skiPassCriancas.length;
-    }
-    
-    // Adicionar seguro se selecionado (3.50€ por pessoa por dia)
-    if (skiPassSeguro) {
-      const totalPessoas = 
-        skiPassTipo === "family" 
-          ? skiPassAdultos.length + skiPassCriancas.length
-          : skiPassTipo === "adulto" 
-            ? skiPassAdultos.length 
-            : skiPassCriancas.length;
-      
-      precoTotal += 3.5 * totalPessoas * skiPassDias;
-    }
-    
-    return precoTotal;
+  const addSkiPassEntry = () => {
+    setSkiPassEntries((prev) => [
+      ...prev,
+      {
+        id: Date.now() + Math.random(),
+        area: "courchevel",
+        dataInicio: "",
+        dias: 1,
+        tipo: "",
+        adultos: [],
+        criancas: [],
+        seguro: false,
+      },
+    ]);
   };
 
-  // Atualizar o preço total quando os dados mudam
+  const removeSkiPassEntry = (index) => {
+    setSkiPassEntries((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateSkiPassEntry = (index, changes) => {
+    setSkiPassEntries((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], ...changes };
+      return copy;
+    });
+  };
+
+  const setEntryTipo = (index, tipo) => {
+    const base = {
+      family: {
+        adultos: [
+          { nome: "", dataNasc: "" },
+          { nome: "", dataNasc: "" },
+        ],
+        criancas: [
+          { nome: "", dataNasc: "" },
+          { nome: "", dataNasc: "" },
+          { nome: "", dataNasc: "" },
+        ],
+      },
+      adulto: { adultos: [{ nome: "", dataNasc: "" }], criancas: [] },
+      crianca: { adultos: [], criancas: [{ nome: "", dataNasc: "" }] },
+    }[tipo] || { adultos: [], criancas: [] };
+    updateSkiPassEntry(index, {
+      tipo,
+      adultos: base.adultos,
+      criancas: base.criancas,
+    });
+  };
+
+  const calcularPrecoParaEntrada = (entry) => {
+    if (!entry || !entry.tipo) return 0;
+    const dias = Math.max(1, Number(entry.dias) || 1);
+    const areaObj = skiPassPrecos[entry.area] || {};
+    if (entry.tipo === "family")
+      return (areaObj.family && areaObj.family[dias]) || 0;
+    if (entry.tipo === "adulto") {
+      const unit = (areaObj.adulto && areaObj.adulto[dias]) || 0;
+      return unit * (entry.adultos?.length || 0);
+    }
+    if (entry.tipo === "crianca") {
+      const unit = (areaObj.crianca && areaObj.crianca[dias]) || 0;
+      return unit * (entry.criancas?.length || 0);
+    }
+    return 0;
+  };
+
   useEffect(() => {
-    if (skiPassTipo) {
-      const novoTotal = calcularPrecoSkiPass();
-      setSkiPassTotal(novoTotal);
-    }
-  }, [skiPassArea, skiPassDias, skiPassTipo, skiPassAdultos.length, skiPassCriancas.length, skiPassSeguro]);
+    const total = skiPassEntries.reduce((acc, entry) => {
+      let preco = calcularPrecoParaEntrada(entry);
+      if (entry.seguro) {
+        const pessoas =
+          (entry.adultos?.length || 0) + (entry.criancas?.length || 0);
+        preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
+      }
+      return acc + preco;
+    }, 0);
+    setSkiPassTotal(total);
+  }, [skiPassEntries]);
+
+  useEffect(() => {
+    document.body.classList.toggle("modal-open", mostrarModal);
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [mostrarModal]);
 
   const concluirModal = () => {
+    if (!servicoSelecionado) {
+      setMostrarModal(false);
+      return;
+    }
+
     if (servicoSelecionado.slug === "aulas-ski") {
       if (!opcaoSelecionada || !dataSelecionada) {
         alert("Selecione a data e o pacote!");
         return;
       }
       const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
-      const servicoComDetalhes = {
-        ...servicoSelecionado,
-        nome: `${servicoSelecionado.nome} - ${pacote.nome}`,
-        preco: pacote.preco,
-        data: dataSelecionada,
-      };
-      setCarrinho([...carrinho, servicoComDetalhes]);
+      setCarrinho((prev) => [
+        ...prev,
+        {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${pacote?.nome || ""}`,
+          preco: pacote?.preco || 0,
+          data: dataSelecionada,
+        },
+      ]);
     }
 
     if (servicoSelecionado.slug === "equip-ski") {
@@ -192,18 +242,18 @@ function Carrinho() {
       const equipamento = equipamentos.find(
         (e) => e.id === equipamentoSelecionado
       );
-      const precoBase = equipamento.preco[categoria];
-      const precoTotal = precoBase * dias;
-
-      const servicoComDetalhes = {
-        ...servicoSelecionado,
-        nome: `${servicoSelecionado.nome} - ${equipamento.nome}`,
-        preco: precoTotal,
-        dias,
-        categoria,
-        tamanho,
-      };
-      setCarrinho([...carrinho, servicoComDetalhes]);
+      const precoBase = equipamento?.preco?.[categoria] || 0;
+      setCarrinho((prev) => [
+        ...prev,
+        {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${equipamento?.nome || ""}`,
+          preco: precoBase * dias,
+          dias,
+          categoria,
+          tamanho,
+        },
+      ]);
     }
 
     if (servicoSelecionado.slug === "equip-snow") {
@@ -219,94 +269,110 @@ function Carrinho() {
       const equipamento = snowboardEquipamentos.find(
         (e) => e.id === snowEquipamentoSelecionado
       );
-      const precoBase = equipamento.preco[snowCategoria];
-      const precoTotal = precoBase * snowDias;
-
-      const servicoComDetalhes = {
-        ...servicoSelecionado,
-        nome: `${servicoSelecionado.nome} - ${equipamento.nome}`,
-        preco: precoTotal,
-        dias: snowDias,
-        categoria: snowCategoria,
-        tamanho: snowTamanho,
-      };
-      setCarrinho([...carrinho, servicoComDetalhes]);
+      const precoBase = equipamento?.preco?.[snowCategoria] || 0;
+      setCarrinho((prev) => [
+        ...prev,
+        {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${equipamento?.nome || ""}`,
+          preco: precoBase * snowDias,
+          dias: snowDias,
+          categoria: snowCategoria,
+          tamanho: snowTamanho,
+        },
+      ]);
     }
-    
+
     if (servicoSelecionado.slug === "ski-pass") {
-      if (!skiPassDataInicio || !skiPassTipo) {
-        alert("Preencha todos os campos obrigatórios!");
+      if (skiPassEntries.length === 0) {
+        alert("Adicione pelo menos um passe antes de concluir.");
         return;
       }
-      
-      // Verificar se os formulários estão preenchidos corretamente
-      if (skiPassTipo === "family") {
-        if (skiPassDias < 5) {
-          alert("Family Flex só pode ser selecionado a partir de 5 dias de esqui.");
+
+      for (let i = 0; i < skiPassEntries.length; i += 1) {
+        const e = skiPassEntries[i];
+        if (!e.tipo || !e.dataInicio) {
+          alert(`Preencha tipo e data de início para o passe #${i + 1}.`);
           return;
         }
-        
-        if (skiPassAdultos.length < 2 || skiPassCriancas.length < 3) {
-          alert("Family Flex requer no mínimo 2 adultos e 3 crianças.");
-          return;
-        }
-        
-        // Verificar se todos os campos estão preenchidos
-        const todosAdultosPreenchidos = skiPassAdultos.every(a => a.nome && a.dataNasc);
-        const todasCriancasPreenchidas = skiPassCriancas.every(c => c.nome && c.dataNasc);
-        
-        if (!todosAdultosPreenchidos || !todasCriancasPreenchidas) {
-          alert("Preencha o nome e data de nascimento de todos os participantes.");
-          return;
-        }
-      } else if (skiPassTipo === "adulto") {
-        const todosAdultosPreenchidos = skiPassAdultos.every(a => a.nome && a.dataNasc);
-        if (!todosAdultosPreenchidos) {
-          alert("Preencha o nome e data de nascimento de todos os adultos.");
-          return;
-        }
-      } else if (skiPassTipo === "crianca") {
-        const todasCriancasPreenchidas = skiPassCriancas.every(c => c.nome && c.dataNasc);
-        if (!todasCriancasPreenchidas) {
-          alert("Preencha o nome e data de nascimento de todas as crianças.");
-          return;
+
+        if (e.tipo === "family") {
+          if ((e.adultos?.length || 0) < 2 || (e.criancas?.length || 0) < 3) {
+            alert(
+              `Passe Family (#${i + 1}) requer mínimo 2 adultos e 3 crianças.`
+            );
+            return;
+          }
+          const allFilled =
+            e.adultos.every((a) => a.nome && a.dataNasc) &&
+            e.criancas.every((c) => c.nome && c.dataNasc);
+          if (!allFilled) {
+            alert(
+              `Preencha nome e data de nascimento de todos os participantes do Family (#${
+                i + 1
+              }).`
+            );
+            return;
+          }
+        } else if (e.tipo === "adulto") {
+          if (!(e.adultos?.length > 0)) {
+            alert(`Passe Adulto (#${i + 1}) precisa de pelo menos 1 adulto.`);
+            return;
+          }
+          if (!e.adultos.every((a) => a.nome && a.dataNasc)) {
+            alert(
+              `Preencha nome e data de nascimento de todos os adultos do passe #${
+                i + 1
+              }.`
+            );
+            return;
+          }
+        } else if (e.tipo === "crianca") {
+          if (!(e.criancas?.length > 0)) {
+            alert(`Passe Criança (#${i + 1}) precisa de pelo menos 1 criança.`);
+            return;
+          }
+          if (!e.criancas.every((c) => c.nome && c.dataNasc)) {
+            alert(
+              `Preencha nome e data de nascimento de todas as crianças do passe #${
+                i + 1
+              }.`
+            );
+            return;
+          }
         }
       }
-      
-      // Calcular o preço final
-      const precoTotal = calcularPrecoSkiPass();
-      
-      // Criar descrição do serviço
-      let descricao = `${skiPassArea === "courchevel" ? "Courchevel Pass" : "Les 3 Vallées Pass"} - ${skiPassDias} dias`;
-      if (skiPassTipo === "family") {
-        descricao += ` - Family Flex (${skiPassAdultos.length} adultos, ${skiPassCriancas.length} crianças)`;
-      } else if (skiPassTipo === "adulto") {
-        descricao += ` - Solo Adulto (${skiPassAdultos.length})`;
-      } else if (skiPassTipo === "crianca") {
-        descricao += ` - Solo Criança (${skiPassCriancas.length})`;
-      }
-      
-      if (skiPassSeguro) {
-        descricao += " + Seguro Carré Neige";
-      }
-      
-      const servicoComDetalhes = {
-        ...servicoSelecionado,
-        nome: `${servicoSelecionado.nome} - ${descricao}`,
-        preco: precoTotal,
-        dataInicio: skiPassDataInicio,
-        dias: skiPassDias,
-        tipo: skiPassTipo,
-        area: skiPassArea,
-        adultos: [...skiPassAdultos],
-        criancas: [...skiPassCriancas],
-        seguro: skiPassSeguro
-      };
-      
-      setCarrinho([...carrinho, servicoComDetalhes]);
+
+      const novos = skiPassEntries.map((e) => {
+        const preco =
+          calcularPrecoParaEntrada(e) +
+          (e.seguro
+            ? 3.5 *
+              ((e.adultos?.length || 0) + (e.criancas?.length || 0)) *
+              Math.max(1, Number(e.dias) || 1)
+            : 0);
+        const descricao = `${
+          e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+        } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
+        return {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${descricao}`,
+          preco,
+          dataInicio: e.dataInicio,
+          dias: e.dias,
+          tipo: e.tipo,
+          adultos: e.adultos ? [...e.adultos] : [],
+          criancas: e.criancas ? [...e.criancas] : [],
+          area: e.area,
+          seguro: e.seguro,
+        };
+      });
+
+      setCarrinho((prev) => [...prev, ...novos]);
+      setSkiPassEntries([]);
     }
 
-    // Reset modal
+    // reset modal genérico
     setServicoSelecionado(null);
     setOpcaoSelecionada(null);
     setDataSelecionada("");
@@ -320,621 +386,540 @@ function Carrinho() {
     setSnowCategoria("");
     setSnowTamanho("");
     setSnowDias(1);
+    setSkiPassTotal(0);
+    setSkiPassDataInicio("");
   };
 
-  const removerDoCarrinho = (id) => {
-    setCarrinho(carrinho.filter((item, index) => index !== id));
-  };
-
+  const removerDoCarrinho = (id) =>
+    setCarrinho((prev) => prev.filter((_, index) => index !== id));
   const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
 
   return (
     <>
-      {/* --- Modal --- */}
       {mostrarModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>{servicoSelecionado?.nome}</h2>
+          {servicoSelecionado?.slug === "ski-pass" ? (
+            <div className="modal-content ski-pass-layout">
+              <header className="modal-header">
+                <h2 className="modal-title">{servicoSelecionado?.nome}</h2>
 
-             {/* MODAL AULAS DE SKI 
-             <label>
-              Data da aula:
-              <input
-                type="date"
-                value={dataSelecionada}
-                onChange={(e) => setDataSelecionada(e.target.value)}
-              />
-            </label>
+                <div className="tabela-help-right">
+                  <div className="tabela-tooltip-wrapper">
+                    <button
+                      type="button"
+                      className="tabela-tooltip-btn"
+                      aria-describedby="tabela-tooltip"
+                    >
+                      Confira tabela de valores.
+                      <span className="tabela-tooltip-icon" aria-hidden="true">
+                        {" "}
+                        ⓘ
+                      </span>
+                    </button>
 
-            <div className="modal-pacotes">
-              {pacotesSki.map((p) => (
-                <div key={p.id} className="pacote-opcao">
-                  <input
-                    type="radio"
-                    name="pacote"
-                    value={p.id}
-                    checked={opcaoSelecionada === p.id}
-                    onChange={() => setOpcaoSelecionada(p.id)}
-                  />
-                  <span>
-                    <strong>{p.nome}</strong> - {p.descricao} - R${" "}
-                    {p.preco.toLocaleString("pt-BR")}
-                  </span>
-                </div>
-              ))}
-            </div> */}
-
-            {/* MODAL EQUIPAMENTOS SKI */}
-            {(servicoSelecionado?.slug === "equip-ski" ||
-              servicoSelecionado?.slug === "equip-snow") && (
-              <>
-                <label>
-                  Categoria:
-                  <select
-                    value={
-                      servicoSelecionado.slug === "equip-ski"
-                        ? categoria
-                        : snowCategoria
-                    }
-                    onChange={(e) =>
-                      servicoSelecionado.slug === "equip-ski"
-                        ? setCategoria(e.target.value)
-                        : setSnowCategoria(e.target.value)
-                    }
-                  >
-                    <option value="">Selecione</option>
-                    <option value="1">Categoria 1 - Básico</option>
-                    <option value="2">Categoria 2 - Intermediário</option>
-                    <option value="3">Categoria 3 - Premium</option>
-                  </select>
-                </label>
-
-                {/* Mostrar os outros filtros somente se a categoria estiver selecionada */}
-                {(categoria || snowCategoria) && (
-                  <>
-                    <label>
-                      Equipamento:
-                      <select
-                        value={
-                          servicoSelecionado.slug === "equip-ski"
-                            ? equipamentoSelecionado
-                            : snowEquipamentoSelecionado
-                        }
-                        onChange={(e) =>
-                          servicoSelecionado.slug === "equip-ski"
-                            ? setEquipamentoSelecionado(e.target.value)
-                            : setSnowEquipamentoSelecionado(e.target.value)
-                        }
-                      >
-                        <option value="">Selecione</option>
-                        {(servicoSelecionado.slug === "equip-ski"
-                          ? equipamentos
-                          : snowboardEquipamentos
-                        ).map((e) => (
-                          <option key={e.id} value={e.id}>
-                            {e.nome}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label>
-                      Tamanho:
-                      <select
-                        value={
-                          servicoSelecionado.slug === "equip-ski"
-                            ? tamanho
-                            : snowTamanho
-                        }
-                        onChange={(e) =>
-                          servicoSelecionado.slug === "equip-ski"
-                            ? setTamanho(e.target.value)
-                            : setSnowTamanho(e.target.value)
-                        }
-                      >
-                        <option value="">Selecione</option>
-                        <optgroup label="Infantil">
-                          <option value="4-6 anos">
-                            4-6 anos - R${" "}
-                            {(servicoSelecionado.slug === "equip-ski"
-                              ? categoria
-                                ? equipamentos.find(
-                                    (eq) => eq.id === equipamentoSelecionado
-                                  )?.preco[categoria] || 0
-                                : 0
-                              : snowCategoria
-                              ? snowboardEquipamentos.find(
-                                  (eq) => eq.id === snowEquipamentoSelecionado
-                                )?.preco[snowCategoria] || 0
-                              : 0
-                            ).toLocaleString("pt-BR")}
-                          </option>
-                          <option value="8-10 anos">
-                            8-10 anos - R${" "}
-                            {(servicoSelecionado.slug === "equip-ski"
-                              ? categoria
-                                ? equipamentos.find(
-                                    (eq) => eq.id === equipamentoSelecionado
-                                  )?.preco[categoria] || 0
-                                : 0
-                              : snowCategoria
-                              ? snowboardEquipamentos.find(
-                                  (eq) => eq.id === snowEquipamentoSelecionado
-                                )?.preco[snowCategoria] || 0
-                              : 0
-                            ).toLocaleString("pt-BR")}
-                          </option>
-                        </optgroup>
-                        <optgroup label="Adulto">
-                          <option value="P">
-                            P - R${" "}
-                            {(servicoSelecionado.slug === "equip-ski"
-                              ? categoria
-                                ? equipamentos.find(
-                                    (eq) => eq.id === equipamentoSelecionado
-                                  )?.preco[categoria] || 0
-                                : 0
-                              : snowCategoria
-                              ? snowboardEquipamentos.find(
-                                  (eq) => eq.id === snowEquipamentoSelecionado
-                                )?.preco[snowCategoria] || 0
-                              : 0
-                            ).toLocaleString("pt-BR")}
-                          </option>
-                          <option value="M">
-                            M - R${" "}
-                            {(servicoSelecionado.slug === "equip-ski"
-                              ? categoria
-                                ? equipamentos.find(
-                                    (eq) => eq.id === equipamentoSelecionado
-                                  )?.preco[categoria] || 0
-                                : 0
-                              : snowCategoria
-                              ? snowboardEquipamentos.find(
-                                  (eq) => eq.id === snowEquipamentoSelecionado
-                                )?.preco[snowCategoria] || 0
-                              : 0
-                            ).toLocaleString("pt-BR")}
-                          </option>
-                        </optgroup>
-                      </select>
-                    </label>
-
-                    <label>
-                      Quantidade de dias:
-                      <input
-                        type="number"
-                        min="1"
-                        value={
-                          servicoSelecionado.slug === "equip-ski"
-                            ? dias
-                            : snowDias
-                        }
-                        onChange={(e) =>
-                          servicoSelecionado.slug === "equip-ski"
-                            ? setDias(parseInt(e.target.value))
-                            : setSnowDias(parseInt(e.target.value))
-                        }
-                      />
-                    </label>
-                  </>
-                )}
-              </>
-            )}
-
-            {/* MODAL SKI PASS */}
-            {servicoSelecionado?.slug === "ski-pass" && (
-              <div className="ski-pass-modal">
-                <h3></h3>
-                <div className="tabela-valores">
-                  <a href="#" onClick={(e) => {e.preventDefault(); alert("Tabela de valores será exibida aqui");}}>Confira tabela de valores.</a>
-                </div>
-                
-                <div className="ski-pass-form">
-                  <div className="form-group">
-                    <label className="form-label">Área:</label>
-                    <div className="radio-buttons">
-                      <label className={`area-option ${skiPassArea === "courchevel" ? "selected" : ""}`}>
-                        <input
-                          type="radio"
-                          name="area"
-                          value="courchevel"
-                          checked={skiPassArea === "courchevel"}
-                          onChange={() => setSkiPassArea("courchevel")}
-                        />
-                        <span>Courchevel Pass</span>
-                      </label>
-                      <label className={`area-option ${skiPassArea === "3vallees" ? "selected" : ""}`}>
-                        <input
-                          type="radio"
-                          name="area"
-                          value="3vallees"
-                          checked={skiPassArea === "3vallees"}
-                          onChange={() => setSkiPassArea("3vallees")}
-                        />
-                        <span>Les 3 Vallées Pass</span>
-                      </label>
+                    <div
+                      id="tabela-tooltip"
+                      role="tooltip"
+                      className="tabela-tooltip"
+                      aria-hidden="true"
+                    >
+                      <img src={tabelaImg} alt="Tabela de valores Ski Pass" />
                     </div>
                   </div>
+                </div>
+              </header>
 
-                  <div className="form-row date-days-row">
-                    <div className="form-group half">
-                      <label className="form-label">
-                        Data de Início:
-                        <div className="input-with-icon">
+              <div className="modal-body">
+                <aside className="modal-aside">
+                  <div className="tabela-box">
+                    {/* tabela/preview de valores (sem o texto "Confira tabela de valores.") */}
+                    {/* ... */}
+                  </div>
+                </aside>
+
+                <section className="modal-form">
+                  {skiPassEntries.map((entry, idx) => (
+                    <div key={entry.id} className="entry-card">
+                      <div className="entry-top">
+                        <div className="entry-number">Passe {idx + 1}</div>
+                        <div className="entry-actions">
+                          {skiPassEntries.length > 1 && (
+                            <button
+                              type="button"
+                              className="btn-small btn-remove"
+                              onClick={() => removeSkiPassEntry(idx)}
+                            >
+                              −
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="row">
+                        <label className="col">
+                          Área:
+                          <div className="area-options">
+                            <label>
+                              <input
+                                type="radio"
+                                name={`area-${entry.id}`}
+                                value="courchevel"
+                                checked={entry.area === "courchevel"}
+                                onChange={() =>
+                                  updateSkiPassEntry(idx, {
+                                    area: "courchevel",
+                                  })
+                                }
+                              />
+                              Courchevel
+                            </label>
+                            <label>
+                              <input
+                                type="radio"
+                                name={`area-${entry.id}`}
+                                value="3vallees"
+                                checked={entry.area === "3vallees"}
+                                onChange={() =>
+                                  updateSkiPassEntry(idx, { area: "3vallees" })
+                                }
+                              />
+                              Les 3 Vallées
+                            </label>
+                          </div>
+                        </label>
+
+                        <label className="col">
+                          Data de Início:
                           <input
                             type="date"
-                            className="date-input"
-                            value={skiPassDataInicio}
-                            onChange={(e) => setSkiPassDataInicio(e.target.value)}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                          <span className="info-icon">ⓘ</span>
-                        </div>
-                      </label>
-                    </div>
-
-                    <div className="form-group half">
-                      <label className="form-label">
-                        Dias de Ski:
-                        <select
-                          className="days-select"
-                          value={skiPassDias}
-                          onChange={(e) => {
-                            const dias = parseInt(e.target.value);
-                            setSkiPassDias(dias);
-                            // Se o tipo de passe for Family Flex e os dias forem menos que 5, resetar o tipo
-                            if (skiPassTipo === "family" && dias < 5) {
-                              alert("Family Flex só pode ser selecionado a partir de 5 dias de esqui.");
-                              setSkiPassTipo("");
+                            value={entry.dataInicio}
+                            onChange={(e) =>
+                              updateSkiPassEntry(idx, {
+                                dataInicio: e.target.value,
+                              })
                             }
-                          }}
+                            min={new Date().toISOString().split("T")[0]}
+                          />
+                        </label>
+
+                        <label className="col">
+                          Dias:
+                          <select
+                            value={entry.dias}
+                            onChange={(e) =>
+                              updateSkiPassEntry(idx, {
+                                dias: parseInt(e.target.value || "1", 10),
+                              })
+                            }
+                          >
+                            {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+                              <option key={d} value={d}>
+                                {d} dia{d > 1 ? "s" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className="row">
+                        <label className="full">
+                          Tipo de passe:
+                          <select
+                            value={entry.tipo}
+                            onChange={(e) => setEntryTipo(idx, e.target.value)}
+                          >
+                            <option value="">Selecione</option>
+                            <option value="family">
+                              Family Flex (mínimo 2 adultos e 3 crianças)
+                            </option>
+                            <option value="adulto">Solo Adulto</option>
+                            <option value="crianca">Solo Criança</option>
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className="row people-section">
+                        {entry.tipo === "family" && (
+                          <div className="family-grid">
+                            <div className="subtitle">Adultos</div>
+                            {entry.adultos.map((a, ai) => (
+                              <div key={ai} className="person-row">
+                                <input
+                                  type="text"
+                                  placeholder={`Adulto ${
+                                    ai + 1
+                                  } - Nome completo`}
+                                  value={a.nome}
+                                  onChange={(ev) => {
+                                    const newAdults = [...entry.adultos];
+                                    newAdults[ai] = {
+                                      ...newAdults[ai],
+                                      nome: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      adultos: newAdults,
+                                    });
+                                  }}
+                                />
+                                <input
+                                  type="date"
+                                  value={a.dataNasc}
+                                  onChange={(ev) => {
+                                    const newAdults = [...entry.adultos];
+                                    newAdults[ai] = {
+                                      ...newAdults[ai],
+                                      dataNasc: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      adultos: newAdults,
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ))}
+
+                            <div className="subtitle">Crianças</div>
+                            {entry.criancas.map((c, ci) => (
+                              <div key={ci} className="person-row">
+                                <input
+                                  type="text"
+                                  placeholder={`Criança ${
+                                    ci + 1
+                                  } - Nome completo`}
+                                  value={c.nome}
+                                  onChange={(ev) => {
+                                    const newCriancas = [...entry.criancas];
+                                    newCriancas[ci] = {
+                                      ...newCriancas[ci],
+                                      nome: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      criancas: newCriancas,
+                                    });
+                                  }}
+                                />
+                                <input
+                                  type="date"
+                                  value={c.dataNasc}
+                                  onChange={(ev) => {
+                                    const newCriancas = [...entry.criancas];
+                                    newCriancas[ci] = {
+                                      ...newCriancas[ci],
+                                      dataNasc: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      criancas: newCriancas,
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {entry.tipo === "adulto" && (
+                          <div className="single-grid">
+                            {entry.adultos.map((a, ai) => (
+                              <div key={ai} className="person-row">
+                                <input
+                                  type="text"
+                                  placeholder={`Nome completo`}
+                                  value={a.nome}
+                                  onChange={(ev) => {
+                                    const newAdults = [...entry.adultos];
+                                    newAdults[ai] = {
+                                      ...newAdults[ai],
+                                      nome: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      adultos: newAdults,
+                                    });
+                                  }}
+                                />
+                                <input
+                                  type="date"
+                                  value={a.dataNasc}
+                                  onChange={(ev) => {
+                                    const newAdults = [...entry.adultos];
+                                    newAdults[ai] = {
+                                      ...newAdults[ai],
+                                      dataNasc: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      adultos: newAdults,
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateSkiPassEntry(idx, {
+                                  adultos: [
+                                    ...(entry.adultos || []),
+                                    { nome: "", dataNasc: "" },
+                                  ],
+                                })
+                              }
+                            >
+                              Adicionar adulto
+                            </button>
+                          </div>
+                        )}
+
+                        {entry.tipo === "crianca" && (
+                          <div className="single-grid">
+                            {entry.criancas.map((c, ci) => (
+                              <div key={ci} className="person-row">
+                                <input
+                                  type="text"
+                                  placeholder={`Nome completo`}
+                                  value={c.nome}
+                                  onChange={(ev) => {
+                                    const newCriancas = [...entry.criancas];
+                                    newCriancas[ci] = {
+                                      ...newCriancas[ci],
+                                      nome: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      criancas: newCriancas,
+                                    });
+                                  }}
+                                />
+                                <input
+                                  type="date"
+                                  value={c.dataNasc}
+                                  onChange={(ev) => {
+                                    const newCriancas = [...entry.criancas];
+                                    newCriancas[ci] = {
+                                      ...newCriancas[ci],
+                                      dataNasc: ev.target.value,
+                                    };
+                                    updateSkiPassEntry(idx, {
+                                      criancas: newCriancas,
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateSkiPassEntry(idx, {
+                                  criancas: [
+                                    ...(entry.criancas || []),
+                                    { nome: "", dataNasc: "" },
+                                  ],
+                                })
+                              }
+                            >
+                              Adicionar criança
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="row entry-bottom">
+                        <label
+                          className="inline"
+                          style={{ position: "relative" }}
                         >
-                          <option value="1">1 dia</option>
-                          <option value="2">2 dias</option>
-                          <option value="3">3 dias</option>
-                          <option value="4">4 dias</option>
-                          <option value="5">5 dias</option>
-                          <option value="6">6 dias</option>
-                          <option value="7">7 dias</option>
-                        </select>
-                      </label>
+                          Seguro Carré Neige:
+                          {/* botão com tooltip */}
+                          <button
+                            type="button"
+                            className="tooltip-btn"
+                            aria-describedby={`tooltip-${entry.id}`}
+                          >
+                            ?
+                          </button>
+                          <div
+                            id={`tooltip-${entry.id}`}
+                            role="tooltip"
+                            className="tooltip"
+                          >
+                            <strong>Por apenas € 3,50 por pessoa/dia</strong>
+                            <div style={{ marginTop: 6 }}>
+                              Resgate imediato nas pistas em caso de acidente
+                              <br />
+                              Cobertura médica e hospitalar, incluindo
+                              transporte sanitário
+                            </div>
+                          </div>
+                          <label>
+                            <input
+                              type="radio"
+                              name={`seguro-${entry.id}`}
+                              checked={!!entry.seguro}
+                              onChange={() =>
+                                updateSkiPassEntry(idx, { seguro: true })
+                              }
+                            />{" "}
+                            Sim
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              name={`seguro-${entry.id}`}
+                              checked={!entry.seguro}
+                              onChange={() =>
+                                updateSkiPassEntry(idx, { seguro: false })
+                              }
+                            />{" "}
+                            Não
+                          </label>
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="entries-actions">
+                    <button
+                      type="button"
+                      className="btn-add"
+                      onClick={addSkiPassEntry}
+                    >
+                      Adicionar outro passe
+                    </button>
+                    <div className="ski-total">
+                      TOTAL SKI PASS: €{" "}
+                      {skiPassTotal.toFixed(2).replace(".", ",")}
                     </div>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">
-                      Tipo de passe:
-                      <div className="pass-type-container">
+                  <div className="modal-footer">
+                    <button
+                      className="btn-cancel"
+                      onClick={() => setMostrarModal(false)}
+                    >
+                      CANCELAR
+                    </button>
+                    <button className="btn-confirm" onClick={concluirModal}>
+                      ADICIONAR
+                    </button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          ) : (
+            <div className="modal-content">
+              <h2>{servicoSelecionado?.nome}</h2>
+
+              {(servicoSelecionado?.slug === "equip-ski" ||
+                servicoSelecionado?.slug === "equip-snow") && (
+                <>
+                  <label>
+                    Categoria:
+                    <select
+                      value={
+                        servicoSelecionado.slug === "equip-ski"
+                          ? categoria
+                          : snowCategoria
+                      }
+                      onChange={(e) =>
+                        servicoSelecionado.slug === "equip-ski"
+                          ? setCategoria(e.target.value)
+                          : setSnowCategoria(e.target.value)
+                      }
+                    >
+                      <option value="">Selecione</option>
+                      <option value="1">Categoria 1 - Básico</option>
+                      <option value="2">Categoria 2 - Intermediário</option>
+                      <option value="3">Categoria 3 - Premium</option>
+                    </select>
+                  </label>
+
+                  {(categoria || snowCategoria) && (
+                    <>
+                      <label>
+                        Equipamento:
                         <select
-                          className="pass-type-select"
-                          value={skiPassTipo}
-                          onChange={(e) => {
-                            const tipo = e.target.value;
-                            setSkiPassTipo(tipo);
-                            if (tipo === "family") {
-                              if (skiPassDias < 5) {
-                                alert("Family Flex só pode ser selecionado a partir de 5 dias de esqui.");
-                                setSkiPassTipo("");
-                              } else {
-                                setSkiPassAdultos([
-                                  { nome: "", dataNasc: "" },
-                                  { nome: "", dataNasc: "" }
-                                ]);
-                                setSkiPassCriancas([
-                                  { nome: "", dataNasc: "" },
-                                  { nome: "", dataNasc: "" },
-                                  { nome: "", dataNasc: "" }
-                                ]);
-                              }
-                            } else if (tipo === "adulto") {
-                              setSkiPassAdultos([{ nome: "", dataNasc: "" }, { nome: "", dataNasc: "" }]);
-                              setSkiPassCriancas([]);
-                            } else if (tipo === "crianca") {
-                              setSkiPassAdultos([{ nome: "", dataNasc: "" }, { nome: "", dataNasc: "" }]);
-                              setSkiPassCriancas([{ nome: "", dataNasc: "" }]);
-                            }
-                          }}
+                          value={
+                            servicoSelecionado.slug === "equip-ski"
+                              ? equipamentoSelecionado
+                              : snowEquipamentoSelecionado
+                          }
+                          onChange={(e) =>
+                            servicoSelecionado.slug === "equip-ski"
+                              ? setEquipamentoSelecionado(e.target.value)
+                              : setSnowEquipamentoSelecionado(e.target.value)
+                          }
                         >
                           <option value="">Selecione</option>
-                          <option value="family">Family Flex</option>
-                          <option value="adulto">Solo Adulto (18 - 75 anos)</option>
-                          <option value="crianca">Solo Criança (5 - 18 anos)</option>
+                          {(servicoSelecionado.slug === "equip-ski"
+                            ? equipamentos
+                            : snowboardEquipamentos
+                          ).map((e) => (
+                            <option key={e.id} value={e.id}>
+                              {e.nome}
+                            </option>
+                          ))}
                         </select>
-                        <button 
-                          className="btn-add-person" 
-                          type="button"
-                          onClick={() => {
-                            if (skiPassTipo === "family") {
-                              if (skiPassCriancas.length < 6) {
-                                setSkiPassCriancas([...skiPassCriancas, { nome: "", dataNasc: "" }]);
-                              }
-                            }
-                          }}
+                      </label>
+
+                      <label>
+                        Tamanho:
+                        <select
+                          value={
+                            servicoSelecionado.slug === "equip-ski"
+                              ? tamanho
+                              : snowTamanho
+                          }
+                          onChange={(e) =>
+                            servicoSelecionado.slug === "equip-ski"
+                              ? setTamanho(e.target.value)
+                              : setSnowTamanho(e.target.value)
+                          }
                         >
-                          +
-                        </button>
-                      </div>
-                    </label>
-                    {skiPassTipo === "family" && (
-                      <div className="family-flex-notice">Mínimo 2 adultos e 3 crianças</div>
-                    )}
-                  </div>
+                          <option value="">Selecione</option>
+                          <optgroup label="Infantil">
+                            <option value="4-6 anos">4-6 anos</option>
+                            <option value="8-10 anos">8-10 anos</option>
+                          </optgroup>
+                          <optgroup label="Adulto">
+                            <option value="P">P</option>
+                            <option value="M">M</option>
+                          </optgroup>
+                        </select>
+                      </label>
 
-
-
-                {/* Formulários dinâmicos baseados no tipo de passe */}
-                  {skiPassTipo === "family" && (
-                    <div className="family-form">
-                      {skiPassAdultos.map((adulto, index) => (
-                        <div key={`adulto-${index}`} className="pessoa-form">
-                          <div className="pessoa-header">
-                            <h4>Adulto {index + 1}</h4>
-                            {index > 1 && (
-                              <button 
-                                className="btn-remove" 
-                                type="button"
-                                onClick={() => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos.splice(index, 1);
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              >
-                                −
-                              </button>
-                            )}
-                          </div>
-                          <div className="form-row">
-                            <label>
-                              Nome Completo:
-                              <input
-                                type="text"
-                                className="nome-input"
-                                value={adulto.nome}
-                                onChange={(e) => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos[index].nome = e.target.value;
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              />
-                            </label>
-                            <label>
-                              Data Nasc.:
-                              <input
-                                type="date"
-                                className="data-nasc-input"
-                                value={adulto.dataNasc}
-                                onChange={(e) => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos[index].dataNasc = e.target.value;
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-
-                      {skiPassCriancas.map((crianca, index) => (
-                        <div key={`crianca-${index}`} className="pessoa-form">
-                          <h4>Criança {index + 1}</h4>
-                          <div className="form-row">
-                            <label>
-                              Nome Completo:
-                              <input
-                                type="text"
-                                value={crianca.nome}
-                                onChange={(e) => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas[index].nome = e.target.value;
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              />
-                            </label>
-                            <label>
-                              Data Nasc.:
-                              <input
-                                type="date"
-                                value={crianca.dataNasc}
-                                onChange={(e) => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas[index].dataNasc = e.target.value;
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              />
-                            </label>
-                            {index > 2 && (
-                              <button
-                                className="btn-remove"
-                                onClick={() => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas.splice(index, 1);
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              >
-                                -
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {skiPassCriancas.length < 6 && (
-                        <button
-                          className="btn-add-crianca"
-                          onClick={() => {
-                            if (skiPassCriancas.length < 6) {
-                              setSkiPassCriancas([...skiPassCriancas, { nome: "", dataNasc: "" }]);
-                            }
-                          }}
-                        >
-                          Adicionar Criança
-                        </button>
-                      )}
-                    </div>
+                      <label>
+                        Quantidade de dias:
+                        <input
+                          type="number"
+                          min="1"
+                          value={
+                            servicoSelecionado.slug === "equip-ski"
+                              ? dias
+                              : snowDias
+                          }
+                          onChange={(e) =>
+                            servicoSelecionado.slug === "equip-ski"
+                              ? setDias(parseInt(e.target.value || "1", 10))
+                              : setSnowDias(parseInt(e.target.value || "1", 10))
+                          }
+                        />
+                      </label>
+                    </>
                   )}
+                </>
+              )}
 
-                  {skiPassTipo === "adulto" && (
-                    <div className="adulto-form">
-                      {skiPassAdultos.map((adulto, index) => (
-                        <div key={`adulto-solo-${index}`} className="pessoa-form">
-                          <h4>Adulto Solo {index + 1}</h4>
-                          <div className="form-row">
-                            <label>
-                              Nome Completo:
-                              <input
-                                type="text"
-                                value={adulto.nome}
-                                onChange={(e) => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos[index].nome = e.target.value;
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              />
-                            </label>
-                            <label>
-                              Data Nasc.:
-                              <input
-                                type="date"
-                                value={adulto.dataNasc}
-                                onChange={(e) => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos[index].dataNasc = e.target.value;
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              />
-                            </label>
-                            {index > 0 && (
-                              <button
-                                className="btn-remove"
-                                onClick={() => {
-                                  const newAdultos = [...skiPassAdultos];
-                                  newAdultos.splice(index, 1);
-                                  setSkiPassAdultos(newAdultos);
-                                }}
-                              >
-                                -
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {skiPassTipo === "crianca" && (
-                    <div className="crianca-form">
-                      {skiPassCriancas.map((crianca, index) => (
-                        <div key={`crianca-solo-${index}`} className="pessoa-form">
-                          <h4>Criança Solo {index + 1}</h4>
-                          <div className="form-row">
-                            <label>
-                              Nome Completo:
-                              <input
-                                type="text"
-                                value={crianca.nome}
-                                onChange={(e) => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas[index].nome = e.target.value;
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              />
-                            </label>
-                            <label>
-                              Data Nasc.:
-                              <input
-                                type="date"
-                                value={crianca.dataNasc}
-                                onChange={(e) => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas[index].dataNasc = e.target.value;
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              />
-                            </label>
-                            {index > 0 && (
-                              <button
-                                className="btn-remove"
-                                onClick={() => {
-                                  const newCriancas = [...skiPassCriancas];
-                                  newCriancas.splice(index, 1);
-                                  setSkiPassCriancas(newCriancas);
-                                }}
-                              >
-                                -
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="form-row seguro">
-                    <label>
-                      Seguro Carré Neige:
-                      <div className="tooltip">
-                        <span className="tooltip-icon">i</span>
-                        <span className="tooltip-text">
-                          Por apenas € 3,50 por pessoa/dia, você garante tranquilidade total:
-                          • Resgate imediato nas pistas em caso de acidente
-                          • Cobertura médica e hospitalar completa
-                          • Reembolso de despesas médicas
-                          • Transporte sanitário
-                          • Assistência 24h durante toda sua estadia
-                          • Reembolso de aulas e passes não utilizados
-                        </span>
-                      </div>
-                      <div className="seguro-options">
-                        <label className="radio-label">
-                          <input
-                            type="radio"
-                            name="seguro"
-                            value="sim"
-                            checked={skiPassSeguro}
-                            onChange={() => setSkiPassSeguro(true)}
-                          />
-                          Sim
-                        </label>
-                        <label className="radio-label">
-                          <input
-                            type="radio"
-                            name="seguro"
-                            value="nao"
-                            checked={!skiPassSeguro}
-                            onChange={() => setSkiPassSeguro(false)}
-                          />
-                          Não
-                        </label>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div className="aviso-legal">
-                    ATENÇÃO: Seu Ski Pass será emitido somente após a confirmação do pagamento
-                  </div>
-
-                  <div className="total-ski-pass">
-                    TOTAL SKI PASS: € {skiPassTotal.toFixed(2).replace('.', ',')}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button onClick={concluirModal} className="btn-concluir">
-              Concluir
-            </button>
-            <button
-              onClick={() => setMostrarModal(false)}
-              className="btn-cancelar"
-            >
-              Cancelar
-            </button>
-          </div>
+              <button onClick={concluirModal} className="btn-concluir">
+                Concluir e adicionar ao carrinho
+              </button>
+              <button
+                onClick={() => setMostrarModal(false)}
+                className="btn-cancelar"
+              >
+                Cancelar
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Carrinho UI */}
       <div className="carrinho-container">
         <div className="carrinho-servicos">
           <div className="lista-servicos">
@@ -973,7 +958,7 @@ function Carrinho() {
                 <li key={index} className="item-carrinho">
                   <span className="carrinho-info">{item.nome}</span>
                   <span className="carrinho-preco">
-                    R$ {item.preco.toLocaleString("pt-BR")}
+                    R$ {(item.preco || 0).toLocaleString("pt-BR")}
                   </span>
                   <button
                     onClick={() => removerDoCarrinho(index)}
