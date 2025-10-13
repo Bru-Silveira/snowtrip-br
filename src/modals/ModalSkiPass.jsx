@@ -12,22 +12,41 @@ const ModalSkiPass = ({
   const [dataInicio, setDataInicio] = useState("");
   const [dias, setDias] = useState(1);
   const [seguro, setSeguro] = useState(true);
+  const [tipoSkiPass, setTipoSkiPass] = useState("");
+
+  const jsonBasePorTipoSkiPass = new Map();
+  jsonBasePorTipoSkiPass.set("family", {
+    adultos: [
+      { nome: "", dataNasc: "" },
+      { nome: "", dataNasc: "" },
+    ],
+    criancas: [
+      { nome: "", dataNasc: "" },
+      { nome: "", dataNasc: "" },
+      { nome: "", dataNasc: "" },
+    ],
+  });
+  jsonBasePorTipoSkiPass.set("adulto", { nome: "", dataNasc: "" });
+  jsonBasePorTipoSkiPass.set("crianca", { nome: "", dataNasc: "" });
 
   const removeSkiPassEntry = (index) => {
     setSkiPassEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
   const addSkiPassEntry = () => {
+    console.log("Adicionando ski pass:", {
+      tipoSkiPass,
+      jsonBasePorTipoSkiPass,
+    });
     setSkiPassEntries((prev) => [
       ...prev,
       {
         id: Date.now() + Math.random(),
-        dataInicio: "",
-        dias: 1,
-        tipo: "",
-        adultos: [],
-        criancas: [],
-        seguro: false,
+        dataInicio: dataInicio,
+        dias: dias,
+        tipo: tipoSkiPass,
+        esquiadores: jsonBasePorTipoSkiPass.get(tipoSkiPass) || [],
+        seguro: seguro,
       },
     ]);
   };
@@ -37,29 +56,6 @@ const ModalSkiPass = ({
       const copy = [...prev];
       copy[index] = { ...copy[index], ...changes };
       return copy;
-    });
-  };
-
-  const setEntryTipo = (index, tipo) => {
-    const base = {
-      family: {
-        adultos: [
-          { nome: "", dataNasc: "" },
-          { nome: "", dataNasc: "" },
-        ],
-        criancas: [
-          { nome: "", dataNasc: "" },
-          { nome: "", dataNasc: "" },
-          { nome: "", dataNasc: "" },
-        ],
-      },
-      adulto: { adultos: [{ nome: "", dataNasc: "" }], criancas: [] },
-      crianca: { adultos: [], criancas: [{ nome: "", dataNasc: "" }] },
-    }[tipo] || { adultos: [], criancas: [] };
-    updateSkiPassEntry(index, {
-      tipo,
-      adultos: base.adultos,
-      criancas: base.criancas,
     });
   };
 
@@ -77,7 +73,6 @@ const ModalSkiPass = ({
             >
               Confira tabela de valores.
               <span className="tabela-tooltip-icon" aria-hidden="true">
-                {" "}
                 ⓘ
               </span>
             </button>
@@ -155,6 +150,27 @@ const ModalSkiPass = ({
               </select>
             </label>
           </div>
+
+          <div className="row">
+            <label className="full">
+              Tipo de passe:
+              <select
+                value={tipoSkiPass}
+                onChange={(e) => setTipoSkiPass(e.target.value)}
+              >
+                <option value="">Selecione</option>
+                <option value="family">
+                  Family Flex (mínimo 2 adultos e 3 crianças)
+                </option>
+                <option value="adulto">Solo Adulto (18 - 75 anos)</option>
+                <option value="crianca">Solo Criança (5 - 18 anos)</option>
+              </select>
+            </label>
+            <button type="button" className="btn-add" onClick={addSkiPassEntry}>
+              Adicionar
+            </button>
+          </div>
+
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
@@ -172,35 +188,11 @@ const ModalSkiPass = ({
                 </div>
               </div>
 
-              <div className="row">
-                <label className="full">
-                  Tipo de passe:
-                  <select
-                    value={entry.tipo}
-                    onChange={(e) => setEntryTipo(idx, e.target.value)}
-                  >
-                    <option value="">Selecione</option>
-                    <option value="family">
-                      Family Flex (mínimo 2 adultos e 3 crianças)
-                    </option>
-                    <option value="adulto">Solo Adulto</option>
-                    <option value="crianca">Solo Criança</option>
-                  </select>
-                </label>
-                <button
-                  type="button"
-                  className="btn-add"
-                  onClick={addSkiPassEntry}
-                >
-                  Adicionar
-                </button>
-              </div>
-
               <div className="row people-section">
                 {entry.tipo === "family" && (
                   <div className="family-grid">
                     <div className="subtitle">Adultos</div>
-                    {entry.adultos.map((a, ai) => (
+                    {entry.esquiadores.adultos.map((a, ai) => (
                       <div key={ai} className="person-row">
                         <input
                           type="text"
@@ -221,7 +213,7 @@ const ModalSkiPass = ({
                           type="date"
                           value={a.dataNasc}
                           onChange={(ev) => {
-                            const newAdults = [...entry.adultos];
+                            const newAdults = [...entry.esquiadores.adultos];
                             newAdults[ai] = {
                               ...newAdults[ai],
                               dataNasc: ev.target.value,
@@ -235,14 +227,14 @@ const ModalSkiPass = ({
                     ))}
 
                     <div className="subtitle">Crianças</div>
-                    {entry.criancas.map((c, ci) => (
+                    {entry.esquiadores.criancas.map((c, ci) => (
                       <div key={ci} className="person-row">
                         <input
                           type="text"
                           placeholder={`Criança ${ci + 1} - Nome completo`}
                           value={c.nome}
                           onChange={(ev) => {
-                            const newCriancas = [...entry.criancas];
+                            const newCriancas = [...entry.esquiadores.criancas];
                             newCriancas[ci] = {
                               ...newCriancas[ci],
                               nome: ev.target.value,
@@ -256,7 +248,7 @@ const ModalSkiPass = ({
                           type="date"
                           value={c.dataNasc}
                           onChange={(ev) => {
-                            const newCriancas = [...entry.criancas];
+                            const newCriancas = [...entry.esquiadores.criancas];
                             newCriancas[ci] = {
                               ...newCriancas[ci],
                               dataNasc: ev.target.value,
@@ -273,14 +265,14 @@ const ModalSkiPass = ({
 
                 {entry.tipo === "adulto" && (
                   <div className="single-grid">
-                    {entry.adultos.map((a, ai) => (
+                    {entry.esquiadores.adultos.map((a, ai) => (
                       <div key={ai} className="person-row">
                         <input
                           type="text"
                           placeholder={`Nome completo`}
                           value={a.nome}
                           onChange={(ev) => {
-                            const newAdults = [...entry.adultos];
+                            const newAdults = [...entry.esquiadores.adultos];
                             newAdults[ai] = {
                               ...newAdults[ai],
                               nome: ev.target.value,
@@ -294,7 +286,7 @@ const ModalSkiPass = ({
                           type="date"
                           value={a.dataNasc}
                           onChange={(ev) => {
-                            const newAdults = [...entry.adultos];
+                            const newAdults = [...entry.esquiadores.adultos];
                             newAdults[ai] = {
                               ...newAdults[ai],
                               dataNasc: ev.target.value,
@@ -311,7 +303,7 @@ const ModalSkiPass = ({
                       onClick={() =>
                         updateSkiPassEntry(idx, {
                           adultos: [
-                            ...(entry.adultos || []),
+                            ...(entry.esquiadores.adultos || []),
                             { nome: "", dataNasc: "" },
                           ],
                         })
