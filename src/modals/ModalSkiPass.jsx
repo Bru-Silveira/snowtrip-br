@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import tabelaImg from "../img/tabela-ski.jpg";
 
 const ModalSkiPass = ({
@@ -8,6 +8,11 @@ const ModalSkiPass = ({
   concluirModal,
   setMostrarModal,
 }) => {
+  const [area, setArea] = useState("courchevel");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dias, setDias] = useState(1);
+  const [seguro, setSeguro] = useState(true);
+
   const removeSkiPassEntry = (index) => {
     setSkiPassEntries((prev) => prev.filter((_, i) => i !== index));
   };
@@ -17,7 +22,6 @@ const ModalSkiPass = ({
       ...prev,
       {
         id: Date.now() + Math.random(),
-        area: "courchevel",
         dataInicio: "",
         dias: 1,
         tipo: "",
@@ -99,6 +103,58 @@ const ModalSkiPass = ({
         </aside>
 
         <section className="modal-form">
+          <div className="row">
+            <label className="col">
+              Área:
+              <div className="area-options">
+                <label>
+                  <input
+                    type="radio"
+                    name="area-courchevel"
+                    value="courchevel"
+                    checked={area === "courchevel"}
+                    onChange={() => setArea("courchevel")}
+                  />
+                  Courchevel
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="3valles"
+                    value="3vallees"
+                    checked={area === "3vallees"}
+                    onChange={() => setArea("3vallees")}
+                  />
+                  Les 3 Vallées
+                </label>
+              </div>
+            </label>
+          </div>
+          <div className="row">
+            <label className="col">
+              Data de Início:
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+              />
+            </label>
+
+            <label className="col">
+              Dias:
+              <select
+                value={dias}
+                onChange={(e) => setDias(parseInt(e.target.value || "1", 10))}
+              >
+                {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+                  <option key={d} value={d}>
+                    {d} dia{d > 1 ? "s" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
@@ -117,72 +173,6 @@ const ModalSkiPass = ({
               </div>
 
               <div className="row">
-                <label className="col">
-                  Área:
-                  <div className="area-options">
-                    <label>
-                      <input
-                        type="radio"
-                        name={`area-${entry.id}`}
-                        value="courchevel"
-                        checked={entry.area === "courchevel"}
-                        onChange={() =>
-                          updateSkiPassEntry(idx, {
-                            area: "courchevel",
-                          })
-                        }
-                      />
-                      Courchevel
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name={`area-${entry.id}`}
-                        value="3vallees"
-                        checked={entry.area === "3vallees"}
-                        onChange={() =>
-                          updateSkiPassEntry(idx, { area: "3vallees" })
-                        }
-                      />
-                      Les 3 Vallées
-                    </label>
-                  </div>
-                </label>
-
-                <label className="col">
-                  Data de Início:
-                  <input
-                    type="date"
-                    value={entry.dataInicio}
-                    onChange={(e) =>
-                      updateSkiPassEntry(idx, {
-                        dataInicio: e.target.value,
-                      })
-                    }
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                </label>
-
-                <label className="col">
-                  Dias:
-                  <select
-                    value={entry.dias}
-                    onChange={(e) =>
-                      updateSkiPassEntry(idx, {
-                        dias: parseInt(e.target.value || "1", 10),
-                      })
-                    }
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                      <option key={d} value={d}>
-                        {d} dia{d > 1 ? "s" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="row">
                 <label className="full">
                   Tipo de passe:
                   <select
@@ -197,6 +187,13 @@ const ModalSkiPass = ({
                     <option value="crianca">Solo Criança</option>
                   </select>
                 </label>
+                <button
+                  type="button"
+                  className="btn-add"
+                  onClick={addSkiPassEntry}
+                >
+                  Adicionar
+                </button>
               </div>
 
               <div className="row people-section">
@@ -376,60 +373,49 @@ const ModalSkiPass = ({
                   </div>
                 )}
               </div>
-
-              <div className="row entry-bottom">
-                <label className="inline" style={{ position: "relative" }}>
-                  Seguro Carré Neige:
-                  {/* botão com tooltip */}
-                  <button
-                    type="button"
-                    className="tooltip-btn"
-                    aria-describedby={`tooltip-${entry.id}`}
-                  >
-                    ?
-                  </button>
-                  <div
-                    id={`tooltip-${entry.id}`}
-                    role="tooltip"
-                    className="tooltip"
-                  >
-                    <strong>Por apenas € 3,50 por pessoa/dia</strong>
-                    <div style={{ marginTop: 6 }}>
-                      Resgate imediato nas pistas em caso de acidente
-                      <br />
-                      Cobertura médica e hospitalar, incluindo transporte
-                      sanitário
-                    </div>
-                  </div>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`seguro-${entry.id}`}
-                      checked={!!entry.seguro}
-                      onChange={() => updateSkiPassEntry(idx, { seguro: true })}
-                    />{" "}
-                    Sim
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`seguro-${entry.id}`}
-                      checked={!entry.seguro}
-                      onChange={() =>
-                        updateSkiPassEntry(idx, { seguro: false })
-                      }
-                    />{" "}
-                    Não
-                  </label>
-                </label>
-              </div>
             </div>
           ))}
 
+          <div className="row entry-bottom">
+            <label className="inline" style={{ position: "relative" }}>
+              Seguro Carré Neige:
+              {/* botão com tooltip */}
+              <button
+                type="button"
+                className="tooltip-btn"
+                aria-describedby="tooltip-seguro"
+              >
+                ?
+              </button>
+              <div id="tooltip-seguro" role="tooltip" className="tooltip">
+                <strong>Por apenas € 3,50 por pessoa/dia</strong>
+                <div style={{ marginTop: 6 }}>
+                  Resgate imediato nas pistas em caso de acidente
+                  <br />
+                  Cobertura médica e hospitalar, incluindo transporte sanitário
+                </div>
+              </div>
+              <label>
+                <input
+                  type="radio"
+                  name="seguro-sim"
+                  checked={seguro}
+                  onChange={() => setSeguro(true)}
+                />
+                Sim
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="seguro-nao"
+                  checked={!seguro}
+                  onChange={() => setSeguro(false)}
+                />
+                Não
+              </label>
+            </label>
+          </div>
           <div className="entries-actions">
-            <button type="button" className="btn-add" onClick={addSkiPassEntry}>
-              Adicionar outro passe
-            </button>
             <div className="ski-total">
               TOTAL SKI PASS: € {skiPassTotal.toFixed(2).replace(".", ",")}
             </div>
