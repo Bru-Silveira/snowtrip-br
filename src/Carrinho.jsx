@@ -101,20 +101,6 @@ function Carrinho() {
     if (servico.slug === "ski-pass") {
       setServicoSelecionado(servico);
       setMostrarModal(true);
-      if (skiPassEntries.length === 0) {
-        setSkiPassEntries([
-          {
-            id: Date.now(),
-            area: "courchevel",
-            dataInicio: "",
-            dias: 1,
-            tipo: "",
-            adultos: [],
-            criancas: [],
-            seguro: false,
-          },
-        ]);
-      }
     } else if (
       ["aulas-ski", "equip-ski", "equip-snow"].includes(servico.slug)
     ) {
