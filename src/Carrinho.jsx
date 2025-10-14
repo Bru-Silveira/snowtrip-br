@@ -340,7 +340,6 @@ function Carrinho() {
             <ModalSkiPass
               skiPassEntries={skiPassEntries}
               setSkiPassEntries={setSkiPassEntries}
-              skiPassTotal={skiPassTotal}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />

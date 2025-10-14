@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import tabelaImg from "../img/tabela-ski.jpg";
 
 const ModalSkiPass = ({
   skiPassEntries,
   setSkiPassEntries,
-  skiPassTotal,
   concluirModal,
   setMostrarModal,
 }) => {
@@ -13,8 +12,7 @@ const ModalSkiPass = ({
   const [dias, setDias] = useState(1);
   const [seguro, setSeguro] = useState(true);
   const [tipoSkiPass, setTipoSkiPass] = useState("");
-
-  console.log("skiPassEntries:", skiPassEntries);
+  const [skiPassTotal, setSkiPassTotal] = useState(0);
 
   const jsonBasePorTipoSkiPass = new Map();
   jsonBasePorTipoSkiPass.set("family", {
@@ -44,11 +42,11 @@ const ModalSkiPass = ({
       ...prev,
       {
         id: Date.now() + Math.random(),
+        area: area,
         dataInicio: dataInicio,
         dias: dias,
         tipo: tipoSkiPass,
         esquiadores: jsonBasePorTipoSkiPass.get(tipoSkiPass) || [],
-        seguro: seguro,
       },
     ]);
   };
@@ -60,6 +58,56 @@ const ModalSkiPass = ({
       return copy;
     });
   };
+
+  
+  const skiPassPrecos = {
+    courchevel: {
+      adulto: { 1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455 },
+      crianca: { 1: 52, 2: 104, 3: 156, 4: 208, 5: 260, 6: 312, 7: 364 },
+      family: { 5: 405, 6: 486, 7: 567 },
+    },
+    "3vallees": {
+      adulto: { 1: 66, 2: 132, 3: 198, 4: 264, 5: 330, 6: 396, 7: 462 },
+      crianca: { 1: 53, 2: 106, 3: 159, 4: 212, 5: 265, 6: 318, 7: 371 },
+      family: { 5: 818, 6: 981, 7: 1144 },
+    },
+  };
+
+  const calcularPrecoParaEntrada = (entry) => {
+    if (!entry || !entry.tipo) return 0;
+    const dias = Math.max(1, Number(entry.dias) || 1);
+    const areaObj = skiPassPrecos[entry.area] || {};
+    if (entry.tipo === "family"){
+      return (areaObj.family && areaObj.family[dias]) || 0;
+    }
+    if (entry.tipo === "adulto") {
+      const unit = (areaObj.adulto && areaObj.adulto[dias]) || 0;
+      return unit;
+    }
+    if (entry.tipo === "crianca") {
+      const unit = (areaObj.crianca && areaObj.crianca[dias]) || 0;
+      return unit;
+    }
+    return 0;
+  };
+
+  useEffect(() => {
+    console.log("Recalculando total ski pass...");
+    const total = skiPassEntries.reduce((acc, entry) => {
+      let preco = calcularPrecoParaEntrada(entry);
+      console.log("Preço base para entrada", entry, ":", preco);
+      if (seguro) {
+        console.log("Adicionando seguro para entrada", entry);
+        const pessoas =
+          (entry.esquiadores?.adultos?.length || 0) + (entry.esquiadores?.criancas?.length || 0) + (entry.esquiadores?.nome? 1 : 0);
+        console.log("Número de pessoas:", pessoas);
+        preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
+        console.log("Preço com seguro:", preco);
+      }
+      return acc + preco;
+    }, 0);
+    setSkiPassTotal(total);
+  }, [skiPassEntries, seguro, area]);
 
   return (
     <div className="modal-content ski-pass-layout">
@@ -178,14 +226,13 @@ const ModalSkiPass = ({
               <div className="entry-top">
                 <div className="entry-number"> {entry.tipo + (idx + 1)}</div>
                 <div className="entry-actions">
-                    <button
-                      type="button"
-                      className="btn-small btn-remove"
-                      onClick={() => removeSkiPassEntry(idx)}
-                    >
-                      −
-                    </button>
-                  
+                  <button
+                    type="button"
+                    className="btn-small btn-remove"
+                    onClick={() => removeSkiPassEntry(idx)}
+                  >
+                    −
+                  </button>
                 </div>
               </div>
 
@@ -275,7 +322,10 @@ const ModalSkiPass = ({
                         value={entry.esquiadores.nome || ""}
                         onChange={(ev) =>
                           updateSkiPassEntry(idx, {
-                            esquiadores: { nome: ev.target.value , dataNasc: entry.esquiadores.dataNasc || "" },
+                            esquiadores: {
+                              nome: ev.target.value,
+                              dataNasc: entry.esquiadores.dataNasc || "",
+                            },
                           })
                         }
                       />
@@ -284,7 +334,10 @@ const ModalSkiPass = ({
                         value={entry.esquiadores.dataNasc || ""}
                         onChange={(ev) =>
                           updateSkiPassEntry(idx, {
-                            esquiadores: { nome:entry.esquiadores.nome || "", dataNasc: ev.target.value },
+                            esquiadores: {
+                              nome: entry.esquiadores.nome || "",
+                              dataNasc: ev.target.value,
+                            },
                           })
                         }
                       />
@@ -294,25 +347,33 @@ const ModalSkiPass = ({
 
                 {entry.tipo === "crianca" && (
                   <div className="single-grid">
-                      <div key={`nome-` + idx} className="person-row">
-                        <input
-                          type="text"
-                          placeholder={`Nome completo`}
-                          value={entry.esquiadores.nome || ""}
-                          onChange={(ev) => 
-                            updateSkiPassEntry(idx, {
-                            esquiadores: { nome: ev.target.value , dataNasc: entry.esquiadores.dataNasc || "" },
-                          })}
-                        />
-                        <input
-                          type="date"
-                          value={entry.esquiadores.dataNasc || ""}
-                          onChange={(ev) => {
-                            updateSkiPassEntry(idx, {
-                            esquiadores: { nome:entry.esquiadores.nome || "", dataNasc: ev.target.value },
-                          })}}
-                        />
-                      </div>
+                    <div key={`nome-` + idx} className="person-row">
+                      <input
+                        type="text"
+                        placeholder={`Nome completo`}
+                        value={entry.esquiadores.nome || ""}
+                        onChange={(ev) =>
+                          updateSkiPassEntry(idx, {
+                            esquiadores: {
+                              nome: ev.target.value,
+                              dataNasc: entry.esquiadores.dataNasc || "",
+                            },
+                          })
+                        }
+                      />
+                      <input
+                        type="date"
+                        value={entry.esquiadores.dataNasc || ""}
+                        onChange={(ev) => {
+                          updateSkiPassEntry(idx, {
+                            esquiadores: {
+                              nome: entry.esquiadores.nome || "",
+                              dataNasc: ev.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
