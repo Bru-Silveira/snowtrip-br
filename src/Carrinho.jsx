@@ -421,7 +421,6 @@ function Carrinho() {
                       id="tabela-tooltip"
                       role="tooltip"
                       className="tabela-tooltip"
-                      aria-hidden="true"
                     >
                       <img src={tabelaImg} alt="Tabela de valores Ski Pass" />
                     </div>
@@ -441,7 +440,7 @@ function Carrinho() {
                   {skiPassEntries.map((entry, idx) => (
                     <div key={entry.id} className="entry-card">
                       <div className="entry-top">
-                        <div className="entry-number">Passe {idx + 1}</div>
+                        
                         <div className="entry-actions">
                           {skiPassEntries.length > 1 && (
                             <button
@@ -455,10 +454,10 @@ function Carrinho() {
                         </div>
                       </div>
 
-                      <div className="row">
+                      <div className="row1">
                         <label className="col">
                           Área:
-                          <div className="area-options">
+                          <div className="area-options1">
                             <label>
                               <input
                                 type="radio"
@@ -488,7 +487,7 @@ function Carrinho() {
                           </div>
                         </label>
 
-                        <label className="col">
+                        <label className="col2">
                           Data de Início:
                           <input
                             type="date"
@@ -524,7 +523,7 @@ function Carrinho() {
                       <div className="row">
                         <label className="full">
                           Tipo de passe:
-                          <select
+                          <select className="filter"
                             value={entry.tipo}
                             onChange={(e) => setEntryTipo(idx, e.target.value)}
                           >
@@ -770,6 +769,10 @@ function Carrinho() {
                             Não
                           </label>
                         </label>
+                        <span className="notificacion">
+                          ATENÇÃO: Seu Ski Pass será emitido somente após a
+                          confirmação do pagamento
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -782,9 +785,12 @@ function Carrinho() {
                     >
                       Adicionar outro passe
                     </button>
-                    <div className="ski-total">
-                      TOTAL SKI PASS: €{" "}
-                      {skiPassTotal.toFixed(2).replace(".", ",")}
+                  </div>
+
+                  <div className="total-line" aria-live="polite">
+                    <span className="label">TOTAL SKI PASS:</span>
+                    <div className="value">
+                      € {skiPassTotal.toFixed(2).replace(".", ",")}
                     </div>
                   </div>
 

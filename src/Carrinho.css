@@ -1,533 +1,183 @@
-/* ===== Layout principal ===== */
+/* ===== Carrinho - CSS enxuto (removidos trechos não usados) ===== */
+
+/* Layout principal */
 .carrinho-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    padding: 30px;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333;
 }
 
-/* ===== Serviços (em cima, largura toda) ===== */
+/* Serviços listagem */
 .carrinho-servicos {
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
+.lista-servicos { display:flex; justify-content:center; flex-wrap:wrap; gap:20px; }
 
-.lista-servicos {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-/* Wrapper segura o card e o botão */
 .card-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* centraliza o botão */
-    flex: 0 1 100px;
-    /* mesma largura para todos */
-    gap: 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
 }
-
-/* Card agora só cuida da imagem + textos */
 .card-servico {
-    width: 160px;
-    height: 160px;
-    /* altura fixa p/ padronizar */
-    border-radius: 12px;
-    position: relative;
-    /* para o overlay funcionar */
-    overflow: hidden;
-    display: flex;
-    /* textos no rodapé do card */
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 15px;
-    text-align: center;
-    color: #fff;
-    transition: transform 0.2s;
-    background-size: cover;
-    background-position: center;
+  width:160px;
+  height:160px;
+  border-radius:12px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:15px;
+  text-align:center;
+  color:#fff;
+  transition:transform .2s;
+  background-size:cover;
+  background-position:center;
 }
-
-.card-servico:hover {
-    transform: translateY(-3px);
+.card-servico::before{
+  content:"";
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:0;
 }
+.card-servico>*{ position:relative; z-index:1; }
+.servico-nome{ font-size:15px; font-weight:700; margin:0 0 4px; color:#fff; }
 
-/* Overlay em degradê p/ garantir legibilidade do texto */
-.card-servico::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    transition: background 0.3s;
-    z-index: 0;
-}
-
-.card-servico:hover::before {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-/* Garantir que os textos fiquem acima do overlay */
-.card-servico>* {
-    position: relative;
-    z-index: 1;
-}
-
-.servico-nome {
-    font-size: 15px;
-    font-weight: bold;
-    color: #fff;
-    margin: 0 0 4px 0;
-    text-align: center;
-}
-
-.servico-tipo {
-    font-size: 13px;
-    color: #fff;
-    margin: 0;
-}
-
-/* ===== Imagens por serviço (mapeadas por classe) =====*/
+/* imagem do card hospedagem (ajuste caminho se necessário) */
 .card-wrapper.card-hospedagem .card-servico {
-    background-image: url("./img/cards/hospedagem.jpg");
+  background-image: url("./img/cards/hospedagem.jpg");
 }
 
-/* .card-wrapper.card-aulas-ski .card-servico { 
-  background-image: url("/img/cards/aulas-ski.jpg"); 
-}
-.card-wrapper.card-equip-ski .card-servico { 
-  background-image: url("/img/cards/equip-ski.jpg"); 
-}
-.card-wrapper.card-equip-snow .card-servico { 
-  background-image: url("/img/cards/equip-snow.jpg"); 
-}
-.card-wrapper.card-ski-pass .card-servico { 
-  background-image: url("/img/cards/ski-pass.jpg"); 
-}
-.card-wrapper.card-transfer .card-servico { 
-  background-image: url("/img/cards/transfer.jpg"); 
-}
-.card-wrapper.card-concierge .card-servico { 
-  background-image: url("/img/cards/concierge.jpg"); 
-} */
-
-/* ===== Responsivo opcional ===== */
-/* @media (min-width: 768px) {
-  .card-wrapper { flex: 0 1 200px; }  /* aumenta um pouco nos tablets/desktop */
-/* .card-servico { height: 220px; }
-} */
-
-
-/* Botão circular "Adicionar" */
-.btn-adicionar {
-    margin-top: auto;
-    align-self: center;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    border: 2px dashed #999;
-    background: transparent;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-    color: #444;
-    transition: all 0.3s;
+/* Botão adicionar (card) */
+.btn-adicionar{
+  margin-top:auto;
+  align-self:center;
+  width:90px; height:90px;
+  border-radius:50%;
+  border:2px dashed #999;
+  background:transparent;
+  cursor:pointer;
+  font-size:12px; font-weight:700; color:#444;
+  transition: all .3s;
 }
 
-.btn-adicionar:hover {
-    background: grey;
-    color: #fff;
-    /* border: 1px solid black; */
-}
-
-/* ===== Parte de baixo: 2 colunas ===== */
+/* Rodapé do carrinho (duas colunas) */
 .carrinho-inferior {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 30px;
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:30px;
 }
-
-/* Coluna esquerda - detalhes da viagem */
 .carrinho-detalhes {
-    background: #f2f2f2;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background:#f2f2f2; padding:25px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.carrinho-dias{ font-size:22px; font-weight:700; margin-bottom:5px; }
+.carrinho-pessoas{ text-align:center; color:#555; }
+.carrinho-total{ margin-top:25px; font-size:20px; font-weight:700; color:#000; }
+.carrinho-reservar{
+  margin-top:15px; width:100%;
+  background:#ffcc00; border:none; padding:14px; border-radius:8px; font-weight:700; cursor:pointer;
 }
 
-.carrinho-dias {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 5px;
+/* Lista de itens */
+.carrinho-lista{ background:#fff; padding:25px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+.lista-carrinho { list-style:none; margin:0; padding:0; }
+.item-carrinho{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0; }
+
+/* ===== Modal / Ski Pass (essenciais) ===== */
+.modal-overlay{
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); padding:24px; z-index:9999;
+}
+body.modal-open{ overflow:hidden; }
+
+/* Modal layout principal */
+.modal-content.ski-pass-layout{
+  display:flex; flex-direction:column;
+  width:min(820px,96%); max-width:980px;
+  max-height: calc(100vh - 48px);
+  overflow: visible; /* permitir que tooltips saiam do container */
+  /* mantém o scroll interno em .modal-body (já definido) */
+  padding:22px 28px; background:#fff; box-shadow:0 20px 50px rgba(0,0,0,.35);
 }
 
-.carrinho-pessoas {
-    text-align: center;
-    font-size: 14px;
-    color: #555;
+/* Header / título */
+.modal-header{ position:relative; flex:0 0 auto; padding-bottom:8px; }
+.modal-title{
+  margin:0; text-align:center; font-size:42px; font-weight:800; color:#4e4545;
 }
 
-.carrinho-total {
-    margin-top: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #000;
+/* Corpo: form + aside (preview) */
+.modal-body{
+  display:grid;
+  grid-template-columns: 1fr 300px;
+  gap:18px;
+  align-items:start;
+  flex:1 1 auto;
+  overflow:auto; -webkit-overflow-scrolling: touch;
+  padding-right:6px;
+}
+.modal-form{ grid-column:1; display:flex; flex-direction:column; gap:10px; }
+.modal-aside{ grid-column:2; }
+.modal-aside .tabela-box{
+  background:#fbfbfb; border-radius:8px; padding:12px; box-shadow:0 6px 20px rgba(0,0,0,0.06); text-align:center;
 }
 
-.carrinho-reservar {
-    margin-top: 15px;
-    width: 100%;
-    background: #ffcc00;
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
+/* inputs e selects dentro do modal */
+.modal-content.ski-pass-layout input,
+.modal-content.ski-pass-layout select,
+.modal-content.ski-pass-layout textarea{
+  width:100%; padding:8px 10px; border-radius:4px; border:1px solid #ddd; background:#DFDFDF; color:#5D5454; box-sizing:border-box;
 }
 
-.carrinho-reservar:hover {
-    background: #e6b800;
-}
+/* linhas / colunas do formulário */
+.row, .row1 { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+.col { display:flex; justify-content:space-around; font-family:raleway, sans-serif; font-weight:700; font-size:1rem; }
+.col2 { display:flex; justify-content:space-around; align-items:flex-end; font-weight:700; font-size:1rem; }
+.area-options1{ display:flex; justify-content:space-between; gap:12px; margin-top:6px; }
 
-/* Coluna direita - carrinho */
-.carrinho-lista {
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
+/* pessoas */
+.person-row{ display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.person-row input[type="text"]{ flex:1 1 60%; min-width:140px; }
+.person-row input[type="date"]{ flex:0 0 160px; }
 
-.titulo-carrinho {
-    font-size: 18px;
-    font-weight: bold;
-}
+/* ações e total */
+.entries-actions{ display:flex; justify-content:flex-start; gap:12px; align-items:center; padding-top:8px; border-top:1px solid #eee; margin-top:12px; }
+.total-line{ width:100%; text-align:center; padding:14px 0; border-top:1px solid #eee; border-bottom:1px solid #eee; margin:14px 0; }
+.total-line .label{ color:#666; font-size:13px; display:block; margin-bottom:6px; }
+.total-line .value{ font-size:22px; font-weight:800; color:#2f2f2f; }
 
-/* Estilos do Modal Ski Pass */
-.ski-pass-modal {
-    position: relative;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* Footer com botões */
+.modal-footer{ display:flex; justify-content:center; align-items:center; gap:14px; flex:0 0 auto; margin-top:8px; }
+.btn-cancel{ background:#9D9C9C; color:#fff; padding:10px 22px; border-radius:20px; border:none; cursor:pointer; }
+.btn-confirm{ background:#D0C009; color:#222; padding:10px 22px; border-radius:20px; border:none; cursor:pointer; }
 
-.ski-pass-modal h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 22px;
-}
+/* botões utilitários */
+.btn-add{ border-radius:20px; background:#9D9C9C; border:1px dashed #cfcfcf; padding:8px 12px; color:#fff; cursor:pointer; }
+.btn-remove{ background:transparent; color:#999; font-size:18px; padding:0 5px; border:none; cursor:pointer; }
+.btn-small{ padding:6px 8px; font-size:14px; }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.radio-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.area-option {
-    flex: 1;
-    position: relative;
-    border-radius: 4px;
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.area-option.selected {
-    background-color: #f0f8ff;
-    border-color: #007bff;
-}
-
-.area-option input {
-    position: static !important;
-    opacity: 1 !important;
-}
-
-
-.form-row {
-    display: flex;
-    gap: 15px;
-}
-
-.half {
-    flex: 1;
-}
-
-.date-input,
-.days-select,
-.pass-type-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-}
-
-.pass-type-container {
-    display: flex;
-    align-items: center;
-}
-
-.btn-add-person {
-    margin-left: 10px;
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-.family-flex-notice {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-    font-style: italic;
-}
-
-.pessoa-form {
-    border: none;
-    padding: 5px 0;
-    margin-bottom: 5px;
-    border-radius: 0;
-    border-bottom: 1px solid #eee;
-}
-
-.pessoa-form h4 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    color: #555;
-    font-size: 14px;
-    font-weight: normal;
-}
-
-.btn-add-crianca,
-.btn-remove {
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 5px;
-    font-size: 12px;
-}
-
-.btn-remove {
-    background-color: transparent;
-    color: #999;
-    font-size: 18px;
-    margin-left: 5px;
-    padding: 0 5px;
-}
-
-.seguro {
-    margin-top: 15px;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-}
-
-.seguro-options {
-    display: flex;
-    gap: 20px;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.tooltip {
+/* tooltip (tabela de valores) */
+.tabela-help-right{ position:absolute; top:18px; right:22px; font-size:13px; color:#777; }
+.tabela-tooltip-wrapper {
   position: relative;
   display: inline-block;
-  margin-left: 5px;
+  overflow: visible; /* importante para não cortar o tooltip */
+  z-index: 120000; /* garantir acima do modal */
 }
 
-.tooltip-icon {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    background-color: #999;
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 16px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-/* tooltip refinado para Seguro Carré Neige - com animação de fade */
-.tooltip-wrapper { position: relative; }
-
-.tooltip-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  color: #444;
-  box-shadow: none;
-}
-.tooltip-btn svg { display: block; }
-
-/* estado inicial: escondido com opacity/transform para animar */
-.tooltip {
-  position: absolute;
-  top: 40px;
-  left: 0;
-  z-index: 40;
-  width: 300px;
-  max-width: calc(100vw - 40px);
-  background: #fbf8d9;
-  color: #222;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  font-size: 13px;
-  line-height: 1.35;
-
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px);
-  pointer-events: none;
-
-  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
-}
-
-/* seta do tooltip */
-.tooltip::after {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 16px;
-  border-width: 8px 8px 0 8px;
-  border-style: solid;
-  border-color: #fbf8d9 transparent transparent transparent;
-}
-
-/* Mostrar tooltip em hover / foco do botão (com fade) */
-.tooltip-btn:hover + .tooltip,
-.tooltip-btn:focus + .tooltip,
-.tooltip-wrapper:hover .tooltip,
-.tooltip-wrapper:focus-within .tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* garantir foco visível */
-.tooltip-btn:focus { outline: 2px solid #e0c700; outline-offset: 2px; }
-
-/* pequenas melhorias de layout */
-.seguro-label { font-size: 13px; color: #444; margin-right: 6px; }
-.seguro-option { margin-left: 8px; font-size: 13px; color: #444; }
-
-/* responsivo: ajustar posição/width do tooltip */
-@media (max-width: 520px) {
-  .tooltip { left: 0; right: 0; width: calc(100% - 24px); top: 42px; }
-}
-
-/* Corrige posicionamento do modal: overlay full-screen e centraliza o modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  padding: 24px; /* espaço em volta em telas pequenas */
-  z-index: 9999;
-}
-
-/* Remove margin que pode empurrar o modal para cima e limita altura */
-.modal-overlay .modal-content,
-.modal-overlay .modal-content.ski-pass-layout {
-  margin: 0;
-  max-height: calc(100vh - 48px);
-  overflow: auto;
-  box-sizing: border-box;
-}
-
-/* Largura/estilo do modal ski-pass */
-.modal-content.ski-pass-layout {
-  width: 980px;
-  max-width: 100%;
-  border-radius: 12px;
-}
-
-/* Evita que conteúdo atrás do modal seja clicável (seguro extra) */
-.modal-overlay *:not(.modal-content):not(.modal-content *) {
-  pointer-events: none;
-}
-
-/* Opcional: se adicionar a classe body.modal-open, evita scroll do body */
-body.modal-open {
-  overflow: hidden;
-}
-
-.modal-header { position: relative; }
-
-.tabela-help-right {
-  position: absolute;
-  top: 18px;
-  right: 22px;
-  font-size: 13px;
-  color: #777;
-}
-
-/* wrapper para tooltip com imagem */
-.tabela-tooltip-wrapper { position: relative; display: inline-block; }
-
-/* botão que mostra o tooltip (mantém estilo parecido com o rótulo) */
-.tabela-tooltip-btn {
-  background: transparent;
-  border: none;
-  color: #777;
-  font-size: 13px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 6px;
-}
-.tabela-tooltip-btn:focus { outline: 2px solid #e0c700; outline-offset: 2px; }
-
-/* ícone pequeno dentro do botão */
-.tabela-tooltip-icon { font-size: 14px; color: #6b6b6b; }
-
-/* tooltip com imagem — inicialmente escondido */
 .tabela-tooltip {
-  position: absolute;
-  top: 40px;
+  position: absolute; /* usar absolute para ficar junto ao botão */
+  top: 36px;          /* ajuste fino se necessário */
   right: 0;
-  z-index: 20000;
+  z-index: 120001;
   width: 420px;
   max-width: calc(100vw - 40px);
   background: #fff;
@@ -536,250 +186,55 @@ body.modal-open {
   box-shadow: 0 10px 28px rgba(0,0,0,0.18);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px) scale(0.98);
-  transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+  transform-origin: top right;
+  transform: translateY(-6px) scale(.98);
+  transition: opacity .18s, transform .18s, visibility .18s;
+  pointer-events: none;
 }
 
-/* imagem interna */
 .tabela-tooltip img {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 4px;
+  max-height: 60vh; /* evita corte vertical */
   object-fit: contain;
 }
 
-/* seta opcional */
-.tabela-tooltip::after {
-  content: "";
-  position: absolute;
-  top: -8px;
-  right: 18px;
-  border-width: 8px 8px 0 8px;
-  border-style: solid;
-  border-color: #fff transparent transparent transparent;
-}
-
-/* mostrar em hover/focus (acessível) */
-.tabela-tooltip-btn:hover + .tabela-tooltip,
-.tabela-tooltip-btn:focus + .tabela-tooltip,
+/* Mostrar tooltip ao hover/focus */
 .tabela-tooltip-wrapper:hover .tabela-tooltip,
-.tabela-tooltip-wrapper:focus-within .tabela-tooltip {
+.tabela-tooltip-wrapper:focus-within .tabela-tooltip,
+.tabela-tooltip-btn:hover + .tabela-tooltip,
+.tabela-tooltip-btn:focus + .tabela-tooltip {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
-/* evitar pointer-events: none do .tabela-help-right (sobrescreve caso exista) */
-.tabela-help-right { pointer-events: auto; }
-
-/* responsivo: posicionamento central abaixo do botão */
-@media (max-width: 920px) {
-  .tabela-tooltip { right: auto; left: 0; top: 46px; width: calc(100vw - 48px); }
-  .tabela-help-right { position: static; margin-top: 8px; text-align: right; }
+/* tooltip pequeno (seguro) */
+.tooltip-wrapper{ position:relative; display:inline-block; }
+.tooltip-btn{ display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; border:1px solid #ddd; background:#fff; cursor:pointer; color:#444; }
+.tooltip{
+  position:absolute; top:40px; left:0; z-index:40; width:300px; max-width:calc(100vw - 40px);
+  background:#fbf8d9; color:#222; padding:12px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.12);
+  opacity:0; visibility:hidden; transform:translateY(-6px); pointer-events:none; transition:opacity .18s,transform .18s,visibility .18s;
 }
-
-/* ===== Botões de Cancelar e Confirmar ===== */
-.btn-cancel {
-  background: #9D9C9C;
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-confirm {
-  background: #D0C009;
-  color: #2b2b2b;
-  padding: 10px 18px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-add {
-  border-radius: 20px;
-  background: #9D9C9C;
-  border: 1px dashed #cfcfcf;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #fff;
-}
-
-/* Hover / contraste para botões */
-.btn-confirm,
-.btn-cancel,
-.btn-add,
-.btn-adicionar,
-.carrinho-reservar {
-  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
-}
-
-/* confirmar (amarelo) */
-.btn-confirm:hover,
-.btn-confirm:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(208, 192, 9, 0.18);
-  filter: brightness(0.98);
-  outline: none;
-}
-
-/* cancelar (cinza) */
-.btn-cancel:hover,
-.btn-cancel:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-  filter: brightness(0.95);
-  outline: none;
-}
-
-/* botão adicionar pequeno */
-.btn-add:hover,
-.btn-add:focus {
-  transform: translateY(-1px) scale(1.02);
-  background: #858484;
-  border-color: #bfbfbf;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-  outline: none;
-}
-
-/* botão circular "Adicionar" (lista de serviços) */
-.btn-adicionar:hover,
-.btn-adicionar:focus {
-  transform: translateY(-4px) scale(1.03);
-  background: #7a7a7a;
-  color: #fff;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-  outline: none;
-}
-
-/* reservar */
-.carrinho-reservar:focus,
-.carrinho-reservar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-
-/* Tooltip: adicionar efeito de scale suave junto ao fade/slide */
-.tooltip {
-  /* já tem transition; ajustar para incluir scale */
-  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
-  transform-origin: top left;
-  transform: translateY(-6px) scale(0.98);
-}
-
-/* estado visível */
 .tooltip-btn:hover + .tooltip,
-.tooltip-btn:focus + .tooltip,
 .tooltip-wrapper:hover .tooltip,
-.tooltip-wrapper:focus-within .tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
+.tooltip-btn:focus + .tooltip,
+.tooltip-wrapper:focus-within .tooltip{
+  opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto;
 }
 
-/* pequena delay no fechamento (melhora sensação do fade) */
-.tooltip {
-  transition-delay: 0ms;
-}
-.tooltip-wrapper:not(:hover) .tooltip,
-.tooltip-wrapper:not(:focus-within) .tooltip {
-  transition-delay: 40ms;
-}
-
-/* Inputs dentro do modal com background solicitado */
-.modal-content input[type="text"],
-.modal-content input[type="date"],
-.modal-content input[type="number"],
-.modal-content input[type="email"],
-.modal-content input[type="tel"],
-.modal-content textarea,
-.modal-content select {
-  background: #DFDFDF;
-  color: #5D5454;
-  padding: 8px 10px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  box-shadow: none;
+/* pequenas regras responsivas */
+@media (max-width:920px){
+  .modal-body{ grid-template-columns:1fr; }
+  .modal-title{ font-size:28px; }
+  .modal-aside{ order:2; width:100%; }
+  .modal-form{ order:1; width:100%; }
+  .tabela-help-right{ position:static; margin-top:8px; text-align:right; }
 }
 
-/* Se precisar também fora do modal (aplique com cautela):
-input[type="text"],
-input[type="date"],
-input[type="number"],
-input[type="email"],
-input[type="tel"],
-textarea,
-select {
-  background: #DFDFDF;
-  color: #5D5454;
-}
-*/
 
-/* força pointer-events e z-index para o wrapper / botão do tooltip de tabela */
-.tabela-tooltip-wrapper,
-.tabela-tooltip-btn {
-  pointer-events: auto !important;
-  z-index: 21000;
-}
-
-/* tooltip com imagem acima de tudo e com pointer-events enquanto visível */
-.tabela-tooltip {
-  z-index: 21001;
-  pointer-events: auto;
-}
-
-/* Espaçamento entre inputs */
-.modal-content .row {
-  display: flex;
-  gap: 12px;           /* espaçamento horizontal entre colunas */
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 8px;  /* espaço entre linhas de inputs */
-}
-
-/* cada label/col dentro da row assume comportamento responsivo */
-.modal-content .row .col,
-.modal-content .row .full {
-  flex: 1 1 33%;
-  min-width: 180px;
-}
-
-/* espaçamento vertical garantido para todos os campos do modal */
-.modal-content input[type="text"],
-.modal-content input[type="date"],
-.modal-content input[type="number"],
-.modal-content select,
-.modal-content textarea {
-  display: block;
-  width: 40%;
-  margin-bottom: 12px; /* espaço vertical entre campos */
-  box-sizing: border-box;
-}
-
-/* pessoa-row (linhas dentro de family/people) */
-.person-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.person-row input[type="text"] { flex: 1 1 60%; min-width: 140px; }
-.person-row input[type="date"] { flex: 0 0 160px; }
-
-/* mantém boa aparência em telas pequenas */
-@media (max-width: 520px) {
-  .modal-content .row .col,
-  .modal-content .row .full,
-  .person-row input[type="text"],
-  .person-row input[type="date"] {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-}
 
 
