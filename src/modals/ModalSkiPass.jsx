@@ -33,11 +33,20 @@ const ModalSkiPass = ({
     setSkiPassEntries((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const addChildEntry = (index) => {
+    console.log("Adicionando criança na entrada", index);
+    let newEsquiadores = { ...skiPassEntries[index].esquiadores };
+      newEsquiadores.criancas = [
+        ...skiPassEntries[index].esquiadores.criancas,
+        { nome: "", dataNasc: "" },
+        { nome: "", dataNasc: "" },
+        { nome: "", dataNasc: "" },
+      ];
+      
+    updateSkiPassEntry(index, newEsquiadores);
+  }
+
   const addSkiPassEntry = () => {
-    console.log("Adicionando ski pass:", {
-      tipoSkiPass,
-      jsonBasePorTipoSkiPass,
-    });
     setSkiPassEntries((prev) => [
       ...prev,
       {
@@ -92,17 +101,12 @@ const ModalSkiPass = ({
   };
 
   useEffect(() => {
-    console.log("Recalculando total ski pass...");
     const total = skiPassEntries.reduce((acc, entry) => {
       let preco = calcularPrecoParaEntrada(entry);
-      console.log("Preço base para entrada", entry, ":", preco);
       if (seguro) {
-        console.log("Adicionando seguro para entrada", entry);
         const pessoas =
           (entry.esquiadores?.adultos?.length || 0) + (entry.esquiadores?.criancas?.length || 0) + (entry.esquiadores?.nome? 1 : 0);
-        console.log("Número de pessoas:", pessoas);
         preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
-        console.log("Preço com seguro:", preco);
       }
       return acc + preco;
     }, 0);
@@ -310,6 +314,9 @@ const ModalSkiPass = ({
                         />
                       </div>
                     ))}
+                    <button type="button" className="btn-add" onClick={() => addChildEntry(idx)}>
+                      Adicionar crianças
+                    </button>
                   </div>
                 )}
 
