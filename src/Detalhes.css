@@ -1,69 +1,69 @@
 .floor-container {
-    text-align: center;
-    z-index: 100;
-    display: flex;
-    position: relative;
-    flex-wrap: wrap;
-    justify-content: center;
+  text-align: center;
+  z-index: 100;
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .floor-container ul {
-    border: solid 1px #ccc;
-    background-color: #fff;
-    border-radius: 10px;
-    text-align: center;
-    z-index: 100;
-    height: fit-content;
-    margin: 5px;
-    padding: 5px;
+  border: solid 1px #ccc;
+  background-color: #fff;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 100;
+  height: fit-content;
+  margin: 5px;
+  padding: 5px;
 }
 .floor-container h4 {
-    text-align: center;
-    padding-bottom: 1em;
+  text-align: center;
+  padding-bottom: 1em;
 }
 
 .floor-container li {
-    padding-bottom: 0.5em;
-    min-width: 100px;
-    max-width: 200px;
+  padding-bottom: 0.5em;
+  min-width: 100px;
+  max-width: 200px;
 }
 
 a.google-maps-link {
-    text-decoration: none;
-    color: #000;
-    font-weight: bold;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
 }
 
 #detalhes-hospedagem-bg {
-    height: 75%;
-    width: 50%;  
+  height: 75%;
+  width: 50%;
 }
 
 .post-list-content-wrapper {
-    padding-top: 50px;
-    margin-top: -1px;
+  padding-top: 50px;
+  margin-top: -1px;
 }
 
 .post-list .post-list-wrapper {
-    margin: -40px 0 0 0;
-    padding: 0 0 50px 0;
+  margin: -40px 0 0 0;
+  padding: 0 0 50px 0;
 }
 
 div#menu-3.menu-visible {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 30px;;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  row-gap: 30px;
 }
 
 #menu-3 .item {
-    width: 100%;
+  width: 100%;
 }
 
 .post-list .post-list-row {
-    position: relative;
-    z-index: 0;
+  position: relative;
+  z-index: 0;
 }
 
 .custom-carousel {
@@ -134,4 +134,16 @@ div#menu-3.menu-visible {
 
 .dot.active {
   background-color: #333;
+}
+
+.menu-detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  row-gap: 30px;
+}
+
+ul#menu-detalhes {
+  float: none;
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import tabelaImg from "../img/tabela-ski.jpg";
+import "../styles/ModalSkiPass.css";
 
 const ModalSkiPass = ({
   skiPassEntries,
@@ -68,7 +69,6 @@ const ModalSkiPass = ({
     });
   };
 
-  
   const skiPassPrecos = {
     courchevel: {
       adulto: { 1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455 },
@@ -86,7 +86,7 @@ const ModalSkiPass = ({
     if (!entry || !entry.tipo) return 0;
     const dias = Math.max(1, Number(entry.dias) || 1);
     const areaObj = skiPassPrecos[entry.area] || {};
-    if (entry.tipo === "family"){
+    if (entry.tipo === "family") {
       return (areaObj.family && areaObj.family[dias]) || 0;
     }
     if (entry.tipo === "adulto") {
@@ -105,7 +105,10 @@ const ModalSkiPass = ({
       let preco = calcularPrecoParaEntrada(entry);
       if (seguro) {
         const pessoas =
-          (entry.esquiadores?.adultos?.length || 0) + (entry.esquiadores?.criancas?.length || 0) + (entry.esquiadores?.nome? 1 : 0);
+          (entry.esquiadores?.adultos?.length || 0) +
+          (entry.esquiadores?.criancas?.length || 0) +
+          (entry.esquiadores?.nome ? 1 : 0);
+        console.log("Número de pessoas:", pessoas);
         preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
       }
       return acc + preco;
@@ -159,22 +162,24 @@ const ModalSkiPass = ({
                 <label>
                   <input
                     type="radio"
-                    name="area-courchevel"
+                    className="location"
+                    name="area"
                     value="courchevel"
                     checked={area === "courchevel"}
                     onChange={() => setArea("courchevel")}
                   />
-                  Courchevel
+                  Courchevel Pass
                 </label>
                 <label>
                   <input
                     type="radio"
-                    name="3valles"
+                    className="location"
+                    name="area"
                     value="3vallees"
                     checked={area === "3vallees"}
                     onChange={() => setArea("3vallees")}
                   />
-                  Les 3 Vallées
+                  Les 3 Vallées Pass
                 </label>
               </div>
             </label>
@@ -244,39 +249,36 @@ const ModalSkiPass = ({
                 {entry.tipo === "family" && (
                   <div className="family-grid">
                     <div className="subtitle">Adultos</div>
-                    {entry.esquiadores.adultos.map((adulto, idx_adulto) => (
-                      <div key={idx_adulto} className="person-row">
-                        <input
-                          type="text"
-                          placeholder={`Adulto ${
-                            idx_adulto + 1
-                          } - Nome completo`}
-                          value={adulto.nome || ""}
-                          onChange={(ev) => {
-                            const newAdults = [...entry.esquiadores.adultos];
-                            newAdults[idx_adulto] = {
-                              ...newAdults[idx_adulto],
-                              nome: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              adultos: newAdults,
-                            });
-                          }}
-                        />
-                        <input
-                          type="date"
-                          value={adulto.dataNasc || ""}
-                          onChange={(ev) => {
-                            const newAdults = [...entry.esquiadores.adultos];
-                            newAdults[idx_adulto] = {
-                              ...newAdults[idx_adulto],
-                              dataNasc: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              adultos: newAdults,
-                            });
-                          }}
-                        />
+                    {entry.adultos?.map((adulto, idx) => (
+                      <div key={`adulto-${idx}`} className="person-row">
+                        <div className="person-row-col1">
+                          <label>Nome Completo:</label>
+                          <input
+                            type="text"
+                            placeholder="José da Silva"
+                            value={adulto.nome || ""}
+                            onChange={(e) => {
+                              const novoAdultos = [...entry.adultos];
+                              novoAdultos[idx].nome = e.target.value;
+                              // atualizar entry no estado
+                            }}
+                          />
+                        </div>
+                        <div className="person-row-col2">
+                          <label>Data Nasc.:</label>
+                          <input
+                            type="date"
+                            value={adulto.dataNasc || ""}
+                            onChange={(e) => {
+                              const novoAdultos = [...entry.adultos];
+                              novoAdultos[idx].dataNasc = e.target.value;
+                              // atualizar entry no estado
+                            }}
+                          />
+                        </div>
+                        <button className="person-row-remove btn-remove">
+                          −
+                        </button>
                       </div>
                     ))}
 
