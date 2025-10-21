@@ -36,16 +36,18 @@ const ModalSkiPass = ({
 
   const addChildEntry = (index) => {
     console.log("Adicionando criança na entrada", index);
+    console.log("Entrada atual:", skiPassEntries[index]);
     let newEsquiadores = { ...skiPassEntries[index].esquiadores };
-      newEsquiadores.criancas = [
-        ...skiPassEntries[index].esquiadores.criancas,
-        { nome: "", dataNasc: "" },
-        { nome: "", dataNasc: "" },
-        { nome: "", dataNasc: "" },
-      ];
-      
-    updateSkiPassEntry(index, newEsquiadores);
-  }
+    newEsquiadores.criancas = [
+      ...skiPassEntries[index].esquiadores.criancas,
+      { nome: "", dataNasc: "" },
+      { nome: "", dataNasc: "" },
+      { nome: "", dataNasc: "" },
+    ];
+    skiPassEntries[index].esquiadores = newEsquiadores;
+    console.log("Novos esquiadores:", skiPassEntries[index]);
+    updateSkiPassEntry(index, skiPassEntries);
+  };
 
   const addSkiPassEntry = () => {
     setSkiPassEntries((prev) => [
@@ -108,7 +110,6 @@ const ModalSkiPass = ({
           (entry.esquiadores?.adultos?.length || 0) +
           (entry.esquiadores?.criancas?.length || 0) +
           (entry.esquiadores?.nome ? 1 : 0);
-        console.log("Número de pessoas:", pessoas);
         preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
       }
       return acc + preco;
@@ -249,39 +250,47 @@ const ModalSkiPass = ({
                 {entry.tipo === "family" && (
                   <div className="family-grid">
                     <div className="subtitle">Adultos</div>
-                    {entry.adultos?.map((adulto, idx) => (
-                      <div key={`adulto-${idx}`} className="person-row">
-                        <div className="person-row-col1">
-                          <label>Nome Completo:</label>
-                          <input
-                            type="text"
-                            placeholder="José da Silva"
-                            value={adulto.nome || ""}
-                            onChange={(e) => {
-                              const novoAdultos = [...entry.adultos];
-                              novoAdultos[idx].nome = e.target.value;
-                              // atualizar entry no estado
-                            }}
-                          />
-                        </div>
-                        <div className="person-row-col2">
-                          <label>Data Nasc.:</label>
-                          <input
-                            type="date"
-                            value={adulto.dataNasc || ""}
-                            onChange={(e) => {
-                              const novoAdultos = [...entry.adultos];
-                              novoAdultos[idx].dataNasc = e.target.value;
-                              // atualizar entry no estado
-                            }}
-                          />
-                        </div>
-                        <button className="person-row-remove btn-remove">
-                          −
-                        </button>
+                    {entry.esquiadores.adultos.map((adulto, idx_adulto) => (
+                      <div key={idx_adulto} className="person-row">
+                        <input
+                          type="text"
+                          placeholder={`Adulto ${
+                            idx_adulto + 1
+                          } - Nome completo`}
+                          value={adulto.nome || ""}
+                          onChange={(ev) => {
+                            const newAdults = [...entry.esquiadores.adultos];
+                            newAdults[idx_adulto] = {
+                              ...newAdults[idx_adulto],
+                              nome: ev.target.value,
+                            };
+                            updateSkiPassEntry(idx, {
+                              esquiadores: {
+                                adultos: newAdults,
+                                criancas: entry.esquiadores.criancas || [],
+                              },
+                            });
+                          }}
+                        />
+                        <input
+                          type="date"
+                          value={adulto.dataNasc || ""}
+                          onChange={(ev) => {
+                            const newAdults = [...entry.esquiadores.adultos];
+                            newAdults[idx_adulto] = {
+                              ...newAdults[idx_adulto],
+                              dataNasc: ev.target.value,
+                            };
+                            updateSkiPassEntry(idx, {
+                              esquiadores: {
+                                adultos: newAdults,
+                                criancas: entry.esquiadores.criancas || [],
+                              },
+                            });
+                          }}
+                        />
                       </div>
                     ))}
-
                     <div className="subtitle">Crianças</div>
                     {entry.esquiadores.criancas.map((c, ci) => (
                       <div key={ci} className="person-row">
@@ -296,7 +305,10 @@ const ModalSkiPass = ({
                               nome: ev.target.value,
                             };
                             updateSkiPassEntry(idx, {
-                              criancas: newCriancas,
+                              esquiadores: {
+                                adultos: entry.esquiadores.adultos || [],
+                                criancas: newCriancas,
+                              },
                             });
                           }}
                         />
@@ -310,15 +322,24 @@ const ModalSkiPass = ({
                               dataNasc: ev.target.value,
                             };
                             updateSkiPassEntry(idx, {
-                              criancas: newCriancas,
+                              esquiadores: {
+                                adultos: entry.esquiadores.adultos || [],
+                                criancas: newCriancas,
+                              },
                             });
                           }}
                         />
                       </div>
                     ))}
-                    <button type="button" className="btn-add" onClick={() => addChildEntry(idx)}>
-                      Adicionar crianças
-                    </button>
+                    {entry.esquiadores.criancas.length < 6 && (
+                      <button
+                        type="button"
+                        className="btn-add"
+                        onClick={() => addChildEntry(idx)}
+                      >
+                        Adicionar crianças
+                      </button>
+                    )}{" "}
                   </div>
                 )}
 
