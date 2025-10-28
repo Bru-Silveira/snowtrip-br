@@ -42,12 +42,12 @@ function App() {
     const fim = dataPartida;
     const numAdultos = parseInt(adultos) || 0;
     const numCriancas = parseInt(criancas) || 0;
-    const numeroPessoas = numAdultos + numCriancas;
     const faixaPreco = [0, Infinity]; // ou defina como quiser futuramente
 
     console.log("Início:", inicio);
     console.log("Fim:", fim);
-    console.log("Número de Pessoas:", numeroPessoas);
+    console.log("Número de Adultos:", numAdultos);
+    console.log("Número de Crianças:", numCriancas);
     console.log("Faixa de Preço:", faixaPreco);
     console.log("Cidade:", cidade);
     console.log(`🏠 Filtrando entre ${imoveis.length} imóveis...`);
@@ -58,8 +58,14 @@ function App() {
       const cidadeImovel = imovel.resumo.ville?.trim().toLowerCase();
       const cidadeValida = cidadeInput ? cidadeImovel?.includes(cidadeInput) : true;
 
-      // Filtro por número de pessoas
-      const pessoasValidas = !numeroPessoas || imovel.resumo.capacite >= numeroPessoas;
+      // Filtro por número de adultos
+      const qtdeAdulttosValido = !numAdultos || imovel.detalhes?.detail?.nb_adultes >= numAdultos;
+      console.log(`[${index}] Capacidade do imóvel:`, imovel.detalhes?.detail?.nb_adultes, "Pessoas requeridas:", numAdultos);
+
+      // Filtro por número de crianças
+      const qtdeCriancasValido = !numCriancas || imovel.detalhes?.detail?.nb_enfants >= numCriancas;
+      console.log(`[${index}] Capacidade do imóvel:`, imovel.detalhes?.detail?.nb_enfants, "Pessoas requeridas:", numCriancas);
+
 
       // Cálculo e filtro de faixa de preço
       const precoNoite = imovel.resumo.prix_moyen_semaine || 0;
@@ -85,7 +91,7 @@ function App() {
       //console.log(`[${index}] Dados válidos?`, total.toFixed(2));
       //console.log(`[${index}] Data válida?`, dataValida);
 
-      return cidadeValida && pessoasValidas && dadosValidos && dataValida;
+      return cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dadosValidos && dataValida;
     });
 
     console.log("Imóveis filtrados:", imoveisFiltrados);
@@ -291,7 +297,7 @@ function App() {
                       <label>Adultos</label>
                       <div className="select-inner">
                         <select
-                          className="requiredField-r adultos select2 select"
+                          className="requiredField-r adultos select"
                           id="adultos"
                           name="adultos"
                           onChange={(e) => setAdultos(e.target.value)}
@@ -318,7 +324,7 @@ function App() {
                       <label>Crianças</label>
                       <div className="select-inner">
                         <select
-                          className="requiredField-r criancas select2 select"
+                          className="requiredField-r criancas select"
                           id="criancas"
                           name="criancas"
                           onChange={(e) => setCriancas(e.target.value)}
