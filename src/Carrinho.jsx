@@ -4,6 +4,7 @@ import "./Carrinho.css";
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
+import ModalAulasSki from "./modals/ModalAulasSki";
 
 let tabelaImg;
 try {
@@ -34,6 +35,9 @@ function Carrinho() {
   const [skiPassEntries, setSkiPassEntries] = useState([]);
   const [skiPassTotal, setSkiPassTotal] = useState(0);
   const [skiPassDataInicio, setSkiPassDataInicio] = useState("");
+
+  // ADICIONAR: estado para aulas de ski
+  const [classEntries, setClassEntries] = useState([]);
 
   const servicos = [
     {
@@ -98,19 +102,20 @@ function Carrinho() {
   };
 
   const abrirModal = (servico) => {
-    if (servico.slug === "ski-pass") {
-      setServicoSelecionado(servico);
-      setMostrarModal(true);
-    } else if (
-      ["aulas-ski", "equip-ski", "equip-snow"].includes(servico.slug)
+    setServicoSelecionado(servico);
+
+    // Abre modal para serviços que precisam de configuração
+    if (
+      ["ski-pass", "aulas-ski", "equip-ski", "equip-snow"].includes(
+        servico.slug
+      )
     ) {
-      setServicoSelecionado(servico);
       setMostrarModal(true);
     } else {
+      // Adiciona direto ao carrinho para outros serviços
       setCarrinho((prev) => [...prev, servico]);
     }
   };
-
 
   const calcularPrecoParaEntrada = (entry) => {
     if (!entry || !entry.tipo) return 0;
@@ -153,6 +158,39 @@ function Carrinho() {
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
+    }
+
+    if (servicoSelecionado.slug === "aulas-ski") {
+      if (classEntries.length === 0) {
+        alert("Adicione pelo menos uma aula antes de concluir.");
+        return;
+      }
+
+      const novos = classEntries.map((entry) => {
+        const preco = calcularPrecoParaEntrada(entry);
+        const descricao = `${entry.resort} - ${entry.modalidade} - ${
+          entry.dias
+        } dia${entry.dias > 1 ? "s" : ""} - ${
+          entry.periodo === "halfday" ? "Half day" : "Full day"
+        }`;
+        return {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${descricao}`,
+          preco,
+          dataInicio: entry.dataInicio,
+          dias: entry.dias,
+          modalidade: entry.modalidade,
+          periodo: entry.periodo,
+          resort: entry.resort,
+          totalPessoas: entry.totalPessoas,
+          qtdeCriancas: entry.qtdeCriancas,
+          idadesCriancas: entry.idadesCriancas,
+          nivel: entry.nivel,
+        };
+      });
+
+      setCarrinho((prev) => [...prev, ...novos]);
+      setClassEntries([]);
     }
 
     if (servicoSelecionado.slug === "aulas-ski") {
@@ -326,6 +364,7 @@ function Carrinho() {
     setSnowDias(1);
     setSkiPassTotal(0);
     setSkiPassDataInicio("");
+    setClassEntries([]);
   };
 
   const removerDoCarrinho = (id) =>
@@ -340,6 +379,13 @@ function Carrinho() {
             <ModalSkiPass
               skiPassEntries={skiPassEntries}
               setSkiPassEntries={setSkiPassEntries}
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
+          ) : servicoSelecionado?.slug === "aulas-ski" ? (
+            <ModalAulasSki
+              classEntries={classEntries}
+              setClassEntries={setClassEntries}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
