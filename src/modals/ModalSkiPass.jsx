@@ -149,15 +149,12 @@ const ModalSkiPass = ({
 
       <div className="modal-body">
         <aside className="modal-aside">
-          <div className="tabela-box">
-            {/* tabela/preview de valores (sem o texto "Confira tabela de valores.") */}
-            {/* ... */}
-          </div>
+          <div className="tabela-box">{/* tabela/preview de valores */}</div>
         </aside>
 
         <section className="modal-form">
           <div className="row">
-            <label className="col">
+            <label className="col area-inline">
               Área:
               <div className="area-options">
                 <label>
@@ -185,10 +182,12 @@ const ModalSkiPass = ({
               </div>
             </label>
           </div>
+
           <div className="row">
             <label className="col">
               Data de Início:
               <input
+                className="date"
                 type="date"
                 value={dataInicio}
                 onChange={(e) => setDataInicio(e.target.value)}
@@ -197,9 +196,10 @@ const ModalSkiPass = ({
             </label>
 
             <label className="col">
-              Dias:
+              Dias de Ski:
               <select
                 value={dias}
+                className="day"
                 onChange={(e) => setDias(parseInt(e.target.value || "1", 10))}
               >
                 {[1, 2, 3, 4, 5, 6, 7].map((d) => (
@@ -213,7 +213,7 @@ const ModalSkiPass = ({
 
           <div className="row">
             <label className="full">
-              Tipo de entrada:
+              Tipo de passe:
               <select
                 value={tipoSkiPass}
                 onChange={(e) => setTipoSkiPass(e.target.value)}
@@ -227,14 +227,14 @@ const ModalSkiPass = ({
               </select>
             </label>
             <button type="button" className="btn-add" onClick={addSkiPassEntry}>
-              Adicionar
+              +
             </button>
           </div>
 
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
-                <div className="entry-number"> {entry.tipo + (idx + 1)}</div>
+                <div className="entry-number">{entry.tipo + (idx + 1)}</div>
                 <div className="entry-actions">
                   <button
                     type="button"
@@ -251,84 +251,94 @@ const ModalSkiPass = ({
                   <div className="family-grid">
                     <div className="subtitle">Adultos</div>
                     {entry.esquiadores.adultos.map((adulto, idx_adulto) => (
-                      <div key={idx_adulto} className="person-row">
-                        <input
-                          type="text"
-                          placeholder={`Adulto ${
-                            idx_adulto + 1
-                          } - Nome completo`}
-                          value={adulto.nome || ""}
-                          onChange={(ev) => {
-                            const newAdults = [...entry.esquiadores.adultos];
-                            newAdults[idx_adulto] = {
-                              ...newAdults[idx_adulto],
-                              nome: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              esquiadores: {
-                                adultos: newAdults,
-                                criancas: entry.esquiadores.criancas || [],
-                              },
-                            });
-                          }}
-                        />
-                        <input
-                          type="date"
-                          value={adulto.dataNasc || ""}
-                          onChange={(ev) => {
-                            const newAdults = [...entry.esquiadores.adultos];
-                            newAdults[idx_adulto] = {
-                              ...newAdults[idx_adulto],
-                              dataNasc: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              esquiadores: {
-                                adultos: newAdults,
-                                criancas: entry.esquiadores.criancas || [],
-                              },
-                            });
-                          }}
-                        />
+                      <div key={idx_adulto}>
+                        <div className="person-label">
+                          Adulto {idx_adulto + 1}
+                        </div>
+                        <div className="person-row">
+                          <input
+                            type="text"
+                            placeholder="Nome completo"
+                            value={adulto.nome || ""}
+                            onChange={(ev) => {
+                              const newAdults = [...entry.esquiadores.adultos];
+                              newAdults[idx_adulto] = {
+                                ...newAdults[idx_adulto],
+                                nome: ev.target.value,
+                              };
+                              updateSkiPassEntry(idx, {
+                                esquiadores: {
+                                  adultos: newAdults,
+                                  criancas: entry.esquiadores.criancas || [],
+                                },
+                              });
+                            }}
+                          />
+                          <input
+                            type="date"
+                            value={adulto.dataNasc || ""}
+                            onChange={(ev) => {
+                              const newAdults = [...entry.esquiadores.adultos];
+                              newAdults[idx_adulto] = {
+                                ...newAdults[idx_adulto],
+                                dataNasc: ev.target.value,
+                              };
+                              updateSkiPassEntry(idx, {
+                                esquiadores: {
+                                  adultos: newAdults,
+                                  criancas: entry.esquiadores.criancas || [],
+                                },
+                              });
+                            }}
+                          />
+                        </div>
                       </div>
                     ))}
                     <div className="subtitle">Crianças</div>
                     {entry.esquiadores.criancas.map((c, ci) => (
-                      <div key={ci} className="person-row">
-                        <input
-                          type="text"
-                          placeholder={`Criança ${ci + 1} - Nome completo`}
-                          value={c.nome || ""}
-                          onChange={(ev) => {
-                            const newCriancas = [...entry.esquiadores.criancas];
-                            newCriancas[ci] = {
-                              ...newCriancas[ci],
-                              nome: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              esquiadores: {
-                                adultos: entry.esquiadores.adultos || [],
-                                criancas: newCriancas,
-                              },
-                            });
-                          }}
-                        />
-                        <input
-                          type="date"
-                          value={c.dataNasc || ""}
-                          onChange={(ev) => {
-                            const newCriancas = [...entry.esquiadores.criancas];
-                            newCriancas[ci] = {
-                              ...newCriancas[ci],
-                              dataNasc: ev.target.value,
-                            };
-                            updateSkiPassEntry(idx, {
-                              esquiadores: {
-                                adultos: entry.esquiadores.adultos || [],
-                                criancas: newCriancas,
-                              },
-                            });
-                          }}
-                        />
+                      <div key={ci}>
+                        <div className="person-label">Criança {ci + 1}</div>
+                        <div className="person-row">
+                          <input
+                            type="text"
+                            placeholder="Nome completo"
+                            value={c.nome || ""}
+                            onChange={(ev) => {
+                              const newCriancas = [
+                                ...entry.esquiadores.criancas,
+                              ];
+                              newCriancas[ci] = {
+                                ...newCriancas[ci],
+                                nome: ev.target.value,
+                              };
+                              updateSkiPassEntry(idx, {
+                                esquiadores: {
+                                  adultos: entry.esquiadores.adultos || [],
+                                  criancas: newCriancas,
+                                },
+                              });
+                            }}
+                          />
+                          <input
+                            type="date"
+                            value={c.dataNasc || ""}
+                            onChange={(ev) => {
+                              const newCriancas = [
+                                ...entry.esquiadores.criancas,
+                              ];
+                              newCriancas[ci] = {
+                                ...newCriancas[ci],
+                                dataNasc: ev.target.value,
+                              };
+                              updateSkiPassEntry(idx, {
+                                esquiadores: {
+                                  adultos: entry.esquiadores.adultos || [],
+                                  criancas: newCriancas,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
                       </div>
                     ))}
                     {entry.esquiadores.criancas.length < 6 && (
@@ -337,18 +347,19 @@ const ModalSkiPass = ({
                         className="btn-add"
                         onClick={() => addChildEntry(idx)}
                       >
-                        Adicionar crianças
+                        +
                       </button>
-                    )}{" "}
+                    )}
                   </div>
                 )}
 
                 {entry.tipo === "adulto" && (
                   <div className="single-grid">
-                    <div key={`nome-` + idx} className="person-row">
+                    <div className="person-label">Adulto 1</div>
+                    <div className="person-row">
                       <input
                         type="text"
-                        placeholder={`Nome completo`}
+                        placeholder="Nome completo"
                         value={entry.esquiadores.nome || ""}
                         onChange={(ev) =>
                           updateSkiPassEntry(idx, {
@@ -377,10 +388,11 @@ const ModalSkiPass = ({
 
                 {entry.tipo === "crianca" && (
                   <div className="single-grid">
-                    <div key={`nome-` + idx} className="person-row">
+                    <div className="person-label">Criança 1</div>
+                    <div className="person-row">
                       <input
                         type="text"
-                        placeholder={`Nome completo`}
+                        placeholder="Nome completo"
                         value={entry.esquiadores.nome || ""}
                         onChange={(ev) =>
                           updateSkiPassEntry(idx, {
@@ -394,14 +406,14 @@ const ModalSkiPass = ({
                       <input
                         type="date"
                         value={entry.esquiadores.dataNasc || ""}
-                        onChange={(ev) => {
+                        onChange={(ev) =>
                           updateSkiPassEntry(idx, {
                             esquiadores: {
                               nome: entry.esquiadores.nome || "",
                               dataNasc: ev.target.value,
                             },
-                          });
-                        }}
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -413,7 +425,6 @@ const ModalSkiPass = ({
           <div className="row entry-bottom">
             <label className="inline" style={{ position: "relative" }}>
               Seguro Carré Neige:
-              {/* botão com tooltip */}
               <button
                 type="button"
                 className="tooltip-btn"
@@ -422,11 +433,13 @@ const ModalSkiPass = ({
                 ?
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
-                <strong>Por apenas € 3,50 por pessoa/dia</strong>
+                <strong>
+                  Por apenas € 3,50 por pessoa/dia.Resgate imediato nas pistas
+                  em caso de acidenteCobertura médica e hospitalar, incluindo
+                  transporte sanitário.
+                </strong>
                 <div style={{ marginTop: 6 }}>
-                  Resgate imediato nas pistas em caso de acidente
                   <br />
-                  Cobertura médica e hospitalar, incluindo transporte sanitário
                 </div>
               </div>
               <label>
@@ -449,6 +462,7 @@ const ModalSkiPass = ({
               </label>
             </label>
           </div>
+
           <div className="entries-actions">
             <div className="ski-total">
               TOTAL SKI PASS: € {skiPassTotal.toFixed(2).replace(".", ",")}

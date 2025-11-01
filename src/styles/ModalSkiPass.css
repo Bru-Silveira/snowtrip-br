@@ -14,368 +14,790 @@ body.modal-open {
   overflow: hidden;
 }
 
-/* Modal layout principal */
-.modal-content.ski-pass-layout {
-  display: flex;
-  flex-direction: column;
-  width: min(820px, 96%);
-  max-width: 980px;
-  max-height: calc(100vh - 48px);
-  overflow: visible;
-  /* permitir que tooltips saiam do container */
-  /* mantém o scroll interno em .modal-body (já definido) */
-  padding: 22px 28px;
-  background: #fff;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+/* Modal Ski Pass - Styled to match reference design */
+
+.ski-pass-layout {
+    background: #ffffff;
+    border-radius: 8px;
+    max-width: 850px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
-/* Header / título */
+/* Header */
 .modal-header {
-  display: flex;
-  position: relative;
-  flex: 0 0 auto;
-  padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .modal-title {
-  margin: 0;
-  text-align: center;
-  font-size: 42px;
-  font-weight: 800;
-  color: #4e4545;
+    font-size: 42px;
+    font-weight: 700;
+    color: #5a5a5a;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
-/* Corpo: form + aside (preview) */
+.tabela-help-right {
+    position: relative;
+}
+
+.tabela-tooltip-wrapper {
+    position: relative;
+}
+
+.tabela-tooltip-btn {
+    background: none;
+    border: none;
+    color: #7a7a7a;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+
+.tabela-tooltip-btn:hover {
+    color: #4a4a4a;
+}
+
+.tabela-tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.tabela-tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 12px;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.tabela-tooltip-wrapper:hover .tabela-tooltip {
+    display: block;
+}
+
+.tabela-tooltip img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Body */
 .modal-body {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 18px;
-  align-items: start;
-  flex: 1 1 auto;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-right: 6px;
+    padding: 24px 32px;
 }
 
 .modal-form {
-  grid-column: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    width: 100%;
 }
 
-.modal-aside {
-  grid-column: 2;
+/* Form rows */
+.row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
 }
 
-.modal-aside .tabela-box {
-  background: #fbfbfb;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-  text-align: center;
-}
-
-/* inputs e selects dentro do modal */
-.modal-content.ski-pass-layout input,
-.modal-content.ski-pass-layout select,
-.modal-content.ski-pass-layout textarea {
-  width: 100%;
-  height: 15px;
-  padding: 8px 10px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  background: #dfdfdf;
-  color: #5d5454;
-  box-sizing: border-box;
-}
-
-/* linhas / colunas do formulário */
-.row,
-.row1 {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+.row.people-section {
+    margin-bottom: 0;
 }
 
 .col {
-  display: flex;
-  justify-content: space-around;
-  font-family: raleway, sans-serif;
-  font-weight: 700;
-  font-size: 13px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.col2 {
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  font-weight: 700;
-  font-size: 1rem;
+.full {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
+/* Labels */
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a4a4a;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="date"],
+select {
+    padding: 10px 14px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    background: #f5f5f5;
+    font-size: 14px;
+    color: #4a4a4a;
+    transition: all 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+    outline: none;
+    border-color: #9a9a9a;
+    background: #fafafa;
+}
+
+input[type="date"] {
+    min-width: 140px;
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Radio buttons for area */
 .area-options {
-  display: flex;
-  gap: 24px;
-  margin-top: 6px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
 }
 
 .area-options label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #555;
-  margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
 }
 
-.area-options input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  margin: 0;
-  accent-color: #d0c009;
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4a4a4a;
 }
 
-/* pessoas */
-.person-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr auto;
-  gap: 12px;
-  align-items: flex-end;
-  margin-bottom: 12px;
-  padding: 8px 0;
-}
-
-.person-row-name {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.person-row-name label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
-}
-
-.person-row-name input[type="text"] {
-  width: 100%;
-  padding: 8px 10px;
-  background: #dfdfdf;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.person-row-date {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.person-row-date label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
-}
-
-.person-row-date input[type="date"] {
-  width: 100%;
-  padding: 8px 10px;
-  background: #dfdfdf;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.person-row-remove {
-  padding: 0;
-  align-self: flex-end;
-}
-
-/* ações e total */
-.entries-actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 12px;
-  align-items: center;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
-  margin-top: 12px;
-}
-
-.total-line {
-  width: 100%;
-  text-align: center;
-  padding: 14px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  margin: 14px 0;
-}
-
-.total-line .label {
-  color: #666;
-  font-size: 13px;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.total-line .value {
-  font-size: 22px;
-  font-weight: 800;
-  color: #2f2f2f;
-}
-
-/* Footer com botões */
-.modal-footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  flex: 0 0 auto;
-  margin-top: 8px;
-}
-
-.btn-cancel {
-  background: #9d9c9c;
-  color: #fff;
-  padding: 10px 22px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-confirm {
-  background: #d0c009;
-  color: #222;
-  padding: 10px 22px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-}
-
-/* botões utilitários */
+/* Add button */
 .btn-add {
-  border-radius: 20px;
-  background: #9d9c9c;
-  border: 1px dashed #cfcfcf;
-  padding: 8px 12px;
-  color: #fff;
-  cursor: pointer;
+    background: none;
+    border: 2px solid #4a4a4a;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 26px;
+    padding: 0;
 }
 
-.btn-remove {
-  background: transparent;
-  color: #999;
-  font-size: 18px;
-  padding: 0 5px;
-  border: none;
-  cursor: pointer;
+.btn-add:hover {
+    background: #4a4a4a;
+    transform: scale(1.05);
 }
 
+.btn-add:hover .icon {
+    filter: brightness(0) invert(1);
+}
+
+.btn-add .icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Garantir estilo padrão para btn-small (caso ainda não exista) */
 .btn-small {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border-radius: 50%;
   border: 2px solid #ccc;
   background: transparent;
-  color: #999;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.btn-small:hover {
-  border-color: #999;
   color: #666;
-}
-
-.btn-small:active {
-  transform: scale(0.95);
-}
-
-/* tooltip (tabela de valores) */
-.tabela-help-right {
-  position: absolute;
-  top: 18px;
-  right: 22px;
-  font-size: 13px;
-  color: #777;
-}
-
-.tabela-tooltip-wrapper {
-  position: relative;
-  display: inline-block;
-  overflow: visible;
-  z-index: 120000;
-}
-
-.tabela-tooltip-btn {
-  background: transparent;
-  border: none;
-  color: #777;
-  font-size: 13px;
-  cursor: pointer;
+  font-size: 18px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
 }
 
-.tabela-tooltip-icon {
-  font-size: 14px;
+/* Hover/active iguais para ambos */
+.btn-small:hover,
+.btn-add:hover {
+  border-color: #999;
+  color: #333;
+  background: #f5f5f5;
 }
 
-.tabela-tooltip {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  z-index: 120001;
-  width: 420px;
-  max-width: calc(100vw - 40px);
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
-  opacity: 0;
-  visibility: hidden;
-  transform-origin: top right;
-  transform: translateY(-8px) scale(0.95);
-  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
-  pointer-events: none;
+.btn-small:active,
+.btn-add:active {
+  transform: scale(0.97);
 }
 
-.tabela-tooltip img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 60vh;
-  object-fit: contain;
-  border-radius: 4px;
+/* Fazer btn-add ter o mesmo tamanho/visual do btn-small */
+.btn-add {
+  /* Reaproveita as mesmas regras do btn-small */
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: transparent;
+  color: #666;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
 }
 
-/* Mostrar tooltip ao hover */
-.tabela-tooltip-wrapper:hover .tabela-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
+/* Entry cards */
+.entry-card {
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fafafa;
 }
 
-.tabela-tooltip-wrapper:focus-within .tabela-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
+.entry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.entry-number {
+    font-size: 15px;
+    font-weight: 600;
+    color: #4a4a4a;
+    text-transform: capitalize;
+}
+
+.entry-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-remove {
+    background: #e5e5e5;
+    color: #4a4a4a;
+}
+
+.btn-remove:hover {
+    background: #d0d0d0;
+    transform: scale(1.05);
+}
+
+/* Family and single grids */
+.family-grid,
+.single-grid {
+    width: 100%;
+}
+
+.subtitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6a6a6a;
+    margin: 12px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.person-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.person-row input[type="text"] {
+    flex: 1;
+}
+
+.person-row input[type="date"] {
+    flex: 0 0 auto;
+    min-width: 140px;
+}
+
+/* Seguro section */
+.entry-bottom {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.inline label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Tooltip for seguro */
+.tooltip-btn {
+    background: none;
+    border: 1.5px solid #6a6a6a;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6a6a6a;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.tooltip-btn:hover {
+    background: #6a6a6a;
+    color: white;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 12px;
+    background: #fffae6;
+    border: 1px solid #e6d89f;
+    border-radius: 6px;
+    padding: 14px 16px;
+    min-width: 320px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #4a4a4a;
+    font-weight: 400;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: #fffae6;
+}
+
+.tooltip-btn:hover+.tooltip,
+.tooltip:hover {
+    display: block;
+}
+
+.tooltip strong {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* Total section */
+.entries-actions {
+    margin: 28px 0 24px;
+    padding: 20px 0;
+    border-top: 2px solid #4a4a4a;
+    border-bottom: 2px solid #4a4a4a;
+}
+
+.ski-total {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a4a4a;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* Footer buttons */
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding-top: 8px;
+}
+
+.btn-cancel,
+.btn-confirm {
+    padding: 14px 48px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.btn-cancel {
+    background: #9a9a9a;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #7a7a7a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-confirm {
+    background: #d4c517;
+    color: #4a4a4a;
+}
+
+.btn-confirm:hover {
+    background: #c4b517;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(212, 197, 23, 0.3);
+}
+
+/* Notice text */
+.entry-bottom+div {
+    text-align: center;
+    font-size: 13px;
+    color: #7a7a7a;
+    margin: 16px 0;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ski-pass-layout {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+    
+    .modal-header {
+        padding: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .modal-title {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+    
+    .tabela-help-right {
+        width: 100%;
+        order: 2;
+    }
+    
+    .tabela-tooltip-btn {
+        font-size: 13px;
+        padding: 2px 4px;
+    }
+    
+    .tabela-tooltip {
+        min-width: 280px;
+        max-width: 90vw;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    /* Form rows - empilhar verticalmente */
+    .row {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .col,
+    .full {
+        width: 100%;
+        
+    }
+    
+    /* Labels e inputs em largura completa */
+    label {
+        font-size: 13px;
+    }
+    
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: 100%;
+        background: #DFDFDF;
+        padding: 12px 14px;
+        font-size: 15px;
+        min-height: 44px;
+    }
+    
+    input[type="date"] {
+        min-width: 100%;
+        background: #DFDFDF
+    }
+    
+    select {
+        padding-right: 40px;
+    }
+    
+    /* Radio buttons - empilhar verticalmente */
+    .area-options {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 12px;
+    }
+    
+    .area-options label {
+        padding: 8px 0;
+        font-size: 15px;
+    }
+    
+    input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 4px;
+    }
+    
+    /* Botão adicionar */
+    .btn-add {
+        margin-top: 0;
+        align-self: center;
+        width: 48px;
+        height: 48px;
+        min-height: 48px;
+    }
+    
+    .btn-add .icon {
+        width: 22px;
+        height: 22px;
+    }
+    
+    /* Entry cards */
+    .entry-card {
+        padding: 14px;
+        margin-bottom: 12px;
+    }
+    
+    .entry-number {
+        font-size: 14px;
+    }
+    
+    .btn-small {
+        width: 36px;
+        height: 36px;
+        min-height: 36px;
+        font-size: 20px;
+    }
+    
+    /* Person rows - empilhar campos */
+    .person-row {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .person-row input[type="text"],
+    .person-row input[type="date"] {
+        width: 100%;
+        flex: none;
+    }
+    
+    .subtitle {
+        font-size: 13px;
+        margin: 16px 0 12px;
+    }
+    
+    /* Seguro section */
+    .entry-bottom {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+    }
+    
+    .inline {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .inline label {
+        padding: 8px 0;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Tooltip do seguro */
+    .tooltip-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+        min-height: 24px;
+        margin: 0 8px;
+    }
+    
+    .tooltip {
+        min-width: 280px;
+        max-width: calc(100vw - 40px);
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: auto;
+        top: 100%;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+    
+    .tooltip::after {
+        top: auto;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-top-color: transparent;
+        border-bottom-color: #fffae6;
+    }
+    
+    /* Total section */
+    .entries-actions {
+        margin: 20px 0 16px;
+        padding: 16px 0;
+    }
+    
+    .ski-total {
+        font-size: 18px;
+    }
+    
+    /* Footer buttons */
+    .modal-footer {
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 0;
+    }
+    
+    .btn-cancel,
+    .btn-confirm {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 16px;
+        min-height: 52px;
+    }
+    
+    /* Ajustes de scrollbar para mobile */
+    .ski-pass-layout::-webkit-scrollbar {
+        width: 4px;
+    }
+    }
+    
+    /* Mobile pequeno - ajustes extras */
+    @media (max-width: 480px) {
+        .modal-title {
+            font-size: 24px;
+        }
+    
+        .modal-body {
+            padding: 12px;
+        }
+    
+        .entry-card {
+            padding: 12px;
+        }
+    
+        input[type="text"],
+        input[type="date"],
+        select {
+            padding: 10px 12px;
+            font-size: 14px;
+    }
+}
+
+/* Scrollbar styling */
+.ski-pass-layout::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ski-pass-layout::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.ski-pass-layout::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 4px;
+}
+
+.ski-pass-layout::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}
+
+/* Placeholder styling */
+::placeholder {
+    color: #9a9a9a;
+    opacity: 1;
+}
+
+/* Focus states for accessibility */
+.btn-add:focus,
+.btn-cancel:focus,
+.btn-confirm:focus,
+.btn-remove:focus,
+.tooltip-btn:focus,
+.tabela-tooltip-btn:focus {
+    outline: 2px solid #4a4a4a;
+    outline-offset: 2px;
 }
 
 /* tooltip pequeno (seguro) */
@@ -388,392 +810,72 @@ body.modal-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
   color: #444;
+  font-size: 12px;
+  padding: 0;
+  margin: 0 4px;
+  transition: all 0.15s ease;
+}
+
+.tooltip-btn:hover {
+  border-color: #999;
+  background: #f5f5f5;
 }
 
 .tooltip {
   position: absolute;
-  top: 40px;
-  left: 0;
-  z-index: 40;
-  width: 300px;
-  max-width: calc(100vw - 40px);
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 320px;
+  max-width: calc(100vw - 60px);
   background: #fbf8d9;
   color: #222;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 16px 18px;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-6px);
+  transform: translateX(-50%) translateY(-8px);
   pointer-events: none;
-  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.tooltip-btn:hover + .tooltip,
-.tooltip-wrapper:hover .tooltip,
-.tooltip-btn:focus + .tooltip,
-.tooltip-wrapper:focus-within .tooltip {
+/* Mostrar tooltip ao hover do botão pai */
+label:has(.tooltip-btn):hover .tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
-/* pequenas regras responsivas */
-@media (max-width: 920px) {
-  .modal-body {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-title {
-    font-size: 28px;
-  }
-
-  .modal-aside {
-    order: 2;
-    width: 100%;
-  }
-
-  .modal-form {
-    order: 1;
-    width: 100%;
-  }
-
-  .tabela-help-right {
-    position: static;
-    margin-top: 8px;
-    text-align: right;
-  }
+/* Mostrar ao focus */
+.tooltip-btn:focus {
+  outline: none;
+  border-color: #D0C009;
 }
 
-@media (max-width: 600px) {
-  .person-row {
-    grid-template-columns: 1fr 1fr auto;
-    gap: 8px;
-  }
-}
-
-/* ===== Seções de pessoas (Adultos / Crianças) ===== */
-.person-section {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eee;
-}
-
-.person-section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #555;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.person-item {
-  display: grid;
-  grid-template-columns: 1fr 200px 40px;
-  gap: 12px;
-  align-items: flex-end;
-  margin-bottom: 12px;
-  padding: 8px 0;
-}
-
-.person-item-name {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.person-item-name label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
-}
-
-.person-item-name input {
-  width: 100%;
-  padding: 8px 10px;
-  background: #dfdfdf;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 13px;
-}
-
-.person-item-date {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.person-item-date label {
-  font-size: 12px;
-  color: #666;
-  font-weight: 600;
-}
-
-.person-item-date input {
-  width: 100%;
-  padding: 8px 10px;
-  background: #dfdfdf;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 13px;
-}
-
-.person-item-remove {
-  display: flex;
-  align-items: flex-end;
-  height: 100%;
-}
-
-.person-item-remove button {
-  background: transparent;
-  border: none;
-  color: #999;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+label:has(.tooltip-btn):focus-within .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
 /* Responsivo */
-@media (max-width: 700px) {
-  .person-item {
-    grid-template-columns: 1fr 160px 40px;
-    gap: 8px;
-  }
-}
-
-@media (max-width: 600px) {
-  .person-item {
-    grid-template-columns: 1fr 1fr 40px;
-  }
-}
-
-.area-options {
-  display: flex;
-  justify-content: space-between;
-  font-family: Raleway, sans-serif;
-  font-size: 13px;
-  font-weight: normal;
-}
-
-/* ===== RESPONSIVO - Mobile (< 768px) ===== */
-@media (max-width: 768px) {
-  .modal-content.ski-pass-layout {
-    width: 95vw;
-    max-width: 100%;
-    padding: 16px 20px;
-    max-height: calc(100vh - 40px);
-  }
-
-  .modal-title {
-    font-size: 28px;
-    margin-bottom: 12px;
-  }
-
-  .modal-header {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .tabela-help-right {
-    position: static;
-    margin-top: 8px;
-    text-align: center;
-  }
-
-  /* Body empilha: form acima, aside abaixo */
-  .modal-body {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .modal-form {
-    grid-column: 1;
-  }
-
-  .modal-aside {
-    grid-column: 1;
-    order: 2;
-  }
-
-  .modal-aside .tabela-box {
-    padding: 8px;
-    font-size: 12px;
-  }
-
-  /* Inputs menores */
-  .modal-content.ski-pass-layout input,
-  .modal-content.ski-pass-layout select,
-  .modal-content.ski-pass-layout textarea {
-    font-size: 13px;
-    padding: 6px 8px;
-    height: auto;
-  }
-
-  .row,
-  .row1 {
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 6px;
-    margin-right: 0px;
-  }
-
-  .col,
-  .col2 {
-    width: 100%;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 4px;
-  }
-
-  .col label,
-  .col2 label {
-    font-size: 12px;
-    margin-bottom: 4px;
-  }
-
-  /* Area options horizontal em mobile */
-  .area-options {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .area-options label {
-    font-size: 13px;
-    gap: 6px;
-  }
-
-  /* Pessoas - grid coluna única */
-  .person-item {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .person-item-name,
-  .person-item-date {
-    gap: 2px;
-  }
-
-  .person-item-name label,
-  .person-item-date label {
-    font-size: 11px;
-  }
-
-  .person-item-name input,
-  .person-item-date input {
-    padding: 6px 8px;
-    font-size: 12px;
-  }
-
-  .person-item-remove {
-    justify-self: end;
-  }
-
-  /* Seções com padding reduzido */
-  .person-section {
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-  }
-
-  .person-section-title {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-
-  /* Total reduzido */
-  .total-line {
-    padding: 10px 0;
-    margin: 10px 0;
-  }
-
-  .total-line .value {
-    font-size: 18px;
-  }
-
-  /* Botões footer centralizados */
-  .modal-footer {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  .btn-cancel,
-  .btn-confirm {
-    width: 100%;
-    padding: 12px 20px;
-  }
-
-  .btn-add {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .btn-small {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-  }
-
-  /* Tooltip em mobile */
-  .tabela-tooltip {
-    width: calc(100vw - 40px);
-    max-width: 360px;
-  }
-
-  .tabela-tooltip img {
-    max-height: 50vh;
-  }
-}
-
-/* ===== Extra Small (< 480px) ===== */
 @media (max-width: 480px) {
-  .modal-content.ski-pass-layout {
-    padding: 12px 16px;
-  }
-
-  .modal-title {
-    font-size: 24px;
-  }
-
-  .modal-content.ski-pass-layout input,
-  .modal-content.ski-pass-layout select {
+  .tooltip {
+    width: calc(100vw - 40px);
     font-size: 12px;
-  }
-
-  .col,
-  .col2 {
-    font-size: 11px;
-  }
-
-  .person-item-name input,
-  .person-item-date input {
-    font-size: 11px;
-  }
-
-  .person-section-title {
-    font-size: 11px;
-  }
-
-  .btn-cancel,
-  .btn-confirm {
-    padding: 10px 16px;
-    font-size: 12px;
+    padding: 14px 16px;
   }
 }
