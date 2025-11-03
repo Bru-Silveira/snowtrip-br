@@ -212,9 +212,9 @@ const ModalSkiPass = ({
           </div>
 
           <div className="row">
-            <label className="full">
+            <label className="col">
               Tipo de passe:
-              <div className="row inline-select-add">
+              <div className="inline-select-add">
               <select
                 value={tipoSkiPass}
                 onChange={(e) => setTipoSkiPass(e.target.value)}
