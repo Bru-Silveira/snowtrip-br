@@ -214,6 +214,7 @@ const ModalSkiPass = ({
           <div className="row">
             <label className="full">
               Tipo de passe:
+              <div className="row inline-select-add">
               <select
                 value={tipoSkiPass}
                 onChange={(e) => setTipoSkiPass(e.target.value)}
@@ -225,10 +226,14 @@ const ModalSkiPass = ({
                 <option value="adulto">Solo Adulto (18 - 75 anos)</option>
                 <option value="crianca">Solo Criança (5 - 18 anos)</option>
               </select>
-            </label>
-            <button type="button" className="btn-add" onClick={addSkiPassEntry}>
-              +
+              <button type="button" onClick={addSkiPassEntry}>
+                <span class="material-symbols-outlined">
+                  add_circle
+                </span>
             </button>
+            </div>
+            </label>
+            
           </div>
 
           {skiPassEntries.map((entry, idx) => (
