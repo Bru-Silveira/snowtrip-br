@@ -60,23 +60,15 @@ function App() {
 
       // Filtro por número de adultos
       const qtdeAdulttosValido = !numAdultos || imovel.detalhes?.detail?.nb_adultes >= numAdultos;
-      console.log(`[${index}] Capacidade do imóvel:`, imovel.detalhes?.detail?.nb_adultes, "Pessoas requeridas:", numAdultos);
 
       // Filtro por número de crianças
       const qtdeCriancasValido = !numCriancas || imovel.detalhes?.detail?.nb_enfants >= numCriancas;
-      console.log(`[${index}] Capacidade do imóvel:`, imovel.detalhes?.detail?.nb_enfants, "Pessoas requeridas:", numCriancas);
-
-
-      // Cálculo e filtro de faixa de preço
-      const precoNoite = imovel.resumo.prix_moyen_semaine || 0;
-      const dias = inicio && fim ? Math.ceil((fim - inicio) / (1000 * 60 * 60 * 24)) : 0;
-      const total = precoNoite * dias;
-      const dadosValidos = !inicio || !fim || (total >= faixaPreco[0] && total <= faixaPreco[1]);
 
       // Filtro de disponibilidade por data
       const dataValida = (() => {
         if (!inicio || !fim) return true; // Permite caso datas não sejam selecionadas
         const disponibilidades = imovel.disponibilidades || [];
+        console.log("Disponibilidades do imóvel:", disponibilidades);
         return disponibilidades.some(({ date_debut, date_fin }) => {
           if (!date_debut || !date_fin) return false;
           const dispInicio = new Date(date_debut);
@@ -85,13 +77,7 @@ function App() {
         });
       })();
 
-      // Debug logs para validação
-      //console.log(`[${index}] Cidade válida?`, cidadeValida);
-      //console.log(`[${index}] Pessoas válidas?`, pessoasValidas);
-      //console.log(`[${index}] Dados válidos?`, total.toFixed(2));
-      //console.log(`[${index}] Data válida?`, dataValida);
-
-      return cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dadosValidos && dataValida;
+      return cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida;
     });
 
     console.log("Imóveis filtrados:", imoveisFiltrados);
