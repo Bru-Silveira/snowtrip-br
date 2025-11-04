@@ -436,8 +436,8 @@ const ModalSkiPass = ({
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
                 <strong>
-                  Por apenas € 3,50 por pessoa/dia.Resgate imediato nas pistas
-                  em caso de acidenteCobertura médica e hospitalar, incluindo
+                  Por apenas € 3,50 por pessoa/dia. Resgate imediato nas pistas
+                  em caso de acidente. Cobertura médica e hospitalar, incluindo
                   transporte sanitário.
                 </strong>
                 <div style={{ marginTop: 6 }}>

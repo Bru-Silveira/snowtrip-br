@@ -414,8 +414,7 @@ input[type="radio"] {
 .tooltip {
   display: none;
   position: absolute;
-  bottom: 100%;
-  left: 50%;
+  left: 120px;
   transform: translateX(-50%);
   margin-bottom: 12px;
   background: #fffae6;
@@ -687,23 +686,12 @@ input[type="radio"] {
   }
 
   .tooltip {
-    min-width: 280px;
-    max-width: calc(100vw - 40px);
-    left: 50%;
+    width: 320px;
     transform: translateX(-50%);
     bottom: auto;
     top: 100%;
     margin-top: 8px;
     margin-bottom: 0;
-  }
-
-  .tooltip::after {
-    top: auto;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-top-color: transparent;
-    border-bottom-color: #fffae6;
   }
 
   /* Total section */
@@ -814,12 +802,11 @@ input[type="radio"] {
 
 .tooltip {
   position: absolute;
-  top: 32px;
-  left: 50%;
+  top: 180px;
+  left: 160px;
   transform: translateX(-50%);
   z-index: 9999;
   width: 320px;
-  max-width: calc(100vw - 60px);
   background: #fbf8d9;
   color: #222;
   padding: 16px 18px;
@@ -858,7 +845,6 @@ label:has(.tooltip-btn):focus-within .tooltip {
 /* Responsivo */
 @media (max-width: 480px) {
   .tooltip {
-    width: calc(100vw - 40px);
     font-size: 12px;
     padding: 14px 16px;
   }
