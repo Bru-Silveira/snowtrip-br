@@ -566,7 +566,6 @@ input[type="radio"] {
   input[type="date"],
   select {
     width: 100%;
-    background: #dfdfdf;
     padding: 12px 14px;
     font-size: 15px;
     min-height: 44px;
@@ -574,7 +573,6 @@ input[type="radio"] {
 
   input[type="date"] {
     min-width: 100%;
-    background: #dfdfdf;
   }
 
   select {
