@@ -30,14 +30,15 @@ body.modal-open {
 /* Header */
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
   padding: 24px 32px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  border: none;
 }
 
 .modal-title {
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 700;
   color: #5a5a5a;
   margin: 0;
@@ -45,7 +46,9 @@ body.modal-open {
 }
 
 .tabela-help-right {
-  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .tabela-tooltip-wrapper {
@@ -57,6 +60,7 @@ body.modal-open {
   border: none;
   color: #7a7a7a;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   padding: 4px 8px;
   display: flex;
@@ -527,24 +531,9 @@ input[type="radio"] {
     margin: 0;
   }
 
-  .modal-header {
-    padding: 16px;
-    flex-wrap: wrap;
-  }
-
-  .modal-title {
-    font-size: 28px;
-    margin-bottom: 8px;
-  }
-
   .tabela-help-right {
     width: 100%;
     order: 2;
-  }
-
-  .tabela-tooltip-btn {
-    font-size: 13px;
-    padding: 2px 4px;
   }
 
   .tabela-tooltip {
@@ -726,10 +715,6 @@ input[type="radio"] {
 
 /* Mobile pequeno - ajustes extras */
 @media (max-width: 480px) {
-  .modal-title {
-    font-size: 24px;
-  }
-
   .modal-body {
     padding: 12px;
   }
