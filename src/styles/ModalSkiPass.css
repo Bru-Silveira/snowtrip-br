@@ -692,13 +692,6 @@ input[type="radio"] {
     font-size: 18px;
   }
 
-  /* Footer buttons */
-  .modal-footer {
-    flex-direction: column;
-    gap: 12px;
-    padding-top: 0;
-  }
-
   .btn-cancel,
   .btn-confirm {
     width: 100%;
