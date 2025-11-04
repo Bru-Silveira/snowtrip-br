@@ -215,25 +215,22 @@ const ModalSkiPass = ({
             <label className="col">
               Tipo de passe:
               <div className="inline-select-add">
-              <select
-                value={tipoSkiPass}
-                onChange={(e) => setTipoSkiPass(e.target.value)}
-              >
-                <option value="">Selecione</option>
-                <option value="family">
-                  Family Flex (mínimo 2 adultos e 3 crianças)
-                </option>
-                <option value="adulto">Solo Adulto (18 - 75 anos)</option>
-                <option value="crianca">Solo Criança (5 - 18 anos)</option>
-              </select>
-              <button type="button" onClick={addSkiPassEntry}>
-                <span class="material-symbols-outlined">
-                  add_circle
-                </span>
-            </button>
-            </div>
+                <select
+                  value={tipoSkiPass}
+                  onChange={(e) => setTipoSkiPass(e.target.value)}
+                >
+                  <option value="">Selecione</option>
+                  <option value="family">
+                    Family Flex (mínimo 2 adultos e 3 crianças)
+                  </option>
+                  <option value="adulto">Solo Adulto (18 - 75 anos)</option>
+                  <option value="crianca">Solo Criança (5 - 18 anos)</option>
+                </select>
+                <button type="button" onClick={addSkiPassEntry}>
+                  <span class="material-symbols-outlined">add_circle</span>
+                </button>
+              </div>
             </label>
-            
           </div>
 
           {skiPassEntries.map((entry, idx) => (
@@ -428,14 +425,14 @@ const ModalSkiPass = ({
           ))}
 
           <div className="row entry-bottom">
-            <label className="inline" style={{ position: "relative" }}>
+            <label className="inline">
               Seguro Carré Neige:
               <button
                 type="button"
                 className="tooltip-btn"
                 aria-describedby="tooltip-seguro"
               >
-                ?
+                <span class="material-symbols-outlined help">help</span>
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
                 <strong>

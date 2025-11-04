@@ -118,9 +118,9 @@ body.modal-open {
 /* Form rows */
 .row {
   display: flex;
-  gap: 16px;
   margin-bottom: 20px;
   align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .row.people-section {
@@ -128,16 +128,13 @@ body.modal-open {
 }
 
 .col {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  margin-right: 12px;
 }
 
 .full {
-  flex: 1;
   display: flex;
-  gap: 8px;
 }
 
 .inline-select-add {
@@ -176,6 +173,10 @@ input[type="date"] {
   min-width: 140px;
 }
 
+input[type="radio"] {
+  margin-right: 6px;
+  margin-left: 6px;
+}
 select {
   cursor: pointer;
   appearance: none;
@@ -188,15 +189,12 @@ select {
 /* Radio buttons for area */
 .area-options {
   display: flex;
-  gap: 24px;
   margin-top: 8px;
 }
 
 .area-options label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 500;
   cursor: pointer;
 }
 
@@ -288,11 +286,16 @@ input[type="radio"] {
 }
 /* Icones dos botões*/
 .material-symbols-outlined {
-  font-size: 32px; /* tamanho do ícone */
+  font-size: 40px; /* tamanho do ícone */
   color: #5d5454; /* cor personalizada */
   vertical-align: middle;
   margin-right: 8px;
 }
+
+.help {
+  font-size: 20px; /* tamanho do ícone */
+}
+
 /* Entry cards */
 .entry-card {
   border: 1px solid #d0d0d0;
@@ -385,34 +388,22 @@ input[type="radio"] {
 .inline {
   display: flex;
   align-items: center;
-  gap: 12px;
   font-weight: 600;
 }
 
 .inline label {
   display: flex;
   align-items: center;
-  gap: 6px;
   font-weight: 500;
   cursor: pointer;
 }
 
 /* Tooltip for seguro */
 .tooltip-btn {
-  background: none;
-  border: 1.5px solid #6a6a6a;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: #6a6a6a;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  margin: 0;
 }
 
 .tooltip-btn:hover {
@@ -569,7 +560,6 @@ input[type="radio"] {
 
   /* Form rows - empilhar verticalmente */
   .row {
-    gap: 16px;
     margin-bottom: 16px;
     margin-right: 2px;
     margin-left: 2px;
@@ -607,20 +597,16 @@ input[type="radio"] {
   /* Radio buttons - empilhar verticalmente */
   .area-options {
     flex-direction: row;
-    justify-content: center;
-    gap: 16px;
     margin-top: 12px;
   }
 
   .area-options label {
     padding: 8px 0;
-    font-size: 12px;
   }
 
   input[type="radio"] {
     width: 20px;
     height: 20px;
-    margin-right: 4px;
   }
 
   /* Botão adicionar */
@@ -681,9 +667,6 @@ input[type="radio"] {
   }
 
   .inline {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
     width: 100%;
   }
 
@@ -818,17 +801,7 @@ input[type="radio"] {
 }
 
 .tooltip-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid #ddd;
-  background: #fff;
   cursor: pointer;
-  color: #444;
-  font-size: 12px;
   padding: 0;
   margin: 0 4px;
   transition: all 0.15s ease;
