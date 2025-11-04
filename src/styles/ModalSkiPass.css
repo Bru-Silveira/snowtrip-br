@@ -1,3 +1,7 @@
+button {
+  margin: 0 !important;
+}
+
 /* ===== Modal / Ski Pass (essenciais) ===== */
 .modal-overlay {
   position: fixed;
@@ -121,6 +125,7 @@ body.modal-open {
 /* Form rows */
 .row {
   display: flex;
+  margin: 0;
   margin-bottom: 20px;
   align-items: flex-start;
   justify-content: flex-start;
@@ -131,6 +136,7 @@ body.modal-open {
 }
 
 .col {
+  width: 100%;
   display: flex;
   flex-direction: column;
   margin-right: 12px;
@@ -155,6 +161,7 @@ label {
 input[type="text"],
 input[type="date"],
 select {
+  width: 100%;
   padding: 10px 14px;
   border: 1px solid #d0d0d0;
   border-radius: 4px;
@@ -162,6 +169,7 @@ select {
   font-size: 14px;
   color: #4a4a4a;
   transition: all 0.2s;
+  max-width: 300px;
 }
 
 input[type="text"]:focus,
@@ -480,6 +488,8 @@ input[type="radio"] {
 
 .btn-cancel,
 .btn-confirm {
+  width: 100%;
+  max-width: 270px;
   padding: 14px 48px;
   border: none;
   border-radius: 6px;
@@ -552,7 +562,6 @@ input[type="radio"] {
     margin-left: 2px;
   }
 
-  .col,
   .full {
     width: 100%;
   }
@@ -569,10 +578,6 @@ input[type="radio"] {
     padding: 12px 14px;
     font-size: 15px;
     min-height: 44px;
-  }
-
-  input[type="date"] {
-    min-width: 100%;
   }
 
   select {
@@ -692,7 +697,6 @@ input[type="radio"] {
 
   .btn-cancel,
   .btn-confirm {
-    width: 100%;
     padding: 16px 24px;
     font-size: 16px;
     min-height: 52px;
