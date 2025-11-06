@@ -132,6 +132,7 @@ body.modal-open {
 }
 
 .row.people-section {
+  padding: 12px;
   margin-bottom: 0;
 }
 
@@ -155,6 +156,16 @@ label {
   font-size: 14px;
   font-weight: 600;
   color: #4a4a4a;
+}
+
+.person-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6a6a6a;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  margin-top: 16px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 /* Inputs */
@@ -216,52 +227,20 @@ input[type="radio"] {
   accent-color: #4a4a4a;
 }
 
-/* Add button */
-.btn-add {
-  background: none;
-  border: 2px solid #4a4a4a;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
+/* Button to add more children */
+.btn-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 26px;
-  padding: 0;
+  justify-content: flex-end;
+  margin-top: 16px;
+  width: 100%;
 }
 
-.btn-add:hover {
-  background: #4a4a4a;
-  transform: scale(1.05);
-}
-
-.btn-add:hover .icon {
-  filter: brightness(0) invert(1);
-}
-
-.btn-add .icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* Garantir estilo padrão para btn-small (caso ainda não exista) */
-.btn-small {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  background: transparent;
-  color: #666;
-  font-size: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  line-height: 1;
+.btn-add-children {
+  background: #5a5a5a;
+  color: white;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 16px;
 }
 
 /* Hover/active iguais para ambos */
@@ -309,18 +288,15 @@ input[type="radio"] {
 
 /* Entry cards */
 .entry-card {
-  border: 1px solid #d0d0d0;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 16px;
-  background: #fafafa;
+  margin-top: 40px;
 }
-
 .entry-top {
   display: flex;
+  padding: 16px 0 16px 0;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  border-top: #9d9c9c 1px solid;
+  border-bottom: #9d9c9c 1px solid;
 }
 
 .entry-number {
@@ -349,16 +325,6 @@ input[type="radio"] {
   transition: all 0.2s;
 }
 
-.btn-remove {
-  background: #e5e5e5;
-  color: #4a4a4a;
-}
-
-.btn-remove:hover {
-  background: #d0d0d0;
-  transform: scale(1.05);
-}
-
 /* Family and single grids */
 .family-grid,
 .single-grid {
@@ -376,8 +342,9 @@ input[type="radio"] {
 
 .person-row {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   margin-bottom: 12px;
+  align-items: center;
 }
 
 .person-row input[type="text"] {
@@ -523,15 +490,6 @@ input[type="radio"] {
   box-shadow: 0 4px 8px rgba(212, 197, 23, 0.3);
 }
 
-/* Notice text */
-.entry-bottom + div {
-  text-align: center;
-  font-size: 13px;
-  color: #7a7a7a;
-  margin: 16px 0;
-  font-style: italic;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .ski-pass-layout {
@@ -608,16 +566,7 @@ input[type="radio"] {
     min-height: 48px;
   }
 
-  .btn-add .icon {
-    width: 22px;
-    height: 22px;
-  }
-
   /* Entry cards */
-  .entry-card {
-    padding: 14px;
-    margin-bottom: 12px;
-  }
 
   .entry-number {
     font-size: 14px;
@@ -633,7 +582,7 @@ input[type="radio"] {
   /* Person rows - empilhar campos */
   .person-row {
     flex-direction: column;
-    gap: 12px;
+    align-items: self-start;
     margin-bottom: 12px;
   }
 
@@ -714,10 +663,6 @@ input[type="radio"] {
     padding: 12px;
   }
 
-  .entry-card {
-    padding: 12px;
-  }
-
   input[type="text"],
   input[type="date"],
   select {
@@ -754,17 +699,10 @@ input[type="radio"] {
 .btn-add:focus,
 .btn-cancel:focus,
 .btn-confirm:focus,
-.btn-remove:focus,
 .tooltip-btn:focus,
 .tabela-tooltip-btn:focus {
   outline: 2px solid #4a4a4a;
   outline-offset: 2px;
-}
-
-/* tooltip pequeno (seguro) */
-.tooltip-wrapper {
-  position: relative;
-  display: inline-block;
 }
 
 .tooltip-btn {

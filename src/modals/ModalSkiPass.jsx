@@ -236,14 +236,14 @@ const ModalSkiPass = ({
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
-                <div className="entry-number">{entry.tipo + (idx + 1)}</div>
+                <div className="entry-number">SKI PASS {idx + 1}: {entry.tipo}</div>
                 <div className="entry-actions">
                   <button
                     type="button"
                     className="btn-small btn-remove"
                     onClick={() => removeSkiPassEntry(idx)}
                   >
-                    −
+                    <span class="material-symbols-outlined">cancel</span>
                   </button>
                 </div>
               </div>
@@ -251,13 +251,13 @@ const ModalSkiPass = ({
               <div className="row people-section">
                 {entry.tipo === "family" && (
                   <div className="family-grid">
-                    <div className="subtitle">Adultos</div>
                     {entry.esquiadores.adultos.map((adulto, idx_adulto) => (
                       <div key={idx_adulto}>
                         <div className="person-label">
                           Adulto {idx_adulto + 1}
                         </div>
                         <div className="person-row">
+                          <label>Nome Completo:</label>
                           <input
                             type="text"
                             placeholder="Nome completo"
@@ -276,6 +276,7 @@ const ModalSkiPass = ({
                               });
                             }}
                           />
+                          <label>Data Nasc.:</label>
                           <input
                             type="date"
                             value={adulto.dataNasc || ""}
@@ -296,11 +297,11 @@ const ModalSkiPass = ({
                         </div>
                       </div>
                     ))}
-                    <div className="subtitle">Crianças</div>
                     {entry.esquiadores.criancas.map((c, ci) => (
                       <div key={ci}>
                         <div className="person-label">Criança {ci + 1}</div>
                         <div className="person-row">
+                          <label>Nome Completo:</label>
                           <input
                             type="text"
                             placeholder="Nome completo"
@@ -321,6 +322,7 @@ const ModalSkiPass = ({
                               });
                             }}
                           />
+                          <label>Data Nasc.:</label>
                           <input
                             type="date"
                             value={c.dataNasc || ""}
@@ -344,13 +346,15 @@ const ModalSkiPass = ({
                       </div>
                     ))}
                     {entry.esquiadores.criancas.length < 6 && (
+                      <div className="btn-row">
                       <button
                         type="button"
-                        className="btn-add"
+                        className="btn-add-children"
                         onClick={() => addChildEntry(idx)}
                       >
-                        +
+                        Adicionar Mais Crianças
                       </button>
+                      </div>
                     )}
                   </div>
                 )}
@@ -359,6 +363,7 @@ const ModalSkiPass = ({
                   <div className="single-grid">
                     <div className="person-label">Adulto 1</div>
                     <div className="person-row">
+                      <label>Nome Completo:</label>
                       <input
                         type="text"
                         placeholder="Nome completo"
@@ -372,6 +377,7 @@ const ModalSkiPass = ({
                           })
                         }
                       />
+                      <label>Data Nasc.:</label>
                       <input
                         type="date"
                         value={entry.esquiadores.dataNasc || ""}
@@ -392,6 +398,7 @@ const ModalSkiPass = ({
                   <div className="single-grid">
                     <div className="person-label">Criança 1</div>
                     <div className="person-row">
+                      <label>Nome Completo:</label>
                       <input
                         type="text"
                         placeholder="Nome completo"
@@ -405,6 +412,7 @@ const ModalSkiPass = ({
                           })
                         }
                       />
+                      <label>Data Nasc.:</label>
                       <input
                         type="date"
                         value={entry.esquiadores.dataNasc || ""}
