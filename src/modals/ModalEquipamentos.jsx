@@ -1,142 +1,616 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import "../styles/ModalEquipamentos.css";
+import logoAdd from "../img/logo-add.png";
+import skiEquipmentImg from "../img/ski-equipment.png";
+import snowboardEquipmentImg from "../img/snowboard-equipment.png";
+import helmetImg from "../img/helmet.png";
+import next from "../img/next.png";
+import back from "../img/back.png";
 
 const ModalEquipamentos = ({
-  servicoSelecionado,
-  categoria,
-  setCategoria,
-  equipamentoSelecionado,
-  setEquipamentoSelecionado,
-  tamanho,
-  setTamanho,
-  dias,
-  setDias,
-  equipamentos,
-  snowCategoria,
-  setSnowCategoria,
-  snowEquipamentoSelecionado,
-  setSnowEquipamentoSelecionado,
-  snowTamanho,
-  setSnowTamanho,
-  snowDias,
-  setSnowDias,
-  snowboardEquipamentos,
-  concluirModal,
-  setMostrarModal,
+  servicoSelecionado = null,
+  concluirModal = () => {},
+  setMostrarModal = () => {},
 }) => {
+  const [equipamentos, setEquipamentos] = useState([]);
+  const [packSelecionado, setPackSelecionado] = useState(0);
+  const [incluirCapacete, setIncluirCapacete] = useState(false);
+  const [tamanhoCapacete, setTamanhoCapacete] = useState("");
+  const [dias, setDias] = useState(1);
+  const [qtdePessoas, setQtdePessoas] = useState(1);
+  const [equipTotal, setEquipTotal] = useState(0);
+  const [regiao, setRegiao] = useState("franceses");
+  const [resort, setResort] = useState("");
+  const [loja, setLoja] = useState("");
+  const [genero, setGenero] = useState("masculino");
+  const [categoriaEquipamento, setCategoriaEquipamento] = useState("adulto");
+  const [modalidade, setModalidade] = useState("");
+  const [dataRetirada, setDataRetirada] = useState("");
+  const [dataDevolucao, setDataDevolucao] = useState("");
+  const [mostrarFormularioExpandido, setMostrarFormularioExpandido] =
+    useState(false);
+
+  const resortsporRegiao = {
+    franceses: [
+      "Courchevel 1850",
+      "Courchevel 1650 – Moriond",
+      "Courchevel 1550",
+      "Courchevel 1350 – Le Praz",
+      "Val Thorens",
+      "Meribel",
+      "Meribel Mottaret",
+      "Meribel Village",
+      "Val d'Isère",
+      "Tignes",
+      "Chamonix 345 / 550",
+      "Les Arcs",
+      "La Plagne",
+      "Alpe d'Huez",
+      "Megève",
+      "Samoëns",
+    ],
+    suicos: ["Zermatt", "St. Moritz"],
+  };
+
+  const lojasporResort = {
+    "Courchevel 1850": [
+      "Centro Vila",
+      "Ski Service Hotel Le Lana",
+      "Ski Service Hotel Six Senses",
+    ],
+    "Courchevel 1650 – Moriond": ["Centro Vila"],
+    "Courchevel 1550": ["Centro Vila"],
+    "Courchevel 1350 – Le Praz": ["Centro Vila"],
+    "Val Thorens": ["Centro Vila"],
+    Meribel: ["Centro Villa"],
+    "Meribel Mottaret": ["Centro Villa"],
+    "Meribel Village": ["Sport Merbibel Villa"],
+    "Val d'Isère": ["Centro Vila", "Chalet Val d'Isère", "Snow Berry"],
+    Tignes: ["Centro Vila"],
+    "Chamonix 345 / 550": ["Centro Vila", "Service Ski Hotel La Folie Douce"],
+    "Les Arcs": ["1600", "1800", "1900", "2000"],
+    "La Plagne": ["Centro Vila", "Plagne Aime", "Plagne Soleil / outras"],
+    "Alpe d'Huez": ["Centro Vila / outras"],
+    Megève: ["Philippe Sport", "Ride"],
+    Samoëns: ["Centro Villa", "1600"],
+    Zermatt: ["Centro Vila / Demais"],
+    "St. Moritz": ["Centro Vila / Demais"],
+  };
+
+  const packs = [
+    {
+      id: "pack-iniciante",
+      nome: "Descoberta",
+      nivel: "Nível Iniciante",
+      tipo: "ski",
+      tamanho: "150-160 cm",
+      precoBase: 45,
+      incluso: ["Skis", "Botas", "Bastões"],
+    },
+    {
+      id: "pack-sensacao",
+      nome: "Sensação",
+      nivel: "Nível Intermediário",
+      tipo: "ski",
+      tamanho: "160-170 cm",
+      precoBase: 50,
+      incluso: ["Skis", "Botas", "Bastões"],
+    },
+    {
+      id: "pack-avancado",
+      nome: "Excelência",
+      nivel: "Nível Avançado",
+      tipo: "ski",
+      tamanho: "170-180 cm",
+      precoBase: 60,
+      incluso: ["Skis", "Botas", "Bastões"],
+    },
+    {
+      id: "pack-snowboard-iniciante",
+      nome: "Pack Snowboard Iniciante",
+      nivel: "Nível Iniciante",
+      tipo: "snowboard",
+      tamanho: "150-155 cm",
+      precoBase: 50,
+      incluso: ["Snowboard", "Botas"],
+    },
+    {
+      id: "pack-snowboard-avancado",
+      nome: "Pack Snowboard Avançado",
+      nivel: "Nível Avançado",
+      tipo: "snowboard",
+      tamanho: "160-165 cm",
+      precoBase: 65,
+      incluso: ["Snowboard", "Botas"],
+    },
+  ];
+
+  const precoCapacete = 10;
+
+  const tamanhosCapacete = [
+    "PP (52-54 cm)",
+    "P (54-56 cm)",
+    "M (56-58 cm)",
+    "G (58-60 cm)",
+    "GG (60-62 cm)",
+  ];
+
+  const handleRegioChange = (novaRegiao) => {
+    setRegiao(novaRegiao);
+    setResort("");
+    setLoja("");
+  };
+
+  const handleResortChange = (novoResort) => {
+    setResort(novoResort);
+    setLoja("");
+  };
+
+  const calcularPrecoParaEntrada = (entrada) => {
+    let total = entrada.pack.precoBase * entrada.dias * entrada.qtdePessoas;
+
+    if (entrada.incluirCapacete) {
+      total += precoCapacete * entrada.dias * entrada.qtdePessoas;
+    }
+
+    return total;
+  };
+
+  const calcularPrecoTotal = () => {
+    const precoBase = packs[packSelecionado].precoBase * dias * qtdePessoas;
+    const precoCapaceteTotal = incluirCapacete
+      ? precoCapacete * dias * qtdePessoas
+      : 0;
+    return precoBase + precoCapaceteTotal;
+  };
+
+  const addEquipamento = () => {
+    if (!resort || !loja) {
+      alert("Por favor, selecione Resort e Loja");
+      return;
+    }
+
+    if (incluirCapacete && !tamanhoCapacete) {
+      alert("Por favor, selecione o tamanho do capacete");
+      return;
+    }
+
+    const novoEquipamento = {
+      id: Date.now(),
+      pack: packs[packSelecionado],
+      incluirCapacete,
+      tamanhoCapacete: incluirCapacete ? tamanhoCapacete : "",
+      dias,
+      qtdePessoas,
+      regiao,
+      resort,
+      loja,
+      genero,
+      categoriaEquipamento,
+    };
+
+    setEquipamentos([...equipamentos, novoEquipamento]);
+
+    setIncluirCapacete(false);
+    setTamanhoCapacete("");
+    setDias(1);
+    setQtdePessoas(1);
+  };
+
+  const removeEquipamento = (id) => {
+    setEquipamentos(equipamentos.filter((eq) => eq.id !== id));
+  };
+
+  const proximoPack = () => {
+    setPackSelecionado((prev) => (prev + 1) % packs.length);
+  };
+
+  const packAnterior = () => {
+    setPackSelecionado((prev) => (prev - 1 + packs.length) % packs.length);
+  };
+
+  useEffect(() => {
+    const total = equipamentos.reduce(
+      (sum, eq) => sum + calcularPrecoParaEntrada(eq),
+      0
+    );
+    setEquipTotal(total);
+  }, [equipamentos]);
+
+  const handleConfirm = () => {
+    concluirModal();
+    setMostrarModal(false);
+  };
+
   return (
-    <div className="modal-content">
-              <h2>{servicoSelecionado?.nome}</h2>
+    <div className="modal-content equip-layout">
+      <header className="modal-header">
+        <h2 className="modal-title">Equipamentos</h2>
+      </header>
 
-              {(servicoSelecionado?.slug === "equip-ski" ||
-                servicoSelecionado?.slug === "equip-snow") && (
-                <>
-                  <label>
-                    Categoria:
-                    <select
-                      value={
-                        servicoSelecionado.slug === "equip-ski"
-                          ? categoria
-                          : snowCategoria
-                      }
-                      onChange={(e) =>
-                        servicoSelecionado.slug === "equip-ski"
-                          ? setCategoria(e.target.value)
-                          : setSnowCategoria(e.target.value)
-                      }
-                    >
-                      <option value="">Selecione</option>
-                      <option value="1">Categoria 1 - Básico</option>
-                      <option value="2">Categoria 2 - Intermediário</option>
-                      <option value="3">Categoria 3 - Premium</option>
-                    </select>
-                  </label>
+      <div className="modal-body">
+        <section className="modal-form">
+          {/* REGIÃO - ALPES */}
+          <div className="row">
+            <label className="col">
+              Região:
+              <div className="area-options">
+                <label>
+                  <input
+                    type="radio"
+                    name="regiao"
+                    value="franceses"
+                    checked={regiao === "franceses"}
+                    onChange={() => handleRegioChange("franceses")}
+                  />
+                  Alpes Franceses
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="regiao"
+                    value="suicos"
+                    checked={regiao === "suicos"}
+                    onChange={() => handleRegioChange("suicos")}
+                  />
+                  Alpes Suíços
+                </label>
+              </div>
+            </label>
+          </div>
 
-                  {(categoria || snowCategoria) && (
-                    <>
-                      <label>
-                        Equipamento:
-                        <select
-                          value={
-                            servicoSelecionado.slug === "equip-ski"
-                              ? equipamentoSelecionado
-                              : snowEquipamentoSelecionado
-                          }
-                          onChange={(e) =>
-                            servicoSelecionado.slug === "equip-ski"
-                              ? setEquipamentoSelecionado(e.target.value)
-                              : setSnowEquipamentoSelecionado(e.target.value)
-                          }
-                        >
-                          <option value="">Selecione</option>
-                          {(servicoSelecionado.slug === "equip-ski"
-                            ? equipamentos
-                            : snowboardEquipamentos
-                          ).map((e) => (
-                            <option key={e.id} value={e.id}>
-                              {e.nome}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-
-                      <label>
-                        Tamanho:
-                        <select
-                          value={
-                            servicoSelecionado.slug === "equip-ski"
-                              ? tamanho
-                              : snowTamanho
-                          }
-                          onChange={(e) =>
-                            servicoSelecionado.slug === "equip-ski"
-                              ? setTamanho(e.target.value)
-                              : setSnowTamanho(e.target.value)
-                          }
-                        >
-                          <option value="">Selecione</option>
-                          <optgroup label="Infantil">
-                            <option value="4-6 anos">4-6 anos</option>
-                            <option value="8-10 anos">8-10 anos</option>
-                          </optgroup>
-                          <optgroup label="Adulto">
-                            <option value="P">P</option>
-                            <option value="M">M</option>
-                          </optgroup>
-                        </select>
-                      </label>
-
-                      <label>
-                        Quantidade de dias:
-                        <input
-                          type="number"
-                          min="1"
-                          value={
-                            servicoSelecionado.slug === "equip-ski"
-                              ? dias
-                              : snowDias
-                          }
-                          onChange={(e) =>
-                            servicoSelecionado.slug === "equip-ski"
-                              ? setDias(parseInt(e.target.value || "1", 10))
-                              : setSnowDias(parseInt(e.target.value || "1", 10))
-                          }
-                        />
-                      </label>
-                    </>
-                  )}
-                </>
-              )}
-
-              <button onClick={concluirModal} className="btn-concluir">
-                Concluir e adicionar ao carrinho
-              </button>
-              <button
-                onClick={() => setMostrarModal(false)}
-                className="btn-cancelar"
+          {/* RESORT / ESTAÇÃO */}
+          <div className="row">
+            <label className="col">
+              Estação / Resort:
+              <select
+                value={resort}
+                onChange={(e) => handleResortChange(e.target.value)}
               >
-                Cancelar
-              </button>
+                <option value="">Selecione</option>
+                {resortsporRegiao[regiao].map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {/* LOJA */}
+          <div className="row">
+            <label className="col">
+              Loja:
+              <select
+                value={loja}
+                onChange={(e) => setLoja(e.target.value)}
+                disabled={!resort}
+              >
+                <option value="">Selecione</option>
+                {resort &&
+                  (lojasporResort[resort] || []).map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          </div>
+
+          {/* ADICIONAR EQUIPAMENTO */}
+          <div className="row add-button-row">
+            <span className="add-label">Adicionar equipamento:</span>
+            <button
+              type="button"
+              className="btn-add"
+              onClick={() => {
+                if (!resort || !loja) {
+                  alert("Por favor, selecione Resort e Loja primeiro");
+                  return;
+                }
+                setMostrarFormularioExpandido(true);
+              }}
+            >
+              <img src={logoAdd} alt="Adicionar" className="icon" />
+            </button>
+          </div>
+
+          {/* FORMULÁRIO EXPANDIDO - Aparece ao clicar no + */}
+          {mostrarFormularioExpandido && (
+            <>
+              {/* GÊNERO */}
+              <div className="row">
+                <label className="col">
+                  Gênero:
+                  <div className="area-options">
+                    <label>
+                      <input
+                        type="radio"
+                        name="genero"
+                        value="masculino"
+                        checked={genero === "masculino"}
+                        onChange={() => setGenero("masculino")}
+                      />
+                      Masculino
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="genero"
+                        value="feminino"
+                        checked={genero === "feminino"}
+                        onChange={() => setGenero("feminino")}
+                      />
+                      Feminino
+                    </label>
+                  </div>
+                </label>
+              </div>
+
+              {/* CATEGORIA - ADULTO/INFANTIL */}
+              <div className="row">
+                <label className="col">
+                  Tamanho:
+                  <div className="area-options">
+                    <label>
+                      <input
+                        type="radio"
+                        name="tamanhoCategoria"
+                        value="adulto"
+                        checked={categoriaEquipamento === "adulto"}
+                        onChange={() => setCategoriaEquipamento("adulto")}
+                      />
+                      Adulto
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="tamanhoCategoria"
+                        value="infantil"
+                        checked={categoriaEquipamento === "infantil"}
+                        onChange={() => setCategoriaEquipamento("infantil")}
+                      />
+                      Infantil
+                    </label>
+                  </div>
+                </label>
+              </div>
+
+              {/* MODALIDADE */}
+              <div className="row">
+                <div className="col">
+                  <label>Modalidade</label>
+                  <select
+                    value={modalidade}
+                    onChange={(e) => setModalidade(e.target.value)}
+                  >
+                    <option value="">Selecione</option>
+                    <option value="ski">Ski</option>
+                    <option value="snowboard">Snowboard</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* DATA DE RETIRADA E DEVOLUÇÃO */}
+              <div className="row">
+                <div className="col">
+                  <label>Data de Retirada</label>
+                  <input
+                    type="date"
+                    value={dataRetirada}
+                    onChange={(e) => setDataRetirada(e.target.value)}
+                  />
+                </div>
+                <div className="col">
+                  <label>Data de Devolução</label>
+                  <input
+                    type="date"
+                    value={dataDevolucao}
+                    onChange={(e) => setDataDevolucao(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* CARROSSEL DE PACKS - Aparece apenas quando formulário expandido e todos os campos estão preenchidos */}
+              {genero &&
+                categoriaEquipamento &&
+                modalidade &&
+                dataRetirada &&
+                dataDevolucao && (
+                  <div className="pack-carousel">
+                    <button
+                      type="button"
+                      className="carousel-btn prev"
+                      onClick={packAnterior}
+                    >
+                      <img src={back} alt="Anterior" className="icon" />
+                    </button>
+
+                    <div className="pack-card">
+                      <div className="pack-image">
+                        <img
+                          src={
+                            packs[packSelecionado].tipo === "ski"
+                              ? skiEquipmentImg
+                              : snowboardEquipmentImg
+                          }
+                          alt={packs[packSelecionado].nome}
+                        />
+                      </div>
+
+                      <div className="pack-info">
+                        <h3 className="pack-nome">
+                          {packs[packSelecionado].nome}
+                        </h3>
+                        <p className="pack-nivel">
+                          {packs[packSelecionado].nivel}
+                        </p>
+
+                        <div className="pack-preco">
+                          <span className="preco-valor">
+                            € {calcularPrecoTotal().toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className="pack-incluso">
+                          <p>Incluso:</p>
+                          <p>{packs[packSelecionado].incluso.join(" + ")}</p>
+                        </div>
+
+                        <div className="capacete-card">
+                          <div className="capacete-card-content">
+                            <div className="capacete-image">
+                              <img
+                                src={helmetImg}
+                                alt="Capacete"
+                                className={incluirCapacete ? "" : "grayscale"}
+                              />
+                            </div>
+
+                            <div className="capacete-info-inline">
+                              <span className="capacete-preco">
+                                + €{" "}
+                                {(precoCapacete * dias * qtdePessoas).toFixed(
+                                  2
+                                )}
+                              </span>
+
+                              <label className="toggle-switch">
+                                <input
+                                  type="checkbox"
+                                  checked={incluirCapacete}
+                                  onChange={(e) =>
+                                    setIncluirCapacete(e.target.checked)
+                                  }
+                                />
+                                <span className="toggle-slider"></span>
+                              </label>
+                            </div>
+                          </div>
+
+                          {incluirCapacete && (
+                            <div className="capacete-size-inline">
+                              <label>Tamanho do Capacete</label>
+                              <select
+                                value={tamanhoCapacete}
+                                onChange={(e) =>
+                                  setTamanhoCapacete(e.target.value)
+                                }
+                              >
+                                <option value="">Selecione</option>
+                                {tamanhosCapacete.map((t) => (
+                                  <option key={t} value={t}>
+                                    {t}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className="btn-adicionar-pack"
+                          onClick={addEquipamento}
+                        >
+                          ADICIONAR
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="carousel-btn next"
+                      onClick={proximoPack}
+                    >
+                      <img src={next} alt="Próximo" className="icon" />
+                    </button>
+                  </div>
+                )}
+            </>
+          )}
+
+          {/* LISTA DE EQUIPAMENTOS */}
+          {equipamentos.map((eq, index) => (
+            <div key={eq.id} className="entry-card">
+              <div className="entry-top">
+                <span className="entry-number">Equipamento {index + 1}</span>
+                <div className="entry-actions">
+                  <button
+                    type="button"
+                    className="btn-small btn-remove"
+                    onClick={() => removeEquipamento(eq.id)}
+                    title="Remover"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              <div className="entry-summary">
+                <div className="summary-item">
+                  <strong>Pack:</strong> {eq.pack.nome}
+                </div>
+                <div className="summary-item">
+                  <strong>Nível:</strong> {eq.pack.nivel}
+                </div>
+                <div className="summary-item">
+                  <strong>Tamanho:</strong> {eq.pack.tamanho}
+                </div>
+                <div className="summary-item">
+                  <strong>Gênero:</strong>{" "}
+                  {eq.genero === "masculino" ? "Masculino" : "Feminino"}
+                </div>
+                <div className="summary-item">
+                  <strong>Categoria:</strong>{" "}
+                  {eq.categoriaEquipamento === "adulto" ? "Adulto" : "Infantil"}
+                </div>
+                <div className="summary-item">
+                  <strong>Resort:</strong> {eq.resort}
+                </div>
+                <div className="summary-item">
+                  <strong>Loja:</strong> {eq.loja}
+                </div>
+                <div className="summary-item">
+                  <strong>Dias:</strong> {eq.dias}
+                </div>
+                <div className="summary-item">
+                  <strong>Pessoas:</strong> {eq.qtdePessoas}
+                </div>
+                <div className="summary-item">
+                  <strong>Capacete:</strong>{" "}
+                  {eq.incluirCapacete ? `Sim (${eq.tamanhoCapacete})` : "Não"}
+                </div>
+                <div className="summary-total">
+                  Total: €{calcularPrecoParaEntrada(eq).toFixed(2)}
+                </div>
+              </div>
             </div>
+          ))}
+
+          {equipamentos.length > 0 && (
+            <div className="entries-actions">
+              <div className="equip-total">
+                TOTAL EQUIPAMENTOS: €{equipTotal.toFixed(2)}
+              </div>
+            </div>
+          )}
+
+          {/* BOTÕES FINAIS */}
+          <div className="modal-footer">
+            <button
+              className="btn-cancel"
+              onClick={() => setMostrarModal(false)}
+            >
+              CANCELAR
+            </button>
+            <button className="btn-confirm" onClick={handleConfirm}>
+              ADICIONAR
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };
 
