@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+
 import tabelaImg from "../img/tabela-ski.jpg";
+
+import "react-toastify/dist/ReactToastify.css";     
 import "../styles/ModalSkiPass.css";
 
 const ModalSkiPass = ({
@@ -50,6 +54,11 @@ const ModalSkiPass = ({
   };
 
   const addSkiPassEntry = () => {
+    if(dataInicio === "" || tipoSkiPass === "") {
+      toast.error("Por favor, selecione a Data de Início e o Tipo de Passe antes de adicionar.");
+      return;
+    }
+
     setSkiPassEntries((prev) => [
       ...prev,
       {

@@ -360,7 +360,6 @@ input[type="radio"] {
 .entry-bottom {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e5e5e5;
 }
 
 .inline {
@@ -451,6 +450,7 @@ input[type="radio"] {
   justify-content: center;
   gap: 16px;
   padding-top: 8px;
+  border: none;
 }
 
 .btn-cancel,
