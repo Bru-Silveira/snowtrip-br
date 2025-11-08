@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+
 import tabelaImg from "../img/tabela-ski.jpg";
+
+import "react-toastify/dist/ReactToastify.css";     
 import "../styles/ModalSkiPass.css";
 
 const ModalSkiPass = ({
@@ -50,6 +54,11 @@ const ModalSkiPass = ({
   };
 
   const addSkiPassEntry = () => {
+    if(dataInicio === "" || tipoSkiPass === "") {
+      toast.error("Por favor, selecione a Data de Início e o Tipo de Passe antes de adicionar.");
+      return;
+    }
+
     setSkiPassEntries((prev) => [
       ...prev,
       {
@@ -212,36 +221,38 @@ const ModalSkiPass = ({
           </div>
 
           <div className="row">
-            <label className="full">
+            <label className="col">
               Tipo de passe:
-              <select
-                value={tipoSkiPass}
-                onChange={(e) => setTipoSkiPass(e.target.value)}
-              >
-                <option value="">Selecione</option>
-                <option value="family">
-                  Family Flex (mínimo 2 adultos e 3 crianças)
-                </option>
-                <option value="adulto">Solo Adulto (18 - 75 anos)</option>
-                <option value="crianca">Solo Criança (5 - 18 anos)</option>
-              </select>
+              <div className="inline-select-add">
+                <select
+                  value={tipoSkiPass}
+                  onChange={(e) => setTipoSkiPass(e.target.value)}
+                >
+                  <option value="">Selecione</option>
+                  <option value="family">
+                    Family Flex (mínimo 2 adultos e 3 crianças)
+                  </option>
+                  <option value="adulto">Solo Adulto (18 - 75 anos)</option>
+                  <option value="crianca">Solo Criança (5 - 18 anos)</option>
+                </select>
+                <button type="button" onClick={addSkiPassEntry}>
+                  <span class="material-symbols-outlined">add_circle</span>
+                </button>
+              </div>
             </label>
-            <button type="button" className="btn-add" onClick={addSkiPassEntry}>
-              +
-            </button>
           </div>
 
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
-                <div className="entry-number">{entry.tipo + (idx + 1)}</div>
+                <div className="entry-number">SKI PASS {idx + 1}: {entry.tipo}</div>
                 <div className="entry-actions">
                   <button
                     type="button"
                     className="btn-small btn-remove"
                     onClick={() => removeSkiPassEntry(idx)}
                   >
-                    −
+                    <span class="material-symbols-outlined">cancel</span>
                   </button>
                 </div>
               </div>
@@ -249,13 +260,13 @@ const ModalSkiPass = ({
               <div className="row people-section">
                 {entry.tipo === "family" && (
                   <div className="family-grid">
-                    <div className="subtitle">Adultos</div>
                     {entry.esquiadores.adultos.map((adulto, idx_adulto) => (
                       <div key={idx_adulto}>
                         <div className="person-label">
                           Adulto {idx_adulto + 1}
                         </div>
                         <div className="person-row">
+                          <label>Nome Completo:</label>
                           <input
                             type="text"
                             placeholder="Nome completo"
@@ -274,6 +285,7 @@ const ModalSkiPass = ({
                               });
                             }}
                           />
+                          <label>Data Nasc.:</label>
                           <input
                             type="date"
                             value={adulto.dataNasc || ""}
@@ -294,11 +306,11 @@ const ModalSkiPass = ({
                         </div>
                       </div>
                     ))}
-                    <div className="subtitle">Crianças</div>
                     {entry.esquiadores.criancas.map((c, ci) => (
                       <div key={ci}>
                         <div className="person-label">Criança {ci + 1}</div>
                         <div className="person-row">
+                          <label>Nome Completo:</label>
                           <input
                             type="text"
                             placeholder="Nome completo"
@@ -319,6 +331,7 @@ const ModalSkiPass = ({
                               });
                             }}
                           />
+                          <label>Data Nasc.:</label>
                           <input
                             type="date"
                             value={c.dataNasc || ""}
@@ -342,13 +355,15 @@ const ModalSkiPass = ({
                       </div>
                     ))}
                     {entry.esquiadores.criancas.length < 6 && (
+                      <div className="btn-row">
                       <button
                         type="button"
-                        className="btn-add"
+                        className="btn-add-children"
                         onClick={() => addChildEntry(idx)}
                       >
-                        +
+                        Adicionar Mais Crianças
                       </button>
+                      </div>
                     )}
                   </div>
                 )}
@@ -357,6 +372,7 @@ const ModalSkiPass = ({
                   <div className="single-grid">
                     <div className="person-label">Adulto 1</div>
                     <div className="person-row">
+                      <label>Nome Completo:</label>
                       <input
                         type="text"
                         placeholder="Nome completo"
@@ -370,6 +386,7 @@ const ModalSkiPass = ({
                           })
                         }
                       />
+                      <label>Data Nasc.:</label>
                       <input
                         type="date"
                         value={entry.esquiadores.dataNasc || ""}
@@ -390,6 +407,7 @@ const ModalSkiPass = ({
                   <div className="single-grid">
                     <div className="person-label">Criança 1</div>
                     <div className="person-row">
+                      <label>Nome Completo:</label>
                       <input
                         type="text"
                         placeholder="Nome completo"
@@ -403,6 +421,7 @@ const ModalSkiPass = ({
                           })
                         }
                       />
+                      <label>Data Nasc.:</label>
                       <input
                         type="date"
                         value={entry.esquiadores.dataNasc || ""}
@@ -423,19 +442,19 @@ const ModalSkiPass = ({
           ))}
 
           <div className="row entry-bottom">
-            <label className="inline" style={{ position: "relative" }}>
+            <label className="inline">
               Seguro Carré Neige:
               <button
                 type="button"
                 className="tooltip-btn"
                 aria-describedby="tooltip-seguro"
               >
-                ?
+                <span class="material-symbols-outlined help">help</span>
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
                 <strong>
-                  Por apenas € 3,50 por pessoa/dia.Resgate imediato nas pistas
-                  em caso de acidenteCobertura médica e hospitalar, incluindo
+                  Por apenas € 3,50 por pessoa/dia. Resgate imediato nas pistas
+                  em caso de acidente. Cobertura médica e hospitalar, incluindo
                   transporte sanitário.
                 </strong>
                 <div style={{ marginTop: 6 }}>

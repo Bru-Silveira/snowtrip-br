@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import "./Carrinho.css";
+
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
+
+import "./Carrinho.css";
 
 let tabelaImg;
 try {
@@ -162,7 +165,7 @@ function Carrinho() {
 
     if (servicoSelecionado.slug === "aulas-ski") {
       if (classEntries.length === 0) {
-        alert("Adicione pelo menos uma aula antes de concluir.");
+        toast.error("Adicione pelo menos uma aula antes de concluir.");
         return;
       }
 
@@ -195,7 +198,7 @@ function Carrinho() {
 
     if (servicoSelecionado.slug === "aulas-ski") {
       if (!opcaoSelecionada || !dataSelecionada) {
-        alert("Selecione a data e o pacote!");
+        toast.error("Selecione a data e o pacote!");
         return;
       }
       const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
@@ -212,7 +215,7 @@ function Carrinho() {
 
     if (servicoSelecionado.slug === "equip-ski") {
       if (!equipamentoSelecionado || !categoria || !tamanho || dias < 1) {
-        alert("Preencha todas as informações do equipamento!");
+        toast.error("Preencha todas as informações do equipamento!");
         return;
       }
       const equipamento = equipamentos.find(
@@ -239,7 +242,7 @@ function Carrinho() {
         !snowTamanho ||
         snowDias < 1
       ) {
-        alert("Preencha todas as informações do equipamento de Snowboard!");
+        toast.error("Preencha todas as informações do equipamento de Snowboard!");
         return;
       }
       const equipamento = snowboardEquipamentos.find(
@@ -261,29 +264,31 @@ function Carrinho() {
 
     if (servicoSelecionado.slug === "ski-pass") {
       if (skiPassEntries.length === 0) {
-        alert("Adicione pelo menos um passe antes de concluir.");
+        toast.error("Adicione pelo menos um passe antes de concluir.");
         return;
       }
 
       for (let i = 0; i < skiPassEntries.length; i += 1) {
         const e = skiPassEntries[i];
-        if (!e.tipo || !e.dataInicio) {
-          alert(`Preencha tipo e data de início para o passe #${i + 1}.`);
-          return;
-        }
+        console.log("Validando entrada de ski pass:", e);
 
         if (e.tipo === "family") {
-          if ((e.adultos?.length || 0) < 2 || (e.criancas?.length || 0) < 3) {
-            alert(
-              `Passe Family (#${i + 1}) requer mínimo 2 adultos e 3 crianças.`
+          const qtdeAdultos = e.esquiadores.adultos?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
+          const qtdeDataNascAdultos = e.esquiadores.adultos?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
+          
+          const qtdeCriancas = e.esquiadores.criancas?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
+          const qtdeDataNascCriancas = e.esquiadores.criancas?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
+          console.log(`Family Pass (#${i + 1}): ${qtdeAdultos} adultos, ${qtdeCriancas} crianças`);
+          if (qtdeAdultos < 2 || qtdeCriancas < 1) {
+            toast.error(
+              `Passe Family (#${i + 1}) requer mínimo 2 adultos e 1 criança.`
             );
             return;
           }
-          const allFilled =
-            e.adultos.every((a) => a.nome && a.dataNasc) &&
-            e.criancas.every((c) => c.nome && c.dataNasc);
+          const allFilled = qtdeAdultos === qtdeDataNascAdultos && qtdeCriancas === qtdeDataNascCriancas;
+
           if (!allFilled) {
-            alert(
+            toast.error(
               `Preencha nome e data de nascimento de todos os participantes do Family (#${
                 i + 1
               }).`
@@ -291,29 +296,13 @@ function Carrinho() {
             return;
           }
         } else if (e.tipo === "adulto") {
-          if (!(e.adultos?.length > 0)) {
-            alert(`Passe Adulto (#${i + 1}) precisa de pelo menos 1 adulto.`);
-            return;
-          }
-          if (!e.adultos.every((a) => a.nome && a.dataNasc)) {
-            alert(
-              `Preencha nome e data de nascimento de todos os adultos do passe #${
-                i + 1
-              }.`
-            );
+          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
+            toast.error(`Passe Adulto (#${i + 1}) precisa de todos os dados preenchidos.`);
             return;
           }
         } else if (e.tipo === "crianca") {
-          if (!(e.criancas?.length > 0)) {
-            alert(`Passe Criança (#${i + 1}) precisa de pelo menos 1 criança.`);
-            return;
-          }
-          if (!e.criancas.every((c) => c.nome && c.dataNasc)) {
-            alert(
-              `Preencha nome e data de nascimento de todas as crianças do passe #${
-                i + 1
-              }.`
-            );
+          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
+            toast.error(`Passe Criança (#${i + 1}) precisa de todos os dados preenchidos.`);
             return;
           }
         }
