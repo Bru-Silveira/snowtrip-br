@@ -311,11 +311,11 @@ const ModalAulasSki = ({
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
                 <div className="entry-number">
-                  Grupo {idx + 1} - {entry.modalidade} (
+                  Grupo {idx + 1}: {entry.modalidade} (
                   {entry.periodo === "halfday" ? "Half day" : "Full day"})
                 </div>
                 <div className="summary-price">
-                  <strong>Subtotal:</strong> €{" "}
+                  €{" "}
                   {calcularPrecoParaEntrada(entry).toFixed(2).replace(".", ",")}
                 </div>
                 <div className="entry-actions">
@@ -395,7 +395,7 @@ const ModalAulasSki = ({
               <div className="row">
                 <label className="col">
                   Período:
-                  <div className="area-options">
+                  <div className="col">
                     <label>
                       <input
                         type="radio"
@@ -426,12 +426,10 @@ const ModalAulasSki = ({
 
               <div className="row">
                 <label className="col">
-                  Total de Pessoas:
-                  {entry.totalPessoas}
-                </label>
-
-                <label className="col">
                   Qtde. Adultos:
+                  <p className="subtitle-small">
+                    Máx. 5 pessoas por grupo
+                  </p>
                   <select
                     value={entry.qtdeAdultos}
                     onChange={(e) =>
@@ -455,6 +453,9 @@ const ModalAulasSki = ({
 
                 <label className="col">
                   Qtde. Crianças:
+                  <p className="subtitle-small">
+                    Máx. 5 pessoas por grupo
+                  </p>
                   <select
                     value={entry.qtdeCriancas}
                     onChange={(e) =>
@@ -479,24 +480,29 @@ const ModalAulasSki = ({
               {entry.qtdeCriancas > 0 && (
                 <div className="row">
                   <div className="full">
-                    <div className="subtitle">Idades das Crianças</div>
                     <div className="children-ages-grid">
                       {Array.from({ length: entry.qtdeCriancas }).map(
                         (_, idx) => (
-                          <input
-                            key={idx}
-                            type="number"
-                            placeholder={`Idade criança ${idx + 1}`}
-                            min="0"
-                            max="17"
-                            value={idadesCriancasForm[idx] || ""}
-                            onChange={(e) => {
-                              const newAges = [...idadesCriancasForm];
-                              newAges[idx] = e.target.value;
-                              setIdadesCriancasForm(newAges);
-                            }}
-                            className="child-age-input"
-                          />
+                          <div className="person-row">
+                            <label className="person-label">{`Criança ${
+                              idx + 1
+                            }`}</label>
+                            <label>Idade:</label>
+                            <input
+                              key={idx}
+                              type="number"
+                              placeholder={`Idade criança ${idx + 1}`}
+                              min="0"
+                              max="17"
+                              value={idadesCriancasForm[idx] || ""}
+                              onChange={(e) => {
+                                const newAges = [...idadesCriancasForm];
+                                newAges[idx] = e.target.value;
+                                setIdadesCriancasForm(newAges);
+                              }}
+                              className="child-age-input"
+                            />
+                          </div>
                         )
                       )}
                     </div>
@@ -505,11 +511,11 @@ const ModalAulasSki = ({
               )}
 
               <div className="row">
-                <label className="full">
+                <label className="col">
                   Nível de Experiência:
-                  <div className="subtitle-small">
+                  <p className="subtitle-small">
                     Escolha o nível que mais se aproxima da experiência do grupo
-                  </div>
+                  </p>
                   <select
                     value={entry.nivel}
                     onChange={(e) =>
