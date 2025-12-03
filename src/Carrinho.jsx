@@ -158,6 +158,7 @@ function Carrinho() {
   }, [mostrarModal]);
 
   const concluirModal = () => {
+    console.log("Concluir modal para serviço:", servicoSelecionado);
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
@@ -196,22 +197,22 @@ function Carrinho() {
       setClassEntries([]);
     }
 
-    if (servicoSelecionado.slug === "aulas-ski") {
-      if (!opcaoSelecionada || !dataSelecionada) {
-        toast.error("Selecione a data e o pacote!");
-        return;
-      }
-      const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${pacote?.nome || ""}`,
-          preco: pacote?.preco || 0,
-          data: dataSelecionada,
-        },
-      ]);
-    }
+    // if (servicoSelecionado.slug === "aulas-ski") {
+    //   if (!opcaoSelecionada || !dataSelecionada) {
+    //     toast.error("Selecione a data e o pacote!");
+    //     return;
+    //   }
+    //   const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
+    //   setCarrinho((prev) => [
+    //     ...prev,
+    //     {
+    //       ...servicoSelecionado,
+    //       nome: `${servicoSelecionado.nome} - ${pacote?.nome || ""}`,
+    //       preco: pacote?.preco || 0,
+    //       data: dataSelecionada,
+    //     },
+    //   ]);
+    // }
 
     if (servicoSelecionado.slug === "equip-ski") {
       if (!equipamentoSelecionado || !categoria || !tamanho || dias < 1) {

@@ -3,7 +3,8 @@ import { toast } from "react-toastify";
 
 import tabelaImg from "../img/tabela-ski.jpg";
 
-import "react-toastify/dist/ReactToastify.css";     
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/ModalCommon.css";     
 import "../styles/ModalSkiPass.css";
 
 const ModalSkiPass = ({
@@ -162,7 +163,7 @@ const ModalSkiPass = ({
         </aside>
 
         <section className="modal-form">
-          <div className="row">
+          <div className="row">  
             <label className="col area-inline">
               Área:
               <div className="area-options">
