@@ -65,6 +65,22 @@ body.modal-open {
   display: flex;
 }
 
+.person-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.person-row input[type="text"] {
+  flex: 1;
+}
+
+.person-row input[type="date"] {
+  flex: 0 0 auto;
+  min-width: 140px;
+}
+
 /* Labels */
 label {
   font-size: 14px;
@@ -228,6 +244,19 @@ input[type="radio"] {
 
   .full {
     width: 100%;
+  }
+
+  /* Person rows - empilhar campos */
+  .person-row {
+    flex-direction: column;
+    align-items: self-start;
+    margin-bottom: 12px;
+  }
+
+  .person-row input[type="text"],
+  .person-row input[type="date"] {
+    width: 100%;
+    flex: none;
   }
 
   /* Labels e inputs em largura completa */

@@ -1,27 +1,18 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import logoAdd from "../img/logo-add.png";
 
 import "../styles/ModalCommon.css";
 import "../styles/ModalSkiClass.css";
 
 const ModalAulasSki = ({
-  classEntries = [],
-  setClassEntries = () => {},
-  concluirModal = () => {},
-  setMostrarModal = () => {},
+  classEntries,
+  setClassEntries,
+  concluirModal,
+  setMostrarModal,
 }) => {
   const [regiao, setRegiao] = useState("franceses");
   const [resort, setResort] = useState("");
-  // const [dataInicio, setDataInicio] = useState("");
-  // const [dias, setDias] = useState(1);
-  // const [periodo, setPeriodo] = useState("halfday");
-  // const [modalidade, setModalidade] = useState("ski");
-  // const [totalPessoas, setTotalPessoas] = useState(1);
-  // const [qtdeCriancas, setQtdeCriancas] = useState(0);
-  // const [qtdeAdultos, setQtdeAdultos] = useState(1);
   const [idadesCriancasForm, setIdadesCriancasForm] = useState([]);
-  // const [nivel, setNivel] = useState("");
   const [classTotal, setClassTotal] = useState(0);
 
   const resortsPorRegiao = {
@@ -169,12 +160,6 @@ const ModalAulasSki = ({
       return;
     }
 
-    // // Validar se todas as idades foram preenchidas
-    // if (qtdeCriancas > 0 && idadesCriancasForm.some((age) => age === "")) {
-    //   alert("Por favor, preencha as idades de todas as crianças");
-    //   return;
-    // }
-
     setClassEntries([
       ...classEntries,
       {
@@ -192,18 +177,6 @@ const ModalAulasSki = ({
         nivel: "",
       },
     ]);
-
-    // Limpar formulário após adicionar
-    // setRegiao("franceses");
-    // setResort("");
-    // setDataInicio("");
-    // setDias(1);
-    // setPeriodo("halfday");
-    // setModalidade("ski");
-    // setQtdeAdultos(1);
-    // setQtdeCriancas(0);
-    // setIdadesCriancasForm([]);
-    // setNivel("");
   };
 
   const removeClassEntry = (index) => {
@@ -219,14 +192,16 @@ const ModalAulasSki = ({
   };
 
   const calcularPrecoParaEntrada = (entry) => {
+    console.log("Calculating price for entry", entry);
     const pessoas = Math.min(5, entry.totalPessoas);
     const diasAula = Math.min(14, entry.dias);
     const tabelaPeriodo = precosAulas[entry.periodo];
-
+    
     if (tabelaPeriodo && tabelaPeriodo[pessoas]) {
       return tabelaPeriodo[pessoas][diasAula] || 0;
     }
     return 0;
+
   };
 
   useEffect(() => {
@@ -239,11 +214,6 @@ const ModalAulasSki = ({
   useEffect(() => {
     setResort("");
   }, [regiao]);
-
-  // Atualizar array de idades quando qtdeCriancas mudar
-  // useEffect(() => {
-  //   setIdadesCriancasForm(Array(qtdeCriancas).fill(""));
-  // }, [qtdeCriancas]);
 
   return (
     <div className="modal-content ski-class-layout">
@@ -491,7 +461,6 @@ const ModalAulasSki = ({
                             <input
                               key={idx}
                               type="number"
-                              placeholder={`Idade criança ${idx + 1}`}
                               min="0"
                               max="17"
                               value={idadesCriancasForm[idx] || ""}
@@ -531,69 +500,6 @@ const ModalAulasSki = ({
                   </select>
                 </label>
               </div>
-
-              {/* <div className="entry-summary">
-                <div className="summary-item">
-                  <strong>Resort:</strong> {entry.resort}
-                </div>
-                <div className="summary-item">
-                  <strong>Data:</strong>{" "}
-                  {new Date(entry.dataInicio).toLocaleDateString("pt-BR")}
-                </div>
-                <div className="summary-item">
-                  <strong>Dias:</strong> {entry.dias}
-                </div>
-                <div className="summary-item">
-                  <strong>Pessoas:</strong> {entry.qtdeAdultos} adulto
-                  {entry.qtdeAdultos > 1 ? "s" : ""}
-                  {entry.qtdeCriancas > 0 &&
-                    ` + ${entry.qtdeCriancas} criança${
-                      entry.qtdeCriancas > 1 ? "s" : ""
-                    }`}{" "}
-                  (Total: {entry.totalPessoas})
-                </div>
-                {entry.qtdeCriancas > 0 && (
-                  <div className="summary-item">
-                    <strong>Idades das crianças:</strong>{" "}
-                    {entry.idadesCriancas.map((c) => c.age).join(", ")} anos
-                  </div>
-                )}
-                <div className="summary-item">
-                  <strong>Nível:</strong>{" "}
-                  {
-                    niveisExperiencia.find((n) => n.value === entry.nivel)
-                      ?.label
-                  }
-                </div>
-                <div className="summary-price">
-                  <strong>Subtotal:</strong> €{" "}
-                  {calcularPrecoParaEntrada(entry).toFixed(2).replace(".", ",")}
-                </div>
-              </div> */}
-
-              {entry.qtdeCriancas > 0 && (
-                <div className="children-ages-section">
-                  <div className="subtitle">Idades das Crianças (Editar)</div>
-                  <div className="children-ages-grid">
-                    {entry.idadesCriancas.map((child, cidx) => (
-                      <input
-                        key={cidx}
-                        type="number"
-                        placeholder={`Idade ${cidx + 1}`}
-                        min="0"
-                        max="17"
-                        value={child.age}
-                        className="child-age-input"
-                        onChange={(e) => {
-                          const newAges = [...entry.idadesCriancas];
-                          newAges[cidx] = { age: e.target.value };
-                          updateClassEntry(idx, { idadesCriancas: newAges });
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           ))}
 
