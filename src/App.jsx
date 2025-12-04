@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import "./App.css";
 
 function App() {
@@ -17,25 +17,42 @@ function App() {
   const checkoutRef = useRef(null);
 
   useEffect(() => {
-        if(window.runLuxexScripts) {
-            window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
-        }
-    }, []);
+    if (window.runLuxexScripts) {
+      window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
+
+      // listener do check-in
+      // if (checkinRef.current) {
+      //   console.log("checkinRef.current:", checkinRef.current);
+      //   checkinRef.current.addEventListener("change", (e) => {
+      //     const [dia, mes, ano] = e.target.value.split("/");
+      //     setDataChegada(new Date(`${ano}-${mes}-${dia}`));
+      //     console.log("Data de Chegada selecionada:", e.target.value);
+      //   });
+      // }
+
+      // listener do check-out
+      // if (checkoutRef.current) {
+      //   checkoutRef.current.addEventListener("change", (e) => {
+      //     const [dia, mes, ano] = e.target.value.split("/");
+      //     setDataPartida(new Date(`${ano}-${mes}-${dia}`));
+      //     console.log("Data de Chegada selecionada:", e.target.value);
+      //   });
+      // }
+    }
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/imoveis")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Dados recebidos:", data);
         setImoveis(data);
       })
       .catch((err) => console.error("Erro no fetch:", err));
   }, []);
 
   const handleCidade = (e) => {
-    console.log("Cidade selecionada:", e.target.value);
     setCidade(e.target.value);
-  } 
+  };
 
   const filtrarImoveis = () => {
     const inicio = dataChegada;
@@ -44,53 +61,67 @@ function App() {
     const numCriancas = parseInt(criancas) || 0;
     const faixaPreco = [0, Infinity]; // ou defina como quiser futuramente
 
-    console.log("Início:", inicio);
-    console.log("Fim:", fim);
-    console.log("Número de Adultos:", numAdultos);
-    console.log("Número de Crianças:", numCriancas);
-    console.log("Faixa de Preço:", faixaPreco);
-    console.log("Cidade:", cidade);
-    console.log(`🏠 Filtrando entre ${imoveis.length} imóveis...`);
+    // console.log("Início:", inicio);
+    // console.log("Fim:", fim);
+    // console.log("Número de Adultos:", numAdultos);
+    // console.log("Número de Crianças:", numCriancas);
+    // console.log("Faixa de Preço:", faixaPreco);
+    // console.log("Cidade:", cidade);
+     console.log(`🏠 Filtrando entre ${imoveis.length} imóveis...`);
+    console.log("dataChegada:", dataChegada);
+    console.log("dataPartida:", dataPartida); 
 
     const imoveisFiltrados = imoveis.filter((imovel, index) => {
       // Filtro por cidade (normalizado)
       const cidadeInput = cidade?.trim().toLowerCase();
       const cidadeImovel = imovel.resumo.ville?.trim().toLowerCase();
-      const cidadeValida = cidadeInput ? cidadeImovel?.includes(cidadeInput) : true;
+      const cidadeValida = cidadeInput
+        ? cidadeImovel?.includes(cidadeInput)
+        : true;
 
       // Filtro por número de adultos
-      const qtdeAdulttosValido = !numAdultos || imovel.detalhes?.detail?.nb_adultes >= numAdultos;
+      const qtdeAdulttosValido =
+        !numAdultos || imovel.detalhes?.detail?.nb_adultes >= numAdultos;
 
       // Filtro por número de crianças
-      const qtdeCriancasValido = !numCriancas || imovel.detalhes?.detail?.nb_enfants >= numCriancas;
+      const qtdeCriancasValido =
+        !numCriancas || imovel.detalhes?.detail?.nb_enfants >= numCriancas;
 
       // Filtro de disponibilidade por data
       const dataValida = (() => {
+        console.log("Verificando disponibilidade para o imóvel:", imovel.resumo.titre);
         if (!inicio || !fim) return true; // Permite caso datas não sejam selecionadas
-        const disponibilidades = imovel.disponibilidades || [];
-        console.log("Disponibilidades do imóvel:", disponibilidades);
+        const disponibilidades = imovel.disponibilidade.sejours.sejour || [];
+        console.log("disponibilidades:", disponibilidades); 
+        if(!Array.isArray(disponibilidades) || disponibilidades.length === 0) {
+          if(!disponibilidades.date_debut || !disponibilidades.date_fin) return false;
+          const dispInicio = new Date(disponibilidades.date_debut).toLocaleString('pt-BR');
+          const dispFim = new Date(disponibilidades.date_fin).toLocaleString('pt-BR');
+          console.log(`Verificando disponibilidade única: ${dispInicio} a ${dispFim}`);
+          return inicio >= dispInicio && fim <= dispFim;
+        }
         return disponibilidades.some(({ date_debut, date_fin }) => {
           if (!date_debut || !date_fin) return false;
-          const dispInicio = new Date(date_debut);
-          const dispFim = new Date(date_fin);
+          const dispInicio = new Date(date_debut).toLocaleString('pt-BR');
+          const dispFim = new Date(date_fin).toLocaleString('pt-BR');
+          console.log(`Verificando disponibilidade: ${dispInicio} a ${dispFim}`);
           return inicio >= dispInicio && fim <= dispFim;
         });
       })();
 
-      return cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida;
+      console.log(`Imóvel: ${imovel.resumo.titre} | Cidade Válida: ${cidadeValida} | Adultos Válido: ${qtdeAdulttosValido} | Crianças Válido: ${qtdeCriancasValido} | Data Válida: ${dataValida}`);
+      return (
+        cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida
+      );
     });
 
-    console.log("Imóveis filtrados:", imoveisFiltrados);
-    console.log(`🏠 ${imoveisFiltrados.length} imóveis encontrados após o filtro.`);
-
+      console.log(`✅ Filtragem concluída. ${imoveisFiltrados.length} imóveis encontrados.`);
     return imoveisFiltrados;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submetido");
     const resultados = filtrarImoveis();
-    console.log("IMOVEIS", imoveis)
     setImoveisFiltrados(resultados);
     setPesquisado(true);
   };
@@ -122,8 +153,15 @@ function App() {
                 <img
                   alt="Logo"
                   className="logo-light"
-                  src='/img/logo-snowtrip.png'
-                  style={{ position: 'relative', top: -40, left: 0, width: '250px', height: '150px', fontWeight: 'bold' }}
+                  src="/img/logo-snowtrip.png"
+                  style={{
+                    position: "relative",
+                    top: -40,
+                    left: 0,
+                    width: "250px",
+                    height: "150px",
+                    fontWeight: "bold",
+                  }}
                 />
                 {/* <img alt="Logo" className="logo-dark" src="img/logo-dark.png"/> */}
               </a>
@@ -131,22 +169,43 @@ function App() {
           </div>
           <div className="main-navigation fadeIn-element">
             <div className="navbar-header">
-              <button aria-expanded="false" className="navbar-toggle collapsed" data-target="#navbar-collapse" data-toggle="collapse" type="button"><span className="sr-only">Toggle
-                navigation</span> <span className="icon-bar"></span> <span className="icon-bar"></span> <span className="icon-bar"></span></button>
+              <button
+                aria-expanded="false"
+                className="navbar-toggle collapsed"
+                data-target="#navbar-collapse"
+                data-toggle="collapse"
+                type="button"
+              >
+                <span className="sr-only">Toggle navigation</span>{" "}
+                <span className="icon-bar"></span>{" "}
+                <span className="icon-bar"></span>{" "}
+                <span className="icon-bar"></span>
+              </button>
             </div>
             <div className="collapse navbar-collapse" id="navbar-collapse">
               <ul className="nav navbar-nav navbar-right">
                 <li>
-                  <a href="index.html" style={{ fontSize: 14 }}>Home</a>
+                  <a href="index.html" style={{ fontSize: 14 }}>
+                    Home
+                  </a>
                 </li>
                 <li>
-                  <a href="gallery.html" style={{ fontSize: 14 }}>Gallery</a>
+                  <a href="gallery.html" style={{ fontSize: 14 }}>
+                    Gallery
+                  </a>
                 </li>
                 <li>
-                  <a href="contact.html" style={{ fontSize: 14 }}>Contact</a>
+                  <a href="contact.html" style={{ fontSize: 14 }}>
+                    Contact
+                  </a>
                 </li>
                 <li>
-                  <a href="http://localhost:3000/Carrinho" style={{ fontSize: 14 }}>Monte sua Trip</a>
+                  <a
+                    href="http://localhost:3000/Carrinho"
+                    style={{ fontSize: 14 }}
+                  >
+                    Monte sua Trip
+                  </a>
                 </li>
               </ul>
             </div>
@@ -171,12 +230,12 @@ function App() {
                             playsInline
                             preload="auto"
                             style={{
-                              position: 'absolute',
+                              position: "absolute",
                               top: 0,
                               left: 0,
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
                               zIndex: 0,
                             }}
                           />
@@ -202,7 +261,10 @@ function App() {
           </div>
         </div>
       </div>
-      <div id="reservation-form-wrapper" className="section-all bg-dark reservation-form-wrapper-home">
+      <div
+        id="reservation-form-wrapper"
+        className="section-all bg-dark reservation-form-wrapper-home"
+      >
         <div className="container-fluid nopadding nopadding-xs">
           <div className="extra-margin-container">
             <div className="row">
@@ -224,20 +286,39 @@ function App() {
           <div className="container">
             <div className="extra-margin-container">
               <div className="reservation-inner clearfix">
-                <form id="form-2" className="form-2" onSubmit={handleSubmit} name="send">
+                <form id="form-2" className="form-2" name="send">
                   <div className="col-1 c-1">
                     <div className="input-wrapper">
                       <label>Check-In</label>
                       <div className="input-inner">
-                        <input
+                        {/* <input
                           className="requiredField-r checkin form-control input datepicker"
                           id="checkin"
                           name="checkin"
                           placeholder="Check-In"
                           type="text"
                           ref={checkinRef}
-                          value={dataChegada ? `${dataChegada.getDate().toString().padStart(2, '0')}/${(dataChegada.getMonth() + 1).toString().padStart(2, '0')}/${dataChegada.getFullYear()}` : ''}
-                          readOnly
+                          value={
+                            dataChegada
+                              ? `${dataChegada
+                                  .getDate()
+                                  .toString()
+                                  .padStart(2, "0")}/${(
+                                  dataChegada.getMonth() + 1
+                                )
+                                  .toString()
+                                  .padStart(
+                                    2,
+                                    "0"
+                                  )}/${dataChegada.getFullYear()}`
+                              : ""
+                          }
+                        /> */}
+                        <input
+                          type="date"
+                          value={dataChegada}
+                          onChange={(e) => setDataChegada(e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
                         />
                       </div>
                     </div>
@@ -246,15 +327,34 @@ function App() {
                     <div className="input-wrapper">
                       <label>Check-Out</label>
                       <div className="input-inner">
-                        <input
+                        {/* <input
                           className="requiredField-r checkout form-control input datepicker"
                           id="checkout"
                           name="checkout"
                           placeholder="Check-Out"
                           type="text"
                           ref={checkoutRef}
-                          value={dataPartida ? `${dataPartida.getDate().toString().padStart(2, '0')}/${(dataPartida.getMonth() + 1).toString().padStart(2, '0')}/${dataPartida.getFullYear()}` : ''}
-                          readOnly
+                          value={
+                            dataPartida
+                              ? `${dataPartida
+                                  .getDate()
+                                  .toString()
+                                  .padStart(2, "0")}/${(
+                                  dataPartida.getMonth() + 1
+                                )
+                                  .toString()
+                                  .padStart(
+                                    2,
+                                    "0"
+                                  )}/${dataPartida.getFullYear()}`
+                              : ""
+                          }
+                        /> */}
+                        <input
+                          type="date"
+                          value={dataPartida}
+                          onChange={(e) => setDataPartida(e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
                         />
                       </div>
                     </div>
@@ -268,7 +368,8 @@ function App() {
                           id="city"
                           name="city"
                           value={cidade}
-                          onChange={(e) => handleCidade(e)}>
+                          onChange={(e) => handleCidade(e)}
+                        >
                           <option className="">Cidade</option>
                           <option value="Chamonix">Chamonix</option>
                           <option value="Courchevel">Courchevel</option>
@@ -281,14 +382,13 @@ function App() {
                   <div className="col-2 c-4">
                     <div className="select-wrapper">
                       <label>Adultos</label>
-                      <div className="select-inner">
+                      <div>
                         <select
-                          className="requiredField-r adultos select"
+                          className="adultos select-hospedagem"
                           id="adultos"
                           name="adultos"
                           onChange={(e) => setAdultos(e.target.value)}
                         >
-
                           <option value="">Adultos</option>
                           <option value="1">1 Adulto</option>
                           <option value="2">2 Adultos</option>
@@ -308,9 +408,9 @@ function App() {
                   <div className="col-2 c-5">
                     <div className="select-wrapper">
                       <label>Crianças</label>
-                      <div className="select-inner">
+                      <div>
                         <select
-                          className="requiredField-r criancas select"
+                          className="requiredField-r criancas select-hospedagem"
                           id="criancas"
                           name="criancas"
                           onChange={(e) => setCriancas(e.target.value)}
@@ -331,25 +431,51 @@ function App() {
                       type="submit"
                       className="reservation-button"
                       onClick={handleSubmit}
-                    >Monte sua Trip
+                    >
+                      Monte sua Trip
                     </button>
                   </div>
                 </form>
                 {/* Exibição dos cards de imóveis filtrados */}
                 <div className="grid">
-                  {pesquisado && (
-                    imoveisFiltrados.length > 0 ? (
+                  {pesquisado &&
+                    (imoveisFiltrados.length > 0 ? (
                       imoveisFiltrados.map((imovel, index) => (
                         <div className="card" key={index}>
                           <img
-                            src={imovel.resumo.image ? imovel.resumo.image : "https://via.placeholder.com/150"}
+                            src={
+                              imovel.resumo.image
+                                ? imovel.resumo.image
+                                : "https://via.placeholder.com/150"
+                            }
                             alt={imovel.resumo.titre || "Sem título"}
                           />
-                          <h2>{imovel.resumo?.titre || "Nome da Hospedagem"}</h2>
-                          <p>{imovel.resumo?.ville || "Cidade"} - {imovel.detalhes?.detail?.secteur[0] || "Setor"}</p>
-                          <p>{imovel.detalhes?.detail?.nb_adultes || "xx"} adultos | {imovel.detalhes?.detail?.nb_enfants || "xx"} crianças</p>
-                          <p> {imovel.detalhes?.detail?.nombre_chambres || "xx"} quartos | {imovel.detalhes?.detail?.nombre_sdb || "xx"} banheiros | {imovel.detalhes?.detail?.surface || "xx"} m²</p>
-                          <p>{imovel.detalhes?.detail?.piste_distance_m || "xx"} metros da estação de esqui</p>
+                          <h2>
+                            {imovel.resumo?.titre || "Nome da Hospedagem"}
+                          </h2>
+                          <p>
+                            {imovel.resumo?.ville || "Cidade"} -{" "}
+                            {imovel.detalhes?.detail?.secteur[0] || "Setor"}
+                          </p>
+                          <p>
+                            {imovel.detalhes?.detail?.nb_adultes || "xx"}{" "}
+                            adultos |{" "}
+                            {imovel.detalhes?.detail?.nb_enfants || "xx"}{" "}
+                            crianças
+                          </p>
+                          <p>
+                            {" "}
+                            {imovel.detalhes?.detail?.nombre_chambres ||
+                              "xx"}{" "}
+                            quartos |{" "}
+                            {imovel.detalhes?.detail?.nombre_sdb || "xx"}{" "}
+                            banheiros |{" "}
+                            {imovel.detalhes?.detail?.surface || "xx"} m²
+                          </p>
+                          <p>
+                            {imovel.detalhes?.detail?.piste_distance_m || "xx"}{" "}
+                            metros da estação de esqui
+                          </p>
 
                           {imovel.resumo.id && (
                             <Link to={`/detalhes/${imovel.resumo.id}`}>
@@ -359,9 +485,10 @@ function App() {
                         </div>
                       ))
                     ) : (
-                      <p>Nenhum imóvel encontrado para os critérios selecionados.</p>
-                    )
-                  )}
+                      <p>
+                        Nenhum imóvel encontrado para os critérios selecionados.
+                      </p>
+                    ))}
                 </div>
               </div>
             </div>
