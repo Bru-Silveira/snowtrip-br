@@ -85,6 +85,8 @@ option::checkmark {
   content: none;
 }
 
+#checkinField,
+#checkoutField,
 .select-hospedagem {
   width: 100% !important;
   height: 62.5px !important;

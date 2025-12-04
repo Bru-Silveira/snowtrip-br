@@ -290,7 +290,7 @@ function App() {
                   <div className="col-1 c-1">
                     <div className="input-wrapper">
                       <label>Check-In</label>
-                      <div className="input-inner">
+                      
                         {/* <input
                           className="requiredField-r checkin form-control input datepicker"
                           id="checkin"
@@ -315,18 +315,20 @@ function App() {
                           }
                         /> */}
                         <input
+                          id="checkinField"
                           type="date"
-                          value={dataChegada}
+                          value={dataChegada || ""}
                           onChange={(e) => setDataChegada(e.target.value)}
                           min={new Date().toISOString().split("T")[0]}
+                          className="select-hospedagem"
                         />
-                      </div>
+                      
                     </div>
                   </div>
                   <div className="col-1 c-2">
                     <div className="input-wrapper">
                       <label>Check-Out</label>
-                      <div className="input-inner">
+                      
                         {/* <input
                           className="requiredField-r checkout form-control input datepicker"
                           id="checkout"
@@ -351,12 +353,14 @@ function App() {
                           }
                         /> */}
                         <input
+                          id="checkoutField"
                           type="date"
-                          value={dataPartida}
+                          value={dataPartida || ""}
                           onChange={(e) => setDataPartida(e.target.value)}
                           min={new Date().toISOString().split("T")[0]}
+                          className="select-hospedagem"
                         />
-                      </div>
+                    
                     </div>
                   </div>
                   <div className="col-2 c-3">
