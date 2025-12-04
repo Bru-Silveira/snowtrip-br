@@ -60,33 +60,27 @@ function App() {
 
       // Filtro de disponibilidade por data
       const dataValida = (() => {
-        console.log("Verificando disponibilidade para o imóvel:", imovel.resumo.titre);
         if (!inicio || !fim) return true; // Permite caso datas não sejam selecionadas
         const disponibilidades = imovel.disponibilidade.sejours.sejour || [];
-        console.log("disponibilidades:", disponibilidades); 
         if(!Array.isArray(disponibilidades) || disponibilidades.length === 0) {
           if(!disponibilidades.date_debut || !disponibilidades.date_fin) return false;
           const dispInicio = new Date(disponibilidades.date_debut).toLocaleString('pt-BR');
           const dispFim = new Date(disponibilidades.date_fin).toLocaleString('pt-BR');
-          console.log(`Verificando disponibilidade única: ${dispInicio} a ${dispFim}`);
           return inicio >= dispInicio && fim <= dispFim;
         }
         return disponibilidades.some(({ date_debut, date_fin }) => {
           if (!date_debut || !date_fin) return false;
           const dispInicio = new Date(date_debut).toLocaleString('pt-BR');
           const dispFim = new Date(date_fin).toLocaleString('pt-BR');
-          console.log(`Verificando disponibilidade: ${dispInicio} a ${dispFim}`);
           return inicio >= dispInicio && fim <= dispFim;
         });
       })();
 
-      console.log(`Imóvel: ${imovel.resumo.titre} | Cidade Válida: ${cidadeValida} | Adultos Válido: ${qtdeAdulttosValido} | Crianças Válido: ${qtdeCriancasValido} | Data Válida: ${dataValida}`);
       return (
         cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida
       );
     });
 
-      console.log(`✅ Filtragem concluída. ${imoveisFiltrados.length} imóveis encontrados.`);
     return imoveisFiltrados;
   };
 
