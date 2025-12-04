@@ -19,25 +19,6 @@ function App() {
   useEffect(() => {
     if (window.runLuxexScripts) {
       window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
-
-      // listener do check-in
-      // if (checkinRef.current) {
-      //   console.log("checkinRef.current:", checkinRef.current);
-      //   checkinRef.current.addEventListener("change", (e) => {
-      //     const [dia, mes, ano] = e.target.value.split("/");
-      //     setDataChegada(new Date(`${ano}-${mes}-${dia}`));
-      //     console.log("Data de Chegada selecionada:", e.target.value);
-      //   });
-      // }
-
-      // listener do check-out
-      // if (checkoutRef.current) {
-      //   checkoutRef.current.addEventListener("change", (e) => {
-      //     const [dia, mes, ano] = e.target.value.split("/");
-      //     setDataPartida(new Date(`${ano}-${mes}-${dia}`));
-      //     console.log("Data de Chegada selecionada:", e.target.value);
-      //   });
-      // }
     }
   }, []);
 
@@ -60,16 +41,6 @@ function App() {
     const numAdultos = parseInt(adultos) || 0;
     const numCriancas = parseInt(criancas) || 0;
     const faixaPreco = [0, Infinity]; // ou defina como quiser futuramente
-
-    // console.log("Início:", inicio);
-    // console.log("Fim:", fim);
-    // console.log("Número de Adultos:", numAdultos);
-    // console.log("Número de Crianças:", numCriancas);
-    // console.log("Faixa de Preço:", faixaPreco);
-    // console.log("Cidade:", cidade);
-     console.log(`🏠 Filtrando entre ${imoveis.length} imóveis...`);
-    console.log("dataChegada:", dataChegada);
-    console.log("dataPartida:", dataPartida); 
 
     const imoveisFiltrados = imoveis.filter((imovel, index) => {
       // Filtro por cidade (normalizado)
@@ -290,31 +261,7 @@ function App() {
                   <div className="col-1 c-1">
                     <div className="input-wrapper">
                       <label>Check-In</label>
-                      
-                        {/* <input
-                          className="requiredField-r checkin form-control input datepicker"
-                          id="checkin"
-                          name="checkin"
-                          placeholder="Check-In"
-                          type="text"
-                          ref={checkinRef}
-                          value={
-                            dataChegada
-                              ? `${dataChegada
-                                  .getDate()
-                                  .toString()
-                                  .padStart(2, "0")}/${(
-                                  dataChegada.getMonth() + 1
-                                )
-                                  .toString()
-                                  .padStart(
-                                    2,
-                                    "0"
-                                  )}/${dataChegada.getFullYear()}`
-                              : ""
-                          }
-                        /> */}
-                        <input
+                                            <input
                           id="checkinField"
                           type="date"
                           value={dataChegada || ""}
@@ -328,31 +275,7 @@ function App() {
                   <div className="col-1 c-2">
                     <div className="input-wrapper">
                       <label>Check-Out</label>
-                      
-                        {/* <input
-                          className="requiredField-r checkout form-control input datepicker"
-                          id="checkout"
-                          name="checkout"
-                          placeholder="Check-Out"
-                          type="text"
-                          ref={checkoutRef}
-                          value={
-                            dataPartida
-                              ? `${dataPartida
-                                  .getDate()
-                                  .toString()
-                                  .padStart(2, "0")}/${(
-                                  dataPartida.getMonth() + 1
-                                )
-                                  .toString()
-                                  .padStart(
-                                    2,
-                                    "0"
-                                  )}/${dataPartida.getFullYear()}`
-                              : ""
-                          }
-                        /> */}
-                        <input
+                                            <input
                           id="checkoutField"
                           type="date"
                           value={dataPartida || ""}
