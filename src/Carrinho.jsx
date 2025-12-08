@@ -34,12 +34,13 @@ function Carrinho() {
   const [snowTamanho, setSnowTamanho] = useState("");
   const [snowDias, setSnowDias] = useState(1);
 
-  // entradas cumulativas de Ski Pass no modal
+  // estados para ski pass
   const [skiPassEntries, setSkiPassEntries] = useState([]);
   const [skiPassTotal, setSkiPassTotal] = useState(0);
 
-  // ADICIONAR: estado para aulas de ski
+  // estados para aulas de ski
   const [classEntries, setClassEntries] = useState([]);
+  const [classTotal, setClassTotal] = useState(0);
 
   const servicos = [
     {
@@ -49,11 +50,17 @@ function Carrinho() {
       preco: 5000,
       imagem: hospedagemImg,
     },
-    { id: 2, slug: "aulas-ski", nome: "Aulas de Ski", preco: 1000 },
-    { id: 3, slug: "equip-ski", nome: "Equipamentos de Ski", preco: 1500 },
-    { id: 4, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
-    { id: 5, slug: "transfer", nome: "Transfer", preco: 2000 },
-    { id: 6, slug: "concierge", nome: "Concierge", preco: 2000 },
+    { id: 2, slug: "aulas", nome: "Aulas", preco: 0, entries: [] },
+    {
+      id: 3,
+      slug: "equip-ski",
+      nome: "Equipamentos de Ski",
+      preco: 0,
+      entries: [],
+    },
+    { id: 4, slug: "ski-pass", nome: "Ski Pass", preco: 0, entries: [] },
+    { id: 5, slug: "transfer", nome: "Transfer", preco: 0, entries: [] },
+    { id: 6, slug: "concierge", nome: "Concierge", preco: 0, entries: [] },
   ];
 
   const pacotesSki = [
@@ -102,9 +109,7 @@ function Carrinho() {
 
     // Abre modal para serviços que precisam de configuração
     if (
-      ["ski-pass", "aulas-ski", "equip-ski", "equip-snow"].includes(
-        servico.slug
-      )
+      ["ski-pass", "aulas", "equip-ski", "equip-snow"].includes(servico.slug)
     ) {
       setMostrarModal(true);
     } else {
@@ -157,32 +162,23 @@ function Carrinho() {
       return;
     }
 
-    if (servicoSelecionado.slug === "aulas-ski") {
+    if (servicoSelecionado.slug === "aulas") {
       if (classEntries.length === 0) {
         toast.error("Adicione pelo menos uma aula antes de concluir.");
         return;
       }
 
       const novos = classEntries.map((entry) => {
-        const preco = calcularPrecoParaEntrada(entry);
-        const descricao = `${entry.resort} - ${entry.modalidade} - ${
-          entry.dias
-        } dia${entry.dias > 1 ? "s" : ""} - ${
-          entry.periodo === "halfday" ? "Half day" : "Full day"
-        }`;
+        const descricao = `${entry.modalidade} - ${entry.resort} 
+        - ${entry.dias} dia${entry.dias > 1 ? "s" : ""} 
+        - ${entry.periodo === "halfday" ? "Half day" : "Full day"}
+        ${entry.qtdeAdultos > 0 ? (" - " + entry.qtdeAdultos +" adultos") : ""} 
+        ${entry.qtdeCriancas > 0 ? (" - " + entry.qtdeCriancas +" crianças") : ""}`;
         return {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco: preco,
-          dataInicio: entry.dataInicio,
-          dias: entry.dias,
-          modalidade: entry.modalidade,
-          periodo: entry.periodo,
-          resort: entry.resort,
-          totalPessoas: entry.totalPessoas,
-          qtdeCriancas: entry.qtdeCriancas,
-          idadesCriancas: entry.idadesCriancas,
-          nivel: entry.nivel,
+          nome: `${servicoSelecionado.nome} de ${descricao}`,
+          preco: entry.subtotal || 0,
+          entries: entry,
         };
       });
 
@@ -213,51 +209,6 @@ function Carrinho() {
     }
 
     if (servicoSelecionado.slug === "ski-pass") {
-      if (skiPassEntries.length === 0) {
-        toast.error("Adicione pelo menos um passe antes de concluir.");
-        return;
-      }
-
-      for (let i = 0; i < skiPassEntries.length; i += 1) {
-        const e = skiPassEntries[i];
-        console.log("Validando entrada de ski pass:", e);
-
-        if (e.tipo === "family") {
-          const qtdeAdultos = e.esquiadores.adultos?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
-          const qtdeDataNascAdultos = e.esquiadores.adultos?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
-          
-          const qtdeCriancas = e.esquiadores.criancas?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
-          const qtdeDataNascCriancas = e.esquiadores.criancas?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
-          console.log(`Family Pass (#${i + 1}): ${qtdeAdultos} adultos, ${qtdeCriancas} crianças`);
-          if (qtdeAdultos < 2 || qtdeCriancas < 1) {
-            toast.error(
-              `Passe Family (#${i + 1}) requer mínimo 2 adultos e 1 criança.`
-            );
-            return;
-          }
-          const allFilled = qtdeAdultos === qtdeDataNascAdultos && qtdeCriancas === qtdeDataNascCriancas;
-
-          if (!allFilled) {
-            toast.error(
-              `Preencha nome e data de nascimento de todos os participantes do Family (#${
-                i + 1
-              }).`
-            );
-            return;
-          }
-        } else if (e.tipo === "adulto") {
-          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
-            toast.error(`Passe Adulto (#${i + 1}) precisa de todos os dados preenchidos.`);
-            return;
-          }
-        } else if (e.tipo === "crianca") {
-          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
-            toast.error(`Passe Criança (#${i + 1}) precisa de todos os dados preenchidos.`);
-            return;
-          }
-        }
-      }
-
       const novos = skiPassEntries.map((e) => {
         const descricao = `${
           e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
@@ -266,13 +217,7 @@ function Carrinho() {
           ...servicoSelecionado,
           nome: `${servicoSelecionado.nome} - ${descricao}`,
           preco: skiPassTotal,
-          dataInicio: e.dataInicio,
-          dias: e.dias,
-          tipo: e.tipo,
-          adultos: e.adultos ? [...e.adultos] : [],
-          criancas: e.criancas ? [...e.criancas] : [],
-          area: e.area,
-          seguro: e.seguro,
+          entries: e,
         };
       });
 
@@ -315,10 +260,12 @@ function Carrinho() {
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
-          ) : servicoSelecionado?.slug === "aulas-ski" ? (
+          ) : servicoSelecionado?.slug === "aulas" ? (
             <ModalAulasSki
               classEntries={classEntries}
               setClassEntries={setClassEntries}
+              classTotal={classTotal}
+              setClassTotal={setClassTotal}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />

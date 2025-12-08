@@ -7,13 +7,14 @@ import "../styles/ModalSkiClass.css";
 const ModalAulasSki = ({
   classEntries,
   setClassEntries,
+  classTotal, 
+  setClassTotal,
   concluirModal,
   setMostrarModal,
 }) => {
   const [regiao, setRegiao] = useState("franceses");
   const [resort, setResort] = useState("");
   const [idadesCriancasForm, setIdadesCriancasForm] = useState([]);
-  const [classTotal, setClassTotal] = useState(0);
 
   const resortsPorRegiao = {
     franceses: [
@@ -198,15 +199,12 @@ const ModalAulasSki = ({
     const tabelaPeriodo = precosAulas[entry.periodo];
     
     if (tabelaPeriodo && tabelaPeriodo[pessoas]) {
-      return tabelaPeriodo[pessoas][diasAula] || 0;
+      entry.subtotal = tabelaPeriodo[pessoas][diasAula] || 0;
+      return entry.subtotal;
     }
     return 0;
 
   };
-
-  const enviarParaCarrinho = () => {
-    concluirModal();
-  }
 
   useEffect(() => {
     const total = classEntries.reduce((acc, entry) => {
@@ -520,7 +518,7 @@ const ModalAulasSki = ({
             >
               CANCELAR
             </button>
-            <button className="btn-confirm" onClick={enviarParaCarrinho}>
+            <button className="btn-confirm" onClick={concluirModal}>
               ADICIONAR
             </button>
           </div>
