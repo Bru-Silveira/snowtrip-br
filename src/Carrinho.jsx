@@ -42,6 +42,12 @@ function Carrinho() {
   const [classEntries, setClassEntries] = useState([]);
   const [classTotal, setClassTotal] = useState(0);
 
+  const handleAtualizarCarrinho = (novoTotal) => {
+    // Este console.log DEVE ser executado ao clicar no botão "ADICIONAR"
+    console.log("Pai: Recebi o novo total do Ski Pass:", novoTotal); 
+    setSkiPassTotal(novoTotal); 
+};
+
   const servicos = [
     {
       id: 1,
@@ -136,19 +142,6 @@ function Carrinho() {
   };
 
   useEffect(() => {
-    const total = skiPassEntries.reduce((acc, entry) => {
-      let preco = calcularPrecoParaEntrada(entry);
-      if (entry.seguro) {
-        const pessoas =
-          (entry.adultos?.length || 0) + (entry.criancas?.length || 0);
-        preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
-      }
-      return acc + preco;
-    }, 0);
-    setSkiPassTotal(total);
-  }, [skiPassEntries]);
-
-  useEffect(() => {
     document.body.classList.toggle("modal-open", mostrarModal);
     return () => {
       document.body.classList.remove("modal-open");
@@ -209,6 +202,8 @@ function Carrinho() {
     }
 
     if (servicoSelecionado.slug === "ski-pass") {
+      console.log("Adicionando Ski Pass ao carrinho:", skiPassEntries);
+      console.log("Total Ski Pass:", skiPassTotal);
       const novos = skiPassEntries.map((e) => {
         const descricao = `${
           e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
@@ -239,7 +234,7 @@ function Carrinho() {
     setSnowCategoria("");
     setSnowTamanho("");
     setSnowDias(1);
-    setSkiPassTotal(0);
+    //setSkiPassTotal(0);
     setClassEntries([]);
   };
 
@@ -255,8 +250,7 @@ function Carrinho() {
             <ModalSkiPass
               skiPassEntries={skiPassEntries}
               setSkiPassEntries={setSkiPassEntries}
-              skiPassTotal={skiPassTotal}
-              setSkiPassTotal={setSkiPassTotal}
+              setSkiPassTotalCarrinho={handleAtualizarCarrinho}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
