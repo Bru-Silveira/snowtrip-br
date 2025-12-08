@@ -204,6 +204,10 @@ const ModalAulasSki = ({
 
   };
 
+  const enviarParaCarrinho = () => {
+    concluirModal();
+  }
+
   useEffect(() => {
     const total = classEntries.reduce((acc, entry) => {
       return acc + calcularPrecoParaEntrada(entry);
@@ -516,7 +520,7 @@ const ModalAulasSki = ({
             >
               CANCELAR
             </button>
-            <button className="btn-confirm" onClick={concluirModal}>
+            <button className="btn-confirm" onClick={enviarParaCarrinho}>
               ADICIONAR
             </button>
           </div>

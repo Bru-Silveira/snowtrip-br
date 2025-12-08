@@ -37,7 +37,6 @@ function Carrinho() {
   // entradas cumulativas de Ski Pass no modal
   const [skiPassEntries, setSkiPassEntries] = useState([]);
   const [skiPassTotal, setSkiPassTotal] = useState(0);
-  const [skiPassDataInicio, setSkiPassDataInicio] = useState("");
 
   // ADICIONAR: estado para aulas de ski
   const [classEntries, setClassEntries] = useState([]);
@@ -50,17 +49,11 @@ function Carrinho() {
       preco: 5000,
       imagem: hospedagemImg,
     },
-    { id: 2, slug: "aulas-ski", nome: "Aulas de Ski" },
+    { id: 2, slug: "aulas-ski", nome: "Aulas de Ski", preco: 1000 },
     { id: 3, slug: "equip-ski", nome: "Equipamentos de Ski", preco: 1500 },
-    {
-      id: 4,
-      slug: "equip-snow",
-      nome: "Equipamentos de Snow Board",
-      preco: 2000,
-    },
-    { id: 5, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
-    { id: 6, slug: "transfer", nome: "Transfer", preco: 2000 },
-    { id: 7, slug: "concierge", nome: "Concierge", preco: 2000 },
+    { id: 4, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
+    { id: 5, slug: "transfer", nome: "Transfer", preco: 2000 },
+    { id: 6, slug: "concierge", nome: "Concierge", preco: 2000 },
   ];
 
   const pacotesSki = [
@@ -180,7 +173,7 @@ function Carrinho() {
         return {
           ...servicoSelecionado,
           nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco,
+          preco: preco,
           dataInicio: entry.dataInicio,
           dias: entry.dias,
           modalidade: entry.modalidade,
@@ -196,23 +189,6 @@ function Carrinho() {
       setCarrinho((prev) => [...prev, ...novos]);
       setClassEntries([]);
     }
-
-    // if (servicoSelecionado.slug === "aulas-ski") {
-    //   if (!opcaoSelecionada || !dataSelecionada) {
-    //     toast.error("Selecione a data e o pacote!");
-    //     return;
-    //   }
-    //   const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
-    //   setCarrinho((prev) => [
-    //     ...prev,
-    //     {
-    //       ...servicoSelecionado,
-    //       nome: `${servicoSelecionado.nome} - ${pacote?.nome || ""}`,
-    //       preco: pacote?.preco || 0,
-    //       data: dataSelecionada,
-    //     },
-    //   ]);
-    // }
 
     if (servicoSelecionado.slug === "equip-ski") {
       if (!equipamentoSelecionado || !categoria || !tamanho || dias < 1) {
@@ -232,33 +208,6 @@ function Carrinho() {
           dias,
           categoria,
           tamanho,
-        },
-      ]);
-    }
-
-    if (servicoSelecionado.slug === "equip-snow") {
-      if (
-        !snowEquipamentoSelecionado ||
-        !snowCategoria ||
-        !snowTamanho ||
-        snowDias < 1
-      ) {
-        toast.error("Preencha todas as informações do equipamento de Snowboard!");
-        return;
-      }
-      const equipamento = snowboardEquipamentos.find(
-        (e) => e.id === snowEquipamentoSelecionado
-      );
-      const precoBase = equipamento?.preco?.[snowCategoria] || 0;
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${equipamento?.nome || ""}`,
-          preco: precoBase * snowDias,
-          dias: snowDias,
-          categoria: snowCategoria,
-          tamanho: snowTamanho,
         },
       ]);
     }
@@ -310,20 +259,13 @@ function Carrinho() {
       }
 
       const novos = skiPassEntries.map((e) => {
-        const preco =
-          calcularPrecoParaEntrada(e) +
-          (e.seguro
-            ? 3.5 *
-              ((e.adultos?.length || 0) + (e.criancas?.length || 0)) *
-              Math.max(1, Number(e.dias) || 1)
-            : 0);
         const descricao = `${
           e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
         } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
         return {
           ...servicoSelecionado,
           nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco,
+          preco: skiPassTotal,
           dataInicio: e.dataInicio,
           dias: e.dias,
           tipo: e.tipo,
@@ -353,7 +295,6 @@ function Carrinho() {
     setSnowTamanho("");
     setSnowDias(1);
     setSkiPassTotal(0);
-    setSkiPassDataInicio("");
     setClassEntries([]);
   };
 
@@ -369,6 +310,8 @@ function Carrinho() {
             <ModalSkiPass
               skiPassEntries={skiPassEntries}
               setSkiPassEntries={setSkiPassEntries}
+              skiPassTotal={skiPassTotal}
+              setSkiPassTotal={setSkiPassTotal}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />

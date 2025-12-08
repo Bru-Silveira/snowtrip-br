@@ -10,6 +10,8 @@ import "../styles/ModalSkiPass.css";
 const ModalSkiPass = ({
   skiPassEntries,
   setSkiPassEntries,
+  skiPassTotal,
+  setSkiPassTotal,
   concluirModal,
   setMostrarModal,
 }) => {
@@ -18,7 +20,6 @@ const ModalSkiPass = ({
   const [dias, setDias] = useState(1);
   const [seguro, setSeguro] = useState(true);
   const [tipoSkiPass, setTipoSkiPass] = useState("");
-  const [skiPassTotal, setSkiPassTotal] = useState(0);
 
   const jsonBasePorTipoSkiPass = new Map();
   jsonBasePorTipoSkiPass.set("family", {
