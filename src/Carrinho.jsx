@@ -317,7 +317,7 @@ function Carrinho() {
                   <li key={index} className="item-carrinho">
                     <span className="carrinho-info">{item.nome}</span>
                     <span className="carrinho-preco">
-                      R$ {(item.preco || 0).toLocaleString("pt-BR")}
+                      € {(item.preco || 0).toFixed(2).replace(".", ",")}
                     </span>
                     <button
                       onClick={() => removerDoCarrinho(index)}
@@ -337,7 +337,7 @@ function Carrinho() {
             <h2 className="carrinho-dias">8 Dias</h2>
             <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
             <div className="carrinho-total">
-              Total: R$ {total.toLocaleString("pt-BR")}
+              Total: € {total.toFixed(2).replace(".", ",")}
             </div>
             <button className="carrinho-reservar">Reserve agora!</button>
           </div>
