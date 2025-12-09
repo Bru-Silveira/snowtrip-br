@@ -200,6 +200,7 @@ const ModalAulasSki = ({
     
     if (tabelaPeriodo && tabelaPeriodo[pessoas]) {
       entry.subtotal = tabelaPeriodo[pessoas][diasAula] || 0;
+      console.log("Calculated subtotal for entry:", entry.subtotal);
       return entry.subtotal;
     }
     return 0;
@@ -274,7 +275,7 @@ const ModalAulasSki = ({
             <label>
               Adicionar Grupo:
               <button type="button" onClick={adicionarClassEntry}>
-                <span class="material-symbols-outlined">add_circle</span>
+                <span className="material-symbols-outlined">add_circle</span>
               </button>
             </label>
           </div>

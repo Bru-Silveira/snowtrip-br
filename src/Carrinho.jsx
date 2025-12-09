@@ -43,10 +43,8 @@ function Carrinho() {
   const [classTotal, setClassTotal] = useState(0);
 
   const handleAtualizarCarrinho = (novoTotal) => {
-    // Este console.log DEVE ser executado ao clicar no botão "ADICIONAR"
-    console.log("Pai: Recebi o novo total do Ski Pass:", novoTotal); 
-    setSkiPassTotal(novoTotal); 
-};
+    setSkiPassTotal(novoTotal);
+  };
 
   const servicos = [
     {
@@ -111,6 +109,22 @@ function Carrinho() {
   };
 
   const abrirModal = (servico) => {
+    // reset modal genérico
+    setServicoSelecionado(null);
+    setOpcaoSelecionada(null);
+    setDataSelecionada("");
+    setEquipamentoSelecionado("");
+    setSnowEquipamentoSelecionado("");
+    setQuantidade(1);
+    setDias(1);
+    setCategoria("");
+    setTamanho("");
+    setSnowCategoria("");
+    setSnowTamanho("");
+    setSnowDias(1);
+    setSkiPassTotal(0);
+    setClassEntries([]);
+
     setServicoSelecionado(servico);
 
     // Abre modal para serviços que precisam de configuração
@@ -124,23 +138,6 @@ function Carrinho() {
     }
   };
 
-  const calcularPrecoParaEntrada = (entry) => {
-    if (!entry || !entry.tipo) return 0;
-    const dias = Math.max(1, Number(entry.dias) || 1);
-    const areaObj = skiPassPrecos[entry.area] || {};
-    if (entry.tipo === "family")
-      return (areaObj.family && areaObj.family[dias]) || 0;
-    if (entry.tipo === "adulto") {
-      const unit = (areaObj.adulto && areaObj.adulto[dias]) || 0;
-      return unit * (entry.adultos?.length || 0);
-    }
-    if (entry.tipo === "crianca") {
-      const unit = (areaObj.crianca && areaObj.crianca[dias]) || 0;
-      return unit * (entry.criancas?.length || 0);
-    }
-    return 0;
-  };
-
   useEffect(() => {
     document.body.classList.toggle("modal-open", mostrarModal);
     return () => {
@@ -148,8 +145,42 @@ function Carrinho() {
     };
   }, [mostrarModal]);
 
+  useEffect(() => {
+    // Este código só é executado DEPOIS que o estado skiPassTotal realmente mudou
+    // e o componente pai re-renderizou.
+    console.log(
+      "PAI (useEffect): O valor final do skiPassTotal AGORA é:",
+      skiPassTotal
+    );
+
+    console.log(
+      "PAI (useEffect): Adicionando entradas de Ski Pass ao carrinho:", skiPassEntries
+    );
+
+    if(skiPassEntries.length === 0 || skiPassTotal === 0){ 
+      return; // Nada a adicionar
+    }
+
+    const novos = skiPassEntries.map((e) => {
+        console.log("Adicionando ao carrinho a entrada:", e);
+        const descricao = `${
+          e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+        } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
+        return {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - ${descricao}`,
+          preco: skiPassTotal,
+          entries: e,
+        };
+      });
+
+      setCarrinho((prev) => [...prev, ...novos]);
+      setSkiPassEntries([]);
+
+    // Você pode adicionar qualquer lógica de atualização de outros totais do carrinho aqui.
+  }, [skiPassTotal]); // Depende do estado do carrinho
+
   const concluirModal = () => {
-    console.log("Concluir modal para serviço:", servicoSelecionado);
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
@@ -165,8 +196,10 @@ function Carrinho() {
         const descricao = `${entry.modalidade} - ${entry.resort} 
         - ${entry.dias} dia${entry.dias > 1 ? "s" : ""} 
         - ${entry.periodo === "halfday" ? "Half day" : "Full day"}
-        ${entry.qtdeAdultos > 0 ? (" - " + entry.qtdeAdultos +" adultos") : ""} 
-        ${entry.qtdeCriancas > 0 ? (" - " + entry.qtdeCriancas +" crianças") : ""}`;
+        ${entry.qtdeAdultos > 0 ? " - " + entry.qtdeAdultos + " adultos" : ""} 
+        ${
+          entry.qtdeCriancas > 0 ? " - " + entry.qtdeCriancas + " crianças" : ""
+        }`;
         return {
           ...servicoSelecionado,
           nome: `${servicoSelecionado.nome} de ${descricao}`,
@@ -201,41 +234,7 @@ function Carrinho() {
       ]);
     }
 
-    if (servicoSelecionado.slug === "ski-pass") {
-      console.log("Adicionando Ski Pass ao carrinho:", skiPassEntries);
-      console.log("Total Ski Pass:", skiPassTotal);
-      const novos = skiPassEntries.map((e) => {
-        const descricao = `${
-          e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
-        } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
-        return {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco: skiPassTotal,
-          entries: e,
-        };
-      });
-
-      setCarrinho((prev) => [...prev, ...novos]);
-      setSkiPassEntries([]);
-    }
-
-    // reset modal genérico
-    setServicoSelecionado(null);
-    setOpcaoSelecionada(null);
-    setDataSelecionada("");
-    setEquipamentoSelecionado("");
-    setSnowEquipamentoSelecionado("");
-    setQuantidade(1);
     setMostrarModal(false);
-    setDias(1);
-    setCategoria("");
-    setTamanho("");
-    setSnowCategoria("");
-    setSnowTamanho("");
-    setSnowDias(1);
-    //setSkiPassTotal(0);
-    setClassEntries([]);
   };
 
   const removerDoCarrinho = (id) =>

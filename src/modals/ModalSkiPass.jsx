@@ -147,7 +147,6 @@ const ModalSkiPass = ({
 
   const adicionarSkiPassNoCarrinho = () => {
     setSkiPassTotalCarrinho(skiPassTotal);
-    console.log("Adicionando Total do Ski Pass no carrinho:", skiPassTotal);
     concluirModal();
   }
 
@@ -265,7 +264,7 @@ const ModalSkiPass = ({
                   <option value="crianca">Solo Criança (5 - 18 anos)</option>
                 </select>
                 <button type="button" onClick={() => addSkiPassEntry()}>
-                  <span class="material-symbols-outlined">add_circle</span>
+                  <span className="material-symbols-outlined">add_circle</span>
                 </button>
               </div>
             </label>
@@ -283,7 +282,7 @@ const ModalSkiPass = ({
                     className="btn-small btn-remove"
                     onClick={() => removeSkiPassEntry(idx)}
                   >
-                    <span class="material-symbols-outlined">cancel</span>
+                    <span className="material-symbols-outlined">cancel</span>
                   </button>
                 </div>
               </div>
@@ -480,7 +479,7 @@ const ModalSkiPass = ({
                 className="tooltip-btn"
                 aria-describedby="tooltip-seguro"
               >
-                <span class="material-symbols-outlined help">help</span>
+                <span className="material-symbols-outlined help">help</span>
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
                 <strong>
