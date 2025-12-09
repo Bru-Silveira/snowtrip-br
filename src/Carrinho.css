@@ -25,6 +25,7 @@
 
 .card-wrapper {
   display: flex;
+  gap: 10px;
   align-items: center;
   background: #fff;
   border-radius: 12px;
@@ -32,10 +33,15 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.card-wrapper:has(.btn-check) {
+  flex-flow: row-reverse;
+  padding-right: 0;
+  padding-left: 10px;
+}
+
 .card-servico {
   width: 200px;
   height: 60px;
-  margin-right: 10px;
   border-radius: 12px;
   position: relative;
   overflow: hidden;
@@ -68,19 +74,23 @@
 }
 
 /* Botão adicionar (card) */
-.btn-adicionar {
-  margin-top: auto;
+.btn-adicionar,
+.btn-check {
   align-self: center;
-  width: 60px;
-  height: 60px;
-  font-weight: 200;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: 2px dashed #999;
   background: transparent;
   cursor: pointer;
-  font-size: 30px;
   color: #444;
   transition: all 0.3s;
+}
+
+.material-symbols-outlined {
+  font-size: 30px;
+  color: #5d5454;
+  margin: 0;
 }
 
 .carrinho-inferior {
@@ -126,23 +136,31 @@
 /* Lista de itens */
 .carrinho-lista {
   min-width: 300px;
-  max-width: 600px;
+  width: 100%;
   background: #fff;
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
+
 .lista-carrinho {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .item-carrinho {
   display: grid;
   grid-template-columns: 2fr 1fr 10px;
   align-items: center;
   gap: 12px;
   padding: 8px 0;
+}
+
+.item-carrinho.titulo {
+  border-bottom: 2px solid #ccc;
+  font-weight: 700;
+  padding-bottom: 12px;
 }
 
 .carrinho-preco {
@@ -160,10 +178,19 @@
     padding-bottom: 10px;
   }
 
+  .card-wrapper:has(.btn-check) {
+    flex-flow: column-reverse;
+    justify-content: flex-end;
+    padding: 10px 0 0 0;
+  }
+
   .card-servico {
     width: 115px;
     height: 95px;
     margin-right: 0;
-    margin-bottom: 5px;
+  }
+
+  .carrinho-lista {
+    width: 60%;
   }
 }

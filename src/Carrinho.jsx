@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
@@ -68,21 +68,6 @@ function Carrinho() {
     { id: 6, slug: "concierge", nome: "Concierge", preco: 0, entries: [] },
   ];
 
-  const pacotesSki = [
-    {
-      id: "p1",
-      nome: "Pacote 1 - Full Day",
-      descricao: "6 horas de aula",
-      preco: 1200,
-    },
-    {
-      id: "p2",
-      nome: "Pacote 2 - Part Day",
-      descricao: "4 horas de aula (09:00 às 13:00)",
-      preco: 900,
-    },
-  ];
-
   const equipamentos = [
     { id: "e1", nome: "Esquis Adulto", preco: { 1: 150, 2: 180, 3: 220 } },
     { id: "e2", nome: "Esquis Infantil", preco: { 1: 100, 2: 130, 3: 160 } },
@@ -95,19 +80,6 @@ function Carrinho() {
     { id: "sb2", nome: "Bota de Snowboard", preco: { 1: 100, 2: 150, 3: 200 } },
     { id: "sb3", nome: "Capacete", preco: { 1: 120, 2: 170, 3: 220 } },
   ];
-
-  const skiPassPrecos = {
-    courchevel: {
-      adulto: { 1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455 },
-      crianca: { 1: 52, 2: 104, 3: 156, 4: 208, 5: 260, 6: 312, 7: 364 },
-      family: { 5: 405, 6: 486, 7: 567 },
-    },
-    "3vallees": {
-      adulto: { 1: 66, 2: 132, 3: 198, 4: 264, 5: 330, 6: 396, 7: 462 },
-      crianca: { 1: 53, 2: 106, 3: 159, 4: 212, 5: 265, 6: 318, 7: 371 },
-      family: { 5: 818, 6: 981, 7: 1144 },
-    },
-  };
 
   const abrirModal = (servico) => {
     // reset modal genérico
@@ -243,6 +215,13 @@ function Carrinho() {
     setCarrinho((prev) => prev.filter((_, index) => index !== id));
   const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
 
+  const addedServiceSlugs = useMemo(() => {
+    // Cria um Set (conjunto) para buscas rápidas.
+    // Usamos item.id para rastrear de qual serviço o item veio.
+    const slugs = carrinho.map((item) => item.slug);
+    return new Set(slugs);
+  }, [carrinho]);
+
   return (
     <>
       {mostrarModal && (
@@ -305,12 +284,21 @@ function Carrinho() {
                 <div className="card-servico">
                   <p className="servico-nome">{servico.nome}</p>
                 </div>
-                <button
-                  onClick={() => abrirModal(servico)}
-                  className="btn-adicionar"
-                >
-                  +
-                </button>
+                {addedServiceSlugs.has(servico.slug) ? (
+                  <button
+                    onClick={() => abrirModal(servico)}
+                    className="btn-check"
+                  >
+                    <span className="material-symbols-outlined">check</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => abrirModal(servico)}
+                    className="btn-adicionar"
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -319,20 +307,29 @@ function Carrinho() {
         <div className="carrinho-inferior">
           <div className="carrinho-lista">
             <ul className="lista-carrinho">
-              {carrinho.map((item, index) => (
-                <li key={index} className="item-carrinho">
-                  <span className="carrinho-info">{item.nome}</span>
-                  <span className="carrinho-preco">
-                    R$ {(item.preco || 0).toLocaleString("pt-BR")}
-                  </span>
-                  <button
-                    onClick={() => removerDoCarrinho(index)}
-                    className="btn-remover"
-                  >
-                    X
-                  </button>
-                </li>
-              ))}
+              <li className="item-carrinho titulo">
+                <span className="carrinho-info">Serviço</span>
+                <span className="carrinho-preco">Preço</span>
+                <span className="carrinho-remover"></span>
+              </li>
+              {carrinho.length > 0 ? (
+                carrinho.map((item, index) => (
+                  <li key={index} className="item-carrinho">
+                    <span className="carrinho-info">{item.nome}</span>
+                    <span className="carrinho-preco">
+                      R$ {(item.preco || 0).toLocaleString("pt-BR")}
+                    </span>
+                    <button
+                      onClick={() => removerDoCarrinho(index)}
+                      className="btn-remover"
+                    >
+                      X
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <span className="carrinho-info">Seu carrinho está vazio.</span>
+              )}
             </ul>
           </div>
 
