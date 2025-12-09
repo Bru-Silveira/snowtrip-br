@@ -305,7 +305,7 @@ function Carrinho() {
                   onClick={() => abrirModal(servico)}
                   className="btn-adicionar"
                 >
-                  Adicionar
+                  +
                 </button>
               </div>
             ))}
@@ -313,14 +313,6 @@ function Carrinho() {
         </div>
 
         <div className="carrinho-inferior">
-          <div className="carrinho-detalhes">
-            <h2 className="carrinho-dias">8 Dias</h2>
-            <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
-            <div className="carrinho-total">
-              Total: R$ {total.toLocaleString("pt-BR")}
-            </div>
-            <button className="carrinho-reservar">Reserve agora!</button>
-          </div>
 
           <div className="carrinho-lista">
             <ul className="lista-carrinho">
@@ -339,6 +331,15 @@ function Carrinho() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="carrinho-detalhes">
+            <h2 className="carrinho-dias">8 Dias</h2>
+            <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
+            <div className="carrinho-total">
+              Total: R$ {total.toLocaleString("pt-BR")}
+            </div>
+            <button className="carrinho-reservar">Reserve agora!</button>
           </div>
         </div>
       </div>
