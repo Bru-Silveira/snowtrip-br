@@ -5,10 +5,12 @@ import { Link } from "react-router-dom";
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
+import ModalTransfer from "./modals/ModalTransfer";
 import Header from "./Header";
 
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
+import ModalConsierge from "./modals/ModalConcierge";
 
 let tabelaImg;
 try {
@@ -56,13 +58,7 @@ function Carrinho() {
       imagem: hospedagemImg,
     },
     { id: 2, slug: "aulas", nome: "Aulas", preco: 0, entries: [] },
-    {
-      id: 3,
-      slug: "equip-ski",
-      nome: "Equipamentos",
-      preco: 0,
-      entries: [],
-    },
+    { id: 3, slug: "equip-ski", nome: "Equipamentos", preco: 0, entries: [] },
     { id: 4, slug: "ski-pass", nome: "Ski Pass", preco: 0, entries: [] },
     { id: 5, slug: "transfer", nome: "Transfer", preco: 0, entries: [] },
     { id: 6, slug: "concierge", nome: "Concierge", preco: 0, entries: [] },
@@ -102,7 +98,9 @@ function Carrinho() {
 
     // Abre modal para serviços que precisam de configuração
     if (
-      ["ski-pass", "aulas", "equip-ski", "equip-snow"].includes(servico.slug)
+      ["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(
+        servico.slug
+      )
     ) {
       setMostrarModal(true);
     } else {
@@ -195,73 +193,102 @@ function Carrinho() {
       ]);
     }
 
+    if (servicoSelecionado.slug === "transfer") {
+      setCarrinho((prev) => [
+        ...prev,
+        {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
+          preco: 0,
+        },
+      ]);
+    }
+
+    if (servicoSelecionado.slug === "concierge") {
+      setCarrinho((prev) => [
+        ...prev,
+        {
+          ...servicoSelecionado,
+          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
+          preco: 0,
+        },
+      ]);
+    }
+
     setMostrarModal(false);
   };
 
   const formatarDetalhesItem = (item) => {
     // 1. Inicia a descrição com o nome principal e preço
-    let detalhes = `*${item.nome.trim().replace(/\s+/g, ' ')}:* € ${item.preco.toLocaleString("pt-BR")}`;
-    
+    let detalhes = `*${item.nome
+      .trim()
+      .replace(/\s+/g, " ")}:* € ${item.preco.toLocaleString("pt-BR")}`;
+
     // 2. Extrai e formata os detalhes específicos por slug
     const entry = item.entries;
 
     if (!entry) {
-        return detalhes; // Retorna apenas nome/preço se não houver detalhes
+      return detalhes; // Retorna apenas nome/preço se não houver detalhes
     }
 
     switch (item.slug) {
-        case "aulas":
-            detalhes += `\n  - Modalidade: ${entry.modalidade.toUpperCase()}`;
-            detalhes += `\n  - Resort: ${entry.resort} (${entry.regiao})`;
-            detalhes += `\n  - Duração: ${entry.dias} dias (${entry.periodo === "halfday" ? "Half Day" : "Full Day"})`;
-            detalhes += `\n  - Pessoas: ${entry.qtdeAdultos} Adulto(s) / ${entry.qtdeCriancas} Criança(s)`;
-            detalhes += `\n  - Nível: ${entry.nivel}`;
-            detalhes += `\n  - Data Início: ${entry.dataInicio}`;
-            break;
-            
-        case "ski-pass":
-            detalhes += `\n  - Área: ${entry.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"}`;
-            detalhes += `\n  - Duração: ${entry.dias} dias`;
-            detalhes += `\n  - Tipo: ${entry.tipo.toUpperCase()}`;
-            
-            // Adiciona detalhes do esquiador (se houver)
-            if (entry.esquiadores && entry.esquiadores.nome) {
-                detalhes += `\n  - Esquiador: ${entry.esquiadores.nome}`;
-            } else if (entry.esquiadores && entry.esquiadores.adultos) {
-                // Lógica para passes Family ou Multi-pessoa
-                const totalEsquiadores = entry.esquiadores.adultos.length + entry.esquiadores.criancas.length;
-                detalhes += `\n  - Total Esquiadores: ${totalEsquiadores}`;
-            }
-            break;
-            
-        // Adicione cases para "equip-ski", "transfer", etc., se necessário
-        
-        default:
-            // Para outros slugs, apenas retorna o básico
-            break;
+      case "aulas":
+        detalhes += `\n  - Modalidade: ${entry.modalidade.toUpperCase()}`;
+        detalhes += `\n  - Resort: ${entry.resort} (${entry.regiao})`;
+        detalhes += `\n  - Duração: ${entry.dias} dias (${
+          entry.periodo === "halfday" ? "Half Day" : "Full Day"
+        })`;
+        detalhes += `\n  - Pessoas: ${entry.qtdeAdultos} Adulto(s) / ${entry.qtdeCriancas} Criança(s)`;
+        detalhes += `\n  - Nível: ${entry.nivel}`;
+        detalhes += `\n  - Data Início: ${entry.dataInicio}`;
+        break;
+
+      case "ski-pass":
+        detalhes += `\n  - Área: ${
+          entry.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+        }`;
+        detalhes += `\n  - Duração: ${entry.dias} dias`;
+        detalhes += `\n  - Tipo: ${entry.tipo.toUpperCase()}`;
+
+        // Adiciona detalhes do esquiador (se houver)
+        if (entry.esquiadores && entry.esquiadores.nome) {
+          detalhes += `\n  - Esquiador: ${entry.esquiadores.nome}`;
+        } else if (entry.esquiadores && entry.esquiadores.adultos) {
+          // Lógica para passes Family ou Multi-pessoa
+          const totalEsquiadores =
+            entry.esquiadores.adultos.length +
+            entry.esquiadores.criancas.length;
+          detalhes += `\n  - Total Esquiadores: ${totalEsquiadores}`;
+        }
+        break;
+
+      // Adicione cases para "equip-ski", "transfer", etc., se necessário
+
+      default:
+        // Para outros slugs, apenas retorna o básico
+        break;
     }
 
     return detalhes;
-};
+  };
 
   const enviarWhatsApp = () => {
-    const numeroTelefone = "5511910011691"; 
+    const numeroTelefone = "5511910011691";
 
     console.log("Carrinho ao enviar para WhatsApp:", carrinho);
 
     // 1. Constrói a lista de itens no carrinho
-    const itensLista = carrinho
-      .map(formatarDetalhesItem)
-      .join("\n");
+    const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
 
     const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
-    
+
     // 2. Constrói a mensagem completa
-    const mensagemPadrao = `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
-                           `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
-                           `${itensLista}\n\n` +
-                           `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
-                           `Aguardamos a confirmação dos detalhes!`;
+    const mensagemPadrao =
+      `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
+      `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
+      `${itensLista}\n\n` +
+      `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
+      `Aguardamos a confirmação dos detalhes!`;
 
     // 3. Codifica a mensagem e constrói o link
     const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
@@ -301,6 +328,16 @@ function Carrinho() {
               setClassEntries={setClassEntries}
               classTotal={classTotal}
               setClassTotal={setClassTotal}
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
+          ) : servicoSelecionado?.slug === "transfer" ? (
+            <ModalTransfer
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
+          ) : servicoSelecionado?.slug === "concierge" ? (
+            <ModalConsierge 
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
@@ -377,9 +414,15 @@ function Carrinho() {
                 carrinho.map((item, index) => (
                   <li key={index} className="item-carrinho">
                     <span className="carrinho-info">{item.nome}</span>
-                    <span className="carrinho-preco">
-                      € {(item.preco || 0).toFixed(2).replace(".", ",")}
-                    </span>
+                    {item.slug === "transfer" || item.slug === "concierge" ? (
+                      <span className="carrinho-preco">
+                        à consultar
+                      </span>
+                    ) : (
+                      <span className="carrinho-preco">
+                        € {(item.preco || 0).toFixed(2).replace(".", ",")}
+                      </span>
+                    )}
                     <button
                       onClick={() => removerDoCarrinho(index)}
                       className="btn-remover"
@@ -400,7 +443,9 @@ function Carrinho() {
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
-            <button className="carrinho-reservar" onClick={enviarWhatsApp}>Reserve agora!</button>
+            <button className="carrinho-reservar" onClick={enviarWhatsApp}>
+              Reserve agora!
+            </button>
           </div>
         </div>
       </div>
