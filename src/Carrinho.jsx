@@ -119,24 +119,11 @@ function Carrinho() {
   }, [mostrarModal]);
 
   useEffect(() => {
-    // Este código só é executado DEPOIS que o estado skiPassTotal realmente mudou
-    // e o componente pai re-renderizou.
-    console.log(
-      "PAI (useEffect): O valor final do skiPassTotal AGORA é:",
-      skiPassTotal
-    );
-
-    console.log(
-      "PAI (useEffect): Adicionando entradas de Ski Pass ao carrinho:",
-      skiPassEntries
-    );
-
     if (skiPassEntries.length === 0 || skiPassTotal === 0) {
       return; // Nada a adicionar
     }
 
     const novos = skiPassEntries.map((e) => {
-      console.log("Adicionando ao carrinho a entrada:", e);
       const descricao = `${
         e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
       } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
@@ -170,9 +157,9 @@ function Carrinho() {
         const descricao = `${entry.modalidade} - ${entry.resort} 
         - ${entry.dias} dia${entry.dias > 1 ? "s" : ""} 
         - ${entry.periodo === "halfday" ? "Half day" : "Full day"}
-        ${entry.qtdeAdultos > 0 ? " - " + entry.qtdeAdultos + " adultos" : ""} 
+        ${entry.qtdeAdultos > 0 ? "- " + entry.qtdeAdultos + " adultos" : ""} 
         ${
-          entry.qtdeCriancas > 0 ? " - " + entry.qtdeCriancas + " crianças" : ""
+          entry.qtdeCriancas > 0 ? "- " + entry.qtdeCriancas + " crianças" : ""
         }`;
         return {
           ...servicoSelecionado,
@@ -209,6 +196,80 @@ function Carrinho() {
     }
 
     setMostrarModal(false);
+  };
+
+  const formatarDetalhesItem = (item) => {
+    // 1. Inicia a descrição com o nome principal e preço
+    let detalhes = `*${item.nome.trim().replace(/\s+/g, ' ')}:* € ${item.preco.toLocaleString("pt-BR")}`;
+    
+    // 2. Extrai e formata os detalhes específicos por slug
+    const entry = item.entries;
+
+    if (!entry) {
+        return detalhes; // Retorna apenas nome/preço se não houver detalhes
+    }
+
+    switch (item.slug) {
+        case "aulas":
+            detalhes += `\n  - Modalidade: ${entry.modalidade.toUpperCase()}`;
+            detalhes += `\n  - Resort: ${entry.resort} (${entry.regiao})`;
+            detalhes += `\n  - Duração: ${entry.dias} dias (${entry.periodo === "halfday" ? "Half Day" : "Full Day"})`;
+            detalhes += `\n  - Pessoas: ${entry.qtdeAdultos} Adulto(s) / ${entry.qtdeCriancas} Criança(s)`;
+            detalhes += `\n  - Nível: ${entry.nivel}`;
+            detalhes += `\n  - Data Início: ${entry.dataInicio}`;
+            break;
+            
+        case "ski-pass":
+            detalhes += `\n  - Área: ${entry.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"}`;
+            detalhes += `\n  - Duração: ${entry.dias} dias`;
+            detalhes += `\n  - Tipo: ${entry.tipo.toUpperCase()}`;
+            
+            // Adiciona detalhes do esquiador (se houver)
+            if (entry.esquiadores && entry.esquiadores.nome) {
+                detalhes += `\n  - Esquiador: ${entry.esquiadores.nome}`;
+            } else if (entry.esquiadores && entry.esquiadores.adultos) {
+                // Lógica para passes Family ou Multi-pessoa
+                const totalEsquiadores = entry.esquiadores.adultos.length + entry.esquiadores.criancas.length;
+                detalhes += `\n  - Total Esquiadores: ${totalEsquiadores}`;
+            }
+            break;
+            
+        // Adicione cases para "equip-ski", "transfer", etc., se necessário
+        
+        default:
+            // Para outros slugs, apenas retorna o básico
+            break;
+    }
+
+    return detalhes;
+};
+
+  const enviarWhatsApp = () => {
+    const numeroTelefone = "5511910011691"; 
+
+    console.log("Carrinho ao enviar para WhatsApp:", carrinho);
+
+    // 1. Constrói a lista de itens no carrinho
+    const itensLista = carrinho
+      .map(formatarDetalhesItem)
+      .join("\n");
+
+    const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+    
+    // 2. Constrói a mensagem completa
+    const mensagemPadrao = `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
+                           `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
+                           `${itensLista}\n\n` +
+                           `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
+                           `Aguardamos a confirmação dos detalhes!`;
+
+    // 3. Codifica a mensagem e constrói o link
+    const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
+      mensagemPadrao
+    )}`;
+
+    // 4. Abre o link em uma nova aba
+    window.open(linkWhatsApp, "_blank");
   };
 
   const removerDoCarrinho = (id) =>
@@ -339,7 +400,7 @@ function Carrinho() {
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
-            <button className="carrinho-reservar">Reserve agora!</button>
+            <button className="carrinho-reservar" onClick={enviarWhatsApp}>Reserve agora!</button>
           </div>
         </div>
       </div>

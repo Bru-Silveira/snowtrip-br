@@ -116,21 +116,22 @@
   color: #555;
 }
 .carrinho-total {
-  margin-top: 25px;
+  margin: 25px 0 25px 0;
   font-size: 20px;
   font-weight: 700;
   color: #000;
   text-align: center;
 }
 .carrinho-reservar {
-  margin-top: 15px;
   width: 100%;
   background: #ffcc00;
   border: none;
   padding: 14px;
   border-radius: 8px;
   font-weight: 700;
+  font-size: 16px;
   cursor: pointer;
+  color: #000;
 }
 
 /* Lista de itens */
