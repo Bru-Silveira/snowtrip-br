@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-import hospedagemImg from "./img/cards/hospedagem.jpg";
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
+import Header from "./Header";
 
+import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
 
 let tabelaImg;
@@ -50,7 +51,7 @@ function Carrinho() {
     {
       id: 1,
       slug: "hospedagem",
-      nome: "Hospedagem XYZ",
+      nome: "Hospedagem",
       preco: 5000,
       imagem: hospedagemImg,
     },
@@ -58,7 +59,7 @@ function Carrinho() {
     {
       id: 3,
       slug: "equip-ski",
-      nome: "Equipamentos de Ski",
+      nome: "Equipamentos",
       preco: 0,
       entries: [],
     },
@@ -154,28 +155,29 @@ function Carrinho() {
     );
 
     console.log(
-      "PAI (useEffect): Adicionando entradas de Ski Pass ao carrinho:", skiPassEntries
+      "PAI (useEffect): Adicionando entradas de Ski Pass ao carrinho:",
+      skiPassEntries
     );
 
-    if(skiPassEntries.length === 0 || skiPassTotal === 0){ 
+    if (skiPassEntries.length === 0 || skiPassTotal === 0) {
       return; // Nada a adicionar
     }
 
     const novos = skiPassEntries.map((e) => {
-        console.log("Adicionando ao carrinho a entrada:", e);
-        const descricao = `${
-          e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
-        } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
-        return {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco: skiPassTotal,
-          entries: e,
-        };
-      });
+      console.log("Adicionando ao carrinho a entrada:", e);
+      const descricao = `${
+        e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+      } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
+      return {
+        ...servicoSelecionado,
+        nome: `${servicoSelecionado.nome} - ${descricao}`,
+        preco: skiPassTotal,
+        entries: e,
+      };
+    });
 
-      setCarrinho((prev) => [...prev, ...novos]);
-      setSkiPassEntries([]);
+    setCarrinho((prev) => [...prev, ...novos]);
+    setSkiPassEntries([]);
 
     // Você pode adicionar qualquer lógica de atualização de outros totais do carrinho aqui.
   }, [skiPassTotal]); // Depende do estado do carrinho
@@ -290,6 +292,8 @@ function Carrinho() {
         </div>
       )}
 
+      <Header titulo="Monte sua Trip!"></Header>
+
       <div className="carrinho-container">
         <div className="carrinho-servicos">
           <div className="lista-servicos">
@@ -313,7 +317,6 @@ function Carrinho() {
         </div>
 
         <div className="carrinho-inferior">
-
           <div className="carrinho-lista">
             <ul className="lista-carrinho">
               {carrinho.map((item, index) => (
