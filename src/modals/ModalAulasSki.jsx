@@ -7,13 +7,14 @@ import "../styles/ModalSkiClass.css";
 const ModalAulasSki = ({
   classEntries,
   setClassEntries,
+  classTotal, 
+  setClassTotal,
   concluirModal,
   setMostrarModal,
 }) => {
   const [regiao, setRegiao] = useState("franceses");
   const [resort, setResort] = useState("");
   const [idadesCriancasForm, setIdadesCriancasForm] = useState([]);
-  const [classTotal, setClassTotal] = useState(0);
 
   const resortsPorRegiao = {
     franceses: [
@@ -198,7 +199,9 @@ const ModalAulasSki = ({
     const tabelaPeriodo = precosAulas[entry.periodo];
     
     if (tabelaPeriodo && tabelaPeriodo[pessoas]) {
-      return tabelaPeriodo[pessoas][diasAula] || 0;
+      entry.subtotal = tabelaPeriodo[pessoas][diasAula] || 0;
+      console.log("Calculated subtotal for entry:", entry.subtotal);
+      return entry.subtotal;
     }
     return 0;
 
@@ -272,7 +275,7 @@ const ModalAulasSki = ({
             <label>
               Adicionar Grupo:
               <button type="button" onClick={adicionarClassEntry}>
-                <span class="material-symbols-outlined">add_circle</span>
+                <span className="material-symbols-outlined">add_circle</span>
               </button>
             </label>
           </div>
