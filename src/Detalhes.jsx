@@ -316,11 +316,10 @@ function Detalhes() {
           </li>
         </ul>
       </div>
-      <div className="spacer-rodape-fixo"></div>
-
-      <div className="rodape-fixo-container">
+      <div className="spacer-fixo"></div>
+      <div className="reserva-container">
         {/* Conteúdo à Esquerda (Ex: Total ou Infos) */}
-        <div className="rodape-infos">
+        <div className="reserva-infos">
           <h4>R$ 5.000,00</h4>
           <p>{`${searchParams.get("dataChegada")} a ${searchParams.get("dataPartida")}`}</p> 
         </div>

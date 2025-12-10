@@ -167,7 +167,7 @@ a.google-maps-link {
 }
 
 /* Container Fixo Principal */
-.rodape-fixo-container {
+.reserva-container {
   /* 1. POSICIONAMENTO FIXO: Fica ancorado no viewport */
   position: fixed;
   bottom: 0;
@@ -190,13 +190,13 @@ a.google-maps-link {
 }
 
 /* Estilo para as Informações (Opcional) */
-.rodape-infos p {
+.reserva-infos p {
   margin: 0;
   color: #666;
   font-size: 0.9em;
 }
 
-.rodape-infos h4 {
+.reserva-infos h4 {
   margin: 0;
   color: #000;
   font-size: 1.4em;
@@ -215,6 +215,6 @@ a.google-maps-link {
   color: #000;
 }
 
-.spacer-rodape-fixo {
+.spacer-fixo {
   height: 80px; /* Ajuste conforme a altura do rodapé fixo */
 }
