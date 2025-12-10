@@ -16,6 +16,16 @@ function App() {
   const checkinRef = useRef(null);
   const checkoutRef = useRef(null);
 
+  const params = new URLSearchParams({
+    cidade: cidade,
+    dataChegada: dataChegada,
+    dataPartida: dataPartida,
+    adultos: adultos,
+    criancas: criancas,
+  });
+
+  const queryString = params.toString();
+
   useEffect(() => {
     if (window.runLuxexScripts) {
       window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
@@ -399,7 +409,7 @@ function App() {
                           </p>
 
                           {imovel.resumo.id && (
-                            <Link to={`/detalhes/${imovel.resumo.id}`}>
+                            <Link to={`/detalhes/${imovel.resumo.id}?${queryString}`} target="_blank" rel="noopener noreferrer">
                               <button>Details</button>
                             </Link>
                           )}
