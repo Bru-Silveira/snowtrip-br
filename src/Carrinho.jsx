@@ -6,7 +6,7 @@ import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
 import ModalTransfer from "./modals/ModalTransfer";
-import Header from "./Header";
+import Header from "./components/Header";
 
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";

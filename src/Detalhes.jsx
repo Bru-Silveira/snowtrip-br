@@ -2,17 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { usePreloadImages } from "./hooks/UsePreloadImages";
 
-import Header from "./Header";
+import Header from "./components/Header";
+import PrecoEstadia from "./components/PrecoEstadia";
 
-import logoLight from "./img/logo-snowtrip.png";
-import logoDark from "./img/logo-snowtrip.png";
 import "./Detalhes.css";
 
-// Imports das imagens de menu
-import menuImg1 from "./img/menu/1.jpg";
-import menuImg2 from "./img/menu/2.jpg";
-import menuImg5 from "./img/menu/5.jpg";
-import menuImg6 from "./img/menu/6.jpg";
 
 function Detalhes() {
   const { id } = useParams(); // Pega o ID da URL
@@ -203,6 +197,8 @@ function Detalhes() {
   const longitude = imovel.detalhes_pt?.detail?.longitude || "";
   const linkGoogleMaps = imovel.detalhes?.detail?.url_googlesat || "";
 
+  const sejours = imovel.disponibilidade?.sejours?.sejour || [];
+
   return (
     <>
       <Header titulo="DETALHES HOSPEDAGEM"></Header>
@@ -316,17 +312,8 @@ function Detalhes() {
           </li>
         </ul>
       </div>
-      <div className="spacer-fixo"></div>
-      <div className="reserva-container">
-        {/* Conteúdo à Esquerda (Ex: Total ou Infos) */}
-        <div className="reserva-infos">
-          <h4>R$ 5.000,00</h4>
-          <p>{`${searchParams.get("dataChegada")} a ${searchParams.get("dataPartida")}`}</p> 
-        </div>
-
-        {/* Conteúdo à Direita (Seu Botão) */}
-        <button className="carrinho-reservar-fixo">Reservar</button>
-      </div>
+      <PrecoEstadia sejours={sejours} dataChegada={searchParams.get("dataChegada")} dataPartida={searchParams.get("dataPartida")}/>
+      
     </>
   );
 }
