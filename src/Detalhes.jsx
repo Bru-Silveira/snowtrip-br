@@ -321,7 +321,8 @@ function Detalhes() {
       <div className="rodape-fixo-container">
         {/* Conteúdo à Esquerda (Ex: Total ou Infos) */}
         <div className="rodape-infos">
-          <h4>R$ 5.000,00</h4> 
+          <h4>R$ 5.000,00</h4>
+          <p>{`${searchParams.get("dataChegada")} a ${searchParams.get("dataPartida")}`}</p> 
         </div>
 
         {/* Conteúdo à Direita (Seu Botão) */}
