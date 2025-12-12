@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
 
+import { encontrarEstadiasNoPeriodo } from "./utils/calculadoraEstadia.js";
+
 function App() {
   const [imoveis, setImoveis] = useState([]);
   const [cidade, setCidade] = useState("");
@@ -16,6 +18,16 @@ function App() {
   const checkinRef = useRef(null);
   const checkoutRef = useRef(null);
 
+  const params = new URLSearchParams({
+    cidade: cidade,
+    dataChegada: dataChegada,
+    dataPartida: dataPartida,
+    adultos: adultos,
+    criancas: criancas,
+  });
+
+  const queryString = params.toString();
+
   useEffect(() => {
     if (window.runLuxexScripts) {
       window.runLuxexScripts(); // Chama a função para rodar os scripts do Luxex
@@ -23,9 +35,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log("Buscando Imóveis...")
     fetch("http://localhost:5000/api/imoveis")
       .then((res) => res.json())
       .then((data) => {
+        console.log("Busca Finalizada")
         setImoveis(data);
       })
       .catch((err) => console.error("Erro no fetch:", err));
@@ -62,31 +76,37 @@ function App() {
       const dataValida = (() => {
         if (!inicio || !fim) return true; // Permite caso datas não sejam selecionadas
         const disponibilidades = imovel.disponibilidade.sejours.sejour || [];
-        if(!Array.isArray(disponibilidades) || disponibilidades.length === 0) {
-          if(!disponibilidades.date_debut || !disponibilidades.date_fin) return false;
-          const dispInicio = new Date(disponibilidades.date_debut).toLocaleString('pt-BR');
-          const dispFim = new Date(disponibilidades.date_fin).toLocaleString('pt-BR');
-          return inicio >= dispInicio && fim <= dispFim;
+        if (!Array.isArray(disponibilidades) || disponibilidades.length === 0) {
+          console.log("Disponibilidades inválidas para o imóvel:", imovel);
+          return false;
         }
-        return disponibilidades.some(({ date_debut, date_fin }) => {
-          if (!date_debut || !date_fin) return false;
-          const dispInicio = new Date(date_debut).toLocaleString('pt-BR');
-          const dispFim = new Date(date_fin).toLocaleString('pt-BR');
-          return inicio >= dispInicio && fim <= dispFim;
-        });
+
+        const {
+          estadias: estadiasEncontradas,
+          disponivel: periodoTotalmenteCoberto,
+        } = encontrarEstadiasNoPeriodo(disponibilidades, inicio, fim);
+
+        if(periodoTotalmenteCoberto){
+          console.log("Imóvel disponível para o período!", imovel.resumo.titre);
+          console.log("Estadias encontradas", estadiasEncontradas);
+        }
+        return periodoTotalmenteCoberto;
       })();
 
       return (
         cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida
       );
     });
-
+    console.log("Imoveis filtrados: ", imoveisFiltrados.length);
     return imoveisFiltrados;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Filtrando imóveis");
     const resultados = filtrarImoveis();
+    console.log("Resultado: ", resultados);
+
     setImoveisFiltrados(resultados);
     setPesquisado(true);
   };
@@ -255,29 +275,27 @@ function App() {
                   <div className="col-1 c-1">
                     <div className="input-wrapper">
                       <label>Check-In</label>
-                                            <input
-                          id="checkinField"
-                          type="date"
-                          value={dataChegada || ""}
-                          onChange={(e) => setDataChegada(e.target.value)}
-                          min={new Date().toISOString().split("T")[0]}
-                          className="select-hospedagem"
-                        />
-                      
+                      <input
+                        id="checkinField"
+                        type="date"
+                        value={dataChegada || ""}
+                        onChange={(e) => setDataChegada(e.target.value)}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="select-hospedagem"
+                      />
                     </div>
                   </div>
                   <div className="col-1 c-2">
                     <div className="input-wrapper">
                       <label>Check-Out</label>
-                                            <input
-                          id="checkoutField"
-                          type="date"
-                          value={dataPartida || ""}
-                          onChange={(e) => setDataPartida(e.target.value)}
-                          min={new Date().toISOString().split("T")[0]}
-                          className="select-hospedagem"
-                        />
-                    
+                      <input
+                        id="checkoutField"
+                        type="date"
+                        value={dataPartida || ""}
+                        onChange={(e) => setDataPartida(e.target.value)}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="select-hospedagem"
+                      />
                     </div>
                   </div>
                   <div className="col-2 c-3">
@@ -399,7 +417,11 @@ function App() {
                           </p>
 
                           {imovel.resumo.id && (
-                            <Link to={`/detalhes/${imovel.resumo.id}`}>
+                            <Link
+                              to={`/detalhes/${imovel.resumo.id}?${queryString}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <button>Details</button>
                             </Link>
                           )}

@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
 import ModalTransfer from "./modals/ModalTransfer";
-import Header from "./Header";
+import Header from "./components/Header";
 
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
@@ -49,12 +49,15 @@ function Carrinho() {
     setSkiPassTotal(novoTotal);
   };
 
+  const precoEstadia = JSON.parse(sessionStorage.getItem("precoEstadia"));
+  console.log("Estado Recebido no Carrinho:", precoEstadia);
+  console.log("Carrinho", carrinho)
   const servicos = [
     {
       id: 1,
       slug: "hospedagem",
       nome: "Hospedagem",
-      preco: 5000,
+      preco: precoEstadia?.total || 0,
       imagem: hospedagemImg,
     },
     { id: 2, slug: "aulas", nome: "Aulas", preco: 0, entries: [] },
@@ -108,7 +111,7 @@ function Carrinho() {
       setCarrinho((prev) => [...prev, servico]);
     }
   };
-
+  
   useEffect(() => {
     document.body.classList.toggle("modal-open", mostrarModal);
     return () => {
@@ -138,6 +141,44 @@ function Carrinho() {
 
     // Você pode adicionar qualquer lógica de atualização de outros totais do carrinho aqui.
   }, [skiPassTotal]); // Depende do estado do carrinho
+
+  useEffect(() => {
+  
+    const preco = precoEstadia?.total || 0;
+    const servicoBaseHospedagem = servicos.find(s => s.slug === "hospedagem");
+    const hospedagemNoCarrinho = carrinho.find(item => item.slug === "hospedagem");
+
+    if (preco <= 0 || !precoEstadia?.disponivel) {
+        // Se a hospedagem está no carrinho, remove.
+        setCarrinho(prev => prev.filter(item => item.slug !== "hospedagem"));
+        return;
+    }
+
+    if (hospedagemNoCarrinho) {
+        // Se já existe, apenas atualiza o preço (caso tenha mudado)
+        if (hospedagemNoCarrinho.preco !== preco) {
+            setCarrinho(prev => prev.map(item => 
+                item.slug === "hospedagem" 
+                    ? { ...item, preco: preco, entries: precoEstadia } // Atualiza preço e detalhes
+                    : item
+            ));
+        }
+    } else if (servicoBaseHospedagem) {
+        // 3. Adiciona ao carrinho se não existir
+        const novoItemHospedagem = {
+            ...servicoBaseHospedagem,
+            id: 1,
+            preco: preco,
+            // Adiciona os detalhes da estadia (check-in/out, etc.) nos entries
+            entries: precoEstadia, 
+            nome: "Hospedagem", // Mantém o nome simples ou refine com datas se precisar
+        };
+        
+        // Adiciona a hospedagem no início do carrinho
+        setCarrinho(prev => [novoItemHospedagem, ...prev]);
+    }
+
+  }, [precoEstadia]);
 
   const concluirModal = () => {
     if (!servicoSelecionado) {
