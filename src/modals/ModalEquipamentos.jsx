@@ -15,14 +15,12 @@ const ModalEquipamentos = ({
   const [equipamentos, setEquipamentos] = useState([]);
   const [packSelecionado, setPackSelecionado] = useState(0);
   const [incluirCapacete, setIncluirCapacete] = useState(false);
-  const [tamanhoCapacete, setTamanhoCapacete] = useState("");
-  const [dias, setDias] = useState(1);
-  const [qtdePessoas, setQtdePessoas] = useState(1);
+  const [dias] = useState(1);
+  const [qtdePessoas] = useState(1);
   const [equipTotal, setEquipTotal] = useState(0);
   const [regiao, setRegiao] = useState("franceses");
   const [resort, setResort] = useState("");
   const [loja, setLoja] = useState("");
-  const [genero, setGenero] = useState("masculino");
   const [categoriaEquipamento, setCategoriaEquipamento] = useState("adulto");
   const [modalidade, setModalidade] = useState("");
   const [dataRetirada, setDataRetirada] = useState("");
@@ -43,7 +41,10 @@ const ModalEquipamentos = ({
       "Val d'Isère",
       "Tignes",
       "Chamonix 345 / 550",
-      "Les Arcs",
+      "Les Arcs 1600",
+      "Les Arc 1800",
+      "Les Arcs 1900",
+      "Les Arcs 2000",
       "La Plagne",
       "Alpe d'Huez",
       "Megève",
@@ -68,7 +69,10 @@ const ModalEquipamentos = ({
     "Val d'Isère": ["Centro Vila", "Chalet Val d'Isère", "Snow Berry"],
     Tignes: ["Centro Vila"],
     "Chamonix 345 / 550": ["Centro Vila", "Service Ski Hotel La Folie Douce"],
-    "Les Arcs": ["1600", "1800", "1900", "2000"],
+    "Les Arcs 1600": ["Centro Villa"],
+    "Les Arc 1800": ["Centro Villa"],
+    "Les Arcs 1900": ["Centro Villa"],
+    "Les Arcs 2000": ["Centro Villa"],
     "La Plagne": ["Centro Vila", "Plagne Aime", "Plagne Soleil / outras"],
     "Alpe d'Huez": ["Centro Vila / outras"],
     Megève: ["Philippe Sport", "Ride"],
@@ -127,14 +131,6 @@ const ModalEquipamentos = ({
 
   const precoCapacete = 10;
 
-  const tamanhosCapacete = [
-    "PP (52-54 cm)",
-    "P (54-56 cm)",
-    "M (56-58 cm)",
-    "G (58-60 cm)",
-    "GG (60-62 cm)",
-  ];
-
   const handleRegioChange = (novaRegiao) => {
     setRegiao(novaRegiao);
     setResort("");
@@ -170,8 +166,20 @@ const ModalEquipamentos = ({
       return;
     }
 
-    if (incluirCapacete && !tamanhoCapacete) {
-      alert("Por favor, selecione o tamanho do capacete");
+    if (!modalidade || !dataRetirada || !dataDevolucao) {
+      alert("Por favor, preencha Modalidade e Datas");
+      return;
+    }
+
+    // Calcular dias entre datas
+    const dataRet = new Date(dataRetirada);
+    const dataDev = new Date(dataDevolucao);
+    const diasCalculados = Math.ceil(
+      (dataDev - dataRet) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasCalculados <= 0) {
+      alert("Data de devolução deve ser após a data de retirada");
       return;
     }
 
@@ -179,22 +187,28 @@ const ModalEquipamentos = ({
       id: Date.now(),
       pack: packs[packSelecionado],
       incluirCapacete,
-      tamanhoCapacete: incluirCapacete ? tamanhoCapacete : "",
-      dias,
-      qtdePessoas,
+      tamanhoCapacete: "",
+      dias: diasCalculados,
+      qtdePessoas: 1,
       regiao,
       resort,
       loja,
-      genero,
       categoriaEquipamento,
+      modalidade,
+      dataRetirada,
+      dataDevolucao,
     };
 
     setEquipamentos([...equipamentos, novoEquipamento]);
 
+    // Limpar formulário
     setIncluirCapacete(false);
-    setTamanhoCapacete("");
-    setDias(1);
-    setQtdePessoas(1);
+    setCategoriaEquipamento("adulto");
+    setModalidade("");
+    setDataRetirada("");
+    setDataDevolucao("");
+    setPackSelecionado(0);
+    setMostrarFormularioExpandido(false);
   };
 
   const removeEquipamento = (id) => {
@@ -318,35 +332,6 @@ const ModalEquipamentos = ({
           {/* FORMULÁRIO EXPANDIDO - Aparece ao clicar no + */}
           {mostrarFormularioExpandido && (
             <>
-              {/* GÊNERO */}
-              <div className="row">
-                <label className="col">
-                  Gênero:
-                  <div className="area-options">
-                    <label>
-                      <input
-                        type="radio"
-                        name="genero"
-                        value="masculino"
-                        checked={genero === "masculino"}
-                        onChange={() => setGenero("masculino")}
-                      />
-                      Masculino
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="genero"
-                        value="feminino"
-                        checked={genero === "feminino"}
-                        onChange={() => setGenero("feminino")}
-                      />
-                      Feminino
-                    </label>
-                  </div>
-                </label>
-              </div>
-
               {/* CATEGORIA - ADULTO/INFANTIL */}
               <div className="row">
                 <label className="col">
@@ -375,159 +360,174 @@ const ModalEquipamentos = ({
                   </div>
                 </label>
               </div>
+            </>
+          )}
 
-              {/* MODALIDADE */}
-              <div className="row">
-                <div className="col">
-                  <label>Modalidade</label>
-                  <select
-                    value={modalidade}
-                    onChange={(e) => setModalidade(e.target.value)}
-                  >
-                    <option value="">Selecione</option>
-                    <option value="ski">Ski</option>
-                    <option value="snowboard">Snowboard</option>
-                  </select>
-                </div>
-              </div>
+          {/* CARROSSEL DE PACKS - Aparece apenas quando Tamanho é selecionado */}
+          {mostrarFormularioExpandido && categoriaEquipamento && (
+            <div className="pack-carousel">
+              <button
+                type="button"
+                className="carousel-btn prev"
+                onClick={packAnterior}
+              >
+                <img src={back} alt="Anterior" className="icon" />
+              </button>
 
-              {/* DATA DE RETIRADA E DEVOLUÇÃO */}
-              <div className="row">
-                <div className="col">
-                  <label>Data de Retirada</label>
-                  <input
-                    type="date"
-                    value={dataRetirada}
-                    onChange={(e) => setDataRetirada(e.target.value)}
-                  />
-                </div>
-                <div className="col">
-                  <label>Data de Devolução</label>
-                  <input
-                    type="date"
-                    value={dataDevolucao}
-                    onChange={(e) => setDataDevolucao(e.target.value)}
-                  />
-                </div>
-              </div>
+              <div className="pack-card">
+                {/* CARD HEADER - TITULO, REMOVE E TOTAL */}
+                {modalidade && dataRetirada && dataDevolucao && (
+                  <div className="pack-card-top">
+                    <span className="pack-card-title">Equipamento 1</span>
+                    <div className="pack-card-actions">
+                      <span className="pack-card-total">
+                        € {calcularPrecoTotal().toFixed(2)}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-remove-card"
+                        onClick={() => {
+                          setMostrarFormularioExpandido(false);
+                          setCategoriaEquipamento("");
+                          setModalidade("");
+                          setDataRetirada("");
+                          setDataDevolucao("");
+                          setIncluirCapacete(false);
+                          setPackSelecionado(0);
+                        }}
+                        title="Remover"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-              {/* CARROSSEL DE PACKS - Aparece apenas quando formulário expandido e todos os campos estão preenchidos */}
-              {genero &&
-                categoriaEquipamento &&
-                modalidade &&
-                dataRetirada &&
-                dataDevolucao && (
-                  <div className="pack-carousel">
-                    <button
-                      type="button"
-                      className="carousel-btn prev"
-                      onClick={packAnterior}
-                    >
-                      <img src={back} alt="Anterior" className="icon" />
-                    </button>
+                <div className="pack-card-header">
+                  {/* IMAGEM - Aparece apenas quando modalidade é selecionada */}
+                  {modalidade && dataRetirada && dataDevolucao && (
+                    <div className="pack-image">
+                      <img
+                        src={
+                          modalidade === "ski"
+                            ? skiEquipmentImg
+                            : snowboardEquipmentImg
+                        }
+                        alt={`${modalidade} equipment`}
+                      />
+                    </div>
+                  )}
 
-                    <div className="pack-card">
-                      <div className="pack-image">
-                        <img
-                          src={
-                            packs[packSelecionado].tipo === "ski"
-                              ? skiEquipmentImg
-                              : snowboardEquipmentImg
-                          }
-                          alt={packs[packSelecionado].nome}
-                        />
+                  {/* PACK INFO - Aparece apenas quando todos os campos estão preenchidos */}
+                  {modalidade && dataRetirada && dataDevolucao && (
+                    <div className="pack-info">
+                      <h3 className="pack-nome">
+                        {packs[packSelecionado].nome}
+                      </h3>
+                      <p className="pack-nivel">
+                        {packs[packSelecionado].nivel}
+                      </p>
+
+                      <div className="pack-preco">
+                        <span className="preco-valor">
+                          € {calcularPrecoTotal().toFixed(2)}
+                        </span>
                       </div>
 
-                      <div className="pack-info">
-                        <h3 className="pack-nome">
-                          {packs[packSelecionado].nome}
-                        </h3>
-                        <p className="pack-nivel">
-                          {packs[packSelecionado].nivel}
-                        </p>
+                      <div className="pack-incluso">
+                        <p>Incluso:</p>
+                        <p>{packs[packSelecionado].incluso.join(" + ")}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                        <div className="pack-preco">
-                          <span className="preco-valor">
-                            € {calcularPrecoTotal().toFixed(2)}
+                {/* INPUTS DENTRO DO CARD */}
+                <div className="pack-card-inputs">
+                  <div className="col">
+                    <label>Modalidade</label>
+                    <select
+                      value={modalidade}
+                      onChange={(e) => {
+                        setModalidade(e.target.value);
+                        setPackSelecionado(0);
+                      }}
+                    >
+                      <option value="">Selecione</option>
+                      <option value="ski">Ski</option>
+                      <option value="snowboard">Snowboard</option>
+                    </select>
+                  </div>
+                  <div className="col">
+                    <label>Data de Retirada</label>
+                    <input
+                      type="date"
+                      value={dataRetirada}
+                      onChange={(e) => setDataRetirada(e.target.value)}
+                    />
+                  </div>
+                  <div className="col">
+                    <label>Data de Devolução</label>
+                    <input
+                      type="date"
+                      value={dataDevolucao}
+                      onChange={(e) => setDataDevolucao(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* CAPACETE E BOTÃO - Aparecem apenas quando todos os campos estão preenchidos */}
+                {modalidade && dataRetirada && dataDevolucao && (
+                  <>
+                    <div className="capacete-card">
+                      <div className="capacete-card-content">
+                        <div className="capacete-image">
+                          <img
+                            src={helmetImg}
+                            alt="Capacete"
+                            className={incluirCapacete ? "" : "grayscale"}
+                          />
+                        </div>
+
+                        <div className="capacete-info-inline">
+                          <span className="capacete-preco">
+                            + €{" "}
+                            {(precoCapacete * dias * qtdePessoas).toFixed(2)}
                           </span>
+
+                          <label className="toggle-switch">
+                            <input
+                              type="checkbox"
+                              checked={incluirCapacete}
+                              onChange={(e) =>
+                                setIncluirCapacete(e.target.checked)
+                              }
+                            />
+                            <span className="toggle-slider"></span>
+                          </label>
                         </div>
-
-                        <div className="pack-incluso">
-                          <p>Incluso:</p>
-                          <p>{packs[packSelecionado].incluso.join(" + ")}</p>
-                        </div>
-
-                        <div className="capacete-card">
-                          <div className="capacete-card-content">
-                            <div className="capacete-image">
-                              <img
-                                src={helmetImg}
-                                alt="Capacete"
-                                className={incluirCapacete ? "" : "grayscale"}
-                              />
-                            </div>
-
-                            <div className="capacete-info-inline">
-                              <span className="capacete-preco">
-                                + €{" "}
-                                {(precoCapacete * dias * qtdePessoas).toFixed(
-                                  2
-                                )}
-                              </span>
-
-                              <label className="toggle-switch">
-                                <input
-                                  type="checkbox"
-                                  checked={incluirCapacete}
-                                  onChange={(e) =>
-                                    setIncluirCapacete(e.target.checked)
-                                  }
-                                />
-                                <span className="toggle-slider"></span>
-                              </label>
-                            </div>
-                          </div>
-
-                          {incluirCapacete && (
-                            <div className="capacete-size-inline">
-                              <label>Tamanho do Capacete</label>
-                              <select
-                                value={tamanhoCapacete}
-                                onChange={(e) =>
-                                  setTamanhoCapacete(e.target.value)
-                                }
-                              >
-                                <option value="">Selecione</option>
-                                {tamanhosCapacete.map((t) => (
-                                  <option key={t} value={t}>
-                                    {t}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          className="btn-adicionar-pack"
-                          onClick={addEquipamento}
-                        >
-                          ADICIONAR
-                        </button>
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      className="carousel-btn next"
-                      onClick={proximoPack}
+                      className="btn-adicionar-pack"
+                      onClick={addEquipamento}
                     >
-                      <img src={next} alt="Próximo" className="icon" />
+                      ADICIONAR
                     </button>
-                  </div>
+                  </>
                 )}
-            </>
+              </div>
+
+              <button
+                type="button"
+                className="carousel-btn next"
+                onClick={proximoPack}
+              >
+                <img src={next} alt="Próximo" className="icon" />
+              </button>
+            </div>
           )}
 
           {/* LISTA DE EQUIPAMENTOS */}
@@ -556,10 +556,6 @@ const ModalEquipamentos = ({
                 </div>
                 <div className="summary-item">
                   <strong>Tamanho:</strong> {eq.pack.tamanho}
-                </div>
-                <div className="summary-item">
-                  <strong>Gênero:</strong>{" "}
-                  {eq.genero === "masculino" ? "Masculino" : "Feminino"}
                 </div>
                 <div className="summary-item">
                   <strong>Categoria:</strong>{" "}
