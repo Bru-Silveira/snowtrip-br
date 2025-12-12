@@ -35,9 +35,11 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log("Buscando Imóveis...")
     fetch("http://localhost:5000/api/imoveis")
       .then((res) => res.json())
       .then((data) => {
+        console.log("Busca Finalizada")
         setImoveis(data);
       })
       .catch((err) => console.error("Erro no fetch:", err));
@@ -95,13 +97,16 @@ function App() {
         cidadeValida && qtdeAdulttosValido && qtdeCriancasValido && dataValida
       );
     });
-
+    console.log("Imoveis filtrados: ", imoveisFiltrados.length);
     return imoveisFiltrados;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Filtrando imóveis");
     const resultados = filtrarImoveis();
+    console.log("Resultado: ", resultados);
+
     setImoveisFiltrados(resultados);
     setPesquisado(true);
   };

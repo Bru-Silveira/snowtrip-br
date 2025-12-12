@@ -7,7 +7,6 @@ import PrecoEstadia from "./components/PrecoEstadia";
 
 import "./Detalhes.css";
 
-
 function Detalhes() {
   const { id } = useParams(); // Pega o ID da URL
   const [searchParams, setSearchParams] = useSearchParams(); //Pega os parâmetros de busca da URL
@@ -312,8 +311,13 @@ function Detalhes() {
           </li>
         </ul>
       </div>
-      <PrecoEstadia sejours={sejours} dataChegada={searchParams.get("dataChegada")} dataPartida={searchParams.get("dataPartida")}/>
-      
+      <PrecoEstadia
+        sejours={sejours}
+        dataChegada={searchParams.get("dataChegada")}
+        dataPartida={searchParams.get("dataPartida")}
+        adultos={searchParams.get("adultos")}
+        criancas={searchParams.get("criancas")}
+      />
     </>
   );
 }
