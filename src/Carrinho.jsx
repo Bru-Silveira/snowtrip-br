@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
-import hospedagemImg from "./img/cards/hospedagem.jpg";
 import ModalSkiPass from "./modals/ModalSkiPass";
 import ModalEquipamentos from "./modals/ModalEquipamentos";
 import ModalAulasSki from "./modals/ModalAulasSki";
+import ModalTransfer from "./modals/ModalTransfer";
+import Header from "./components/Header";
 
+import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
+import ModalConsierge from "./modals/ModalConcierge";
 
 let tabelaImg;
 try {
@@ -34,48 +37,34 @@ function Carrinho() {
   const [snowTamanho, setSnowTamanho] = useState("");
   const [snowDias, setSnowDias] = useState(1);
 
-  // entradas cumulativas de Ski Pass no modal
+  // estados para ski pass
   const [skiPassEntries, setSkiPassEntries] = useState([]);
   const [skiPassTotal, setSkiPassTotal] = useState(0);
-  const [skiPassDataInicio, setSkiPassDataInicio] = useState("");
 
-  // ADICIONAR: estado para aulas de ski
+  // estados para aulas de ski
   const [classEntries, setClassEntries] = useState([]);
+  const [classTotal, setClassTotal] = useState(0);
 
+  const handleAtualizarCarrinho = (novoTotal) => {
+    setSkiPassTotal(novoTotal);
+  };
+
+  const precoEstadia = JSON.parse(sessionStorage.getItem("precoEstadia"));
+  console.log("Estado Recebido no Carrinho:", precoEstadia);
+  console.log("Carrinho", carrinho)
   const servicos = [
     {
       id: 1,
       slug: "hospedagem",
-      nome: "Hospedagem XYZ",
-      preco: 5000,
+      nome: "Hospedagem",
+      preco: precoEstadia?.total || 0,
       imagem: hospedagemImg,
     },
-    { id: 2, slug: "aulas-ski", nome: "Aulas de Ski" },
-    { id: 3, slug: "equip-ski", nome: "Equipamentos de Ski", preco: 1500 },
-    {
-      id: 4,
-      slug: "equip-snow",
-      nome: "Equipamentos de Snow Board",
-      preco: 2000,
-    },
-    { id: 5, slug: "ski-pass", nome: "Ski Pass", preco: 2000 },
-    { id: 6, slug: "transfer", nome: "Transfer", preco: 2000 },
-    { id: 7, slug: "concierge", nome: "Concierge", preco: 2000 },
-  ];
-
-  const pacotesSki = [
-    {
-      id: "p1",
-      nome: "Pacote 1 - Full Day",
-      descricao: "6 horas de aula",
-      preco: 1200,
-    },
-    {
-      id: "p2",
-      nome: "Pacote 2 - Part Day",
-      descricao: "4 horas de aula (09:00 às 13:00)",
-      preco: 900,
-    },
+    { id: 2, slug: "aulas", nome: "Aulas", preco: 0, entries: [] },
+    { id: 3, slug: "equip-ski", nome: "Equipamentos", preco: 0, entries: [] },
+    { id: 4, slug: "ski-pass", nome: "Ski Pass", preco: 0, entries: [] },
+    { id: 5, slug: "transfer", nome: "Transfer", preco: 0, entries: [] },
+    { id: 6, slug: "concierge", nome: "Concierge", preco: 0, entries: [] },
   ];
 
   const equipamentos = [
@@ -91,25 +80,28 @@ function Carrinho() {
     { id: "sb3", nome: "Capacete", preco: { 1: 120, 2: 170, 3: 220 } },
   ];
 
-  const skiPassPrecos = {
-    courchevel: {
-      adulto: { 1: 65, 2: 130, 3: 195, 4: 260, 5: 325, 6: 390, 7: 455 },
-      crianca: { 1: 52, 2: 104, 3: 156, 4: 208, 5: 260, 6: 312, 7: 364 },
-      family: { 5: 405, 6: 486, 7: 567 },
-    },
-    "3vallees": {
-      adulto: { 1: 66, 2: 132, 3: 198, 4: 264, 5: 330, 6: 396, 7: 462 },
-      crianca: { 1: 53, 2: 106, 3: 159, 4: 212, 5: 265, 6: 318, 7: 371 },
-      family: { 5: 818, 6: 981, 7: 1144 },
-    },
-  };
-
   const abrirModal = (servico) => {
+    // reset modal genérico
+    setServicoSelecionado(null);
+    setOpcaoSelecionada(null);
+    setDataSelecionada("");
+    setEquipamentoSelecionado("");
+    setSnowEquipamentoSelecionado("");
+    setQuantidade(1);
+    setDias(1);
+    setCategoria("");
+    setTamanho("");
+    setSnowCategoria("");
+    setSnowTamanho("");
+    setSnowDias(1);
+    setSkiPassTotal(0);
+    setClassEntries([]);
+
     setServicoSelecionado(servico);
 
     // Abre modal para serviços que precisam de configuração
     if (
-      ["ski-pass", "aulas-ski", "equip-ski", "equip-snow"].includes(
+      ["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(
         servico.slug
       )
     ) {
@@ -119,37 +111,7 @@ function Carrinho() {
       setCarrinho((prev) => [...prev, servico]);
     }
   };
-
-  const calcularPrecoParaEntrada = (entry) => {
-    if (!entry || !entry.tipo) return 0;
-    const dias = Math.max(1, Number(entry.dias) || 1);
-    const areaObj = skiPassPrecos[entry.area] || {};
-    if (entry.tipo === "family")
-      return (areaObj.family && areaObj.family[dias]) || 0;
-    if (entry.tipo === "adulto") {
-      const unit = (areaObj.adulto && areaObj.adulto[dias]) || 0;
-      return unit * (entry.adultos?.length || 0);
-    }
-    if (entry.tipo === "crianca") {
-      const unit = (areaObj.crianca && areaObj.crianca[dias]) || 0;
-      return unit * (entry.criancas?.length || 0);
-    }
-    return 0;
-  };
-
-  useEffect(() => {
-    const total = skiPassEntries.reduce((acc, entry) => {
-      let preco = calcularPrecoParaEntrada(entry);
-      if (entry.seguro) {
-        const pessoas =
-          (entry.adultos?.length || 0) + (entry.criancas?.length || 0);
-        preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
-      }
-      return acc + preco;
-    }, 0);
-    setSkiPassTotal(total);
-  }, [skiPassEntries]);
-
+  
   useEffect(() => {
     document.body.classList.toggle("modal-open", mostrarModal);
     return () => {
@@ -157,60 +119,97 @@ function Carrinho() {
     };
   }, [mostrarModal]);
 
+  useEffect(() => {
+    if (skiPassEntries.length === 0 || skiPassTotal === 0) {
+      return; // Nada a adicionar
+    }
+
+    const novos = skiPassEntries.map((e) => {
+      const descricao = `${
+        e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+      } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
+      return {
+        ...servicoSelecionado,
+        nome: `${servicoSelecionado.nome} - ${descricao}`,
+        preco: skiPassTotal,
+        entries: e,
+      };
+    });
+
+    setCarrinho((prev) => [...prev, ...novos]);
+    setSkiPassEntries([]);
+
+    // Você pode adicionar qualquer lógica de atualização de outros totais do carrinho aqui.
+  }, [skiPassTotal]); // Depende do estado do carrinho
+
+  useEffect(() => {
+  
+    const preco = precoEstadia?.total || 0;
+    const servicoBaseHospedagem = servicos.find(s => s.slug === "hospedagem");
+    const hospedagemNoCarrinho = carrinho.find(item => item.slug === "hospedagem");
+
+    if (preco <= 0 || !precoEstadia?.disponivel) {
+        // Se a hospedagem está no carrinho, remove.
+        setCarrinho(prev => prev.filter(item => item.slug !== "hospedagem"));
+        return;
+    }
+
+    if (hospedagemNoCarrinho) {
+        // Se já existe, apenas atualiza o preço (caso tenha mudado)
+        if (hospedagemNoCarrinho.preco !== preco) {
+            setCarrinho(prev => prev.map(item => 
+                item.slug === "hospedagem" 
+                    ? { ...item, preco: preco, entries: precoEstadia } // Atualiza preço e detalhes
+                    : item
+            ));
+        }
+    } else if (servicoBaseHospedagem) {
+        // 3. Adiciona ao carrinho se não existir
+        const novoItemHospedagem = {
+            ...servicoBaseHospedagem,
+            id: 1,
+            preco: preco,
+            // Adiciona os detalhes da estadia (check-in/out, etc.) nos entries
+            entries: precoEstadia, 
+            nome: "Hospedagem", // Mantém o nome simples ou refine com datas se precisar
+        };
+        
+        // Adiciona a hospedagem no início do carrinho
+        setCarrinho(prev => [novoItemHospedagem, ...prev]);
+    }
+
+  }, [precoEstadia]);
+
   const concluirModal = () => {
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
     }
 
-    if (servicoSelecionado.slug === "aulas-ski") {
+    if (servicoSelecionado.slug === "aulas") {
       if (classEntries.length === 0) {
         toast.error("Adicione pelo menos uma aula antes de concluir.");
         return;
       }
 
       const novos = classEntries.map((entry) => {
-        const preco = calcularPrecoParaEntrada(entry);
-        const descricao = `${entry.resort} - ${entry.modalidade} - ${
-          entry.dias
-        } dia${entry.dias > 1 ? "s" : ""} - ${
-          entry.periodo === "halfday" ? "Half day" : "Full day"
+        const descricao = `${entry.modalidade} - ${entry.resort} 
+        - ${entry.dias} dia${entry.dias > 1 ? "s" : ""} 
+        - ${entry.periodo === "halfday" ? "Half day" : "Full day"}
+        ${entry.qtdeAdultos > 0 ? "- " + entry.qtdeAdultos + " adultos" : ""} 
+        ${
+          entry.qtdeCriancas > 0 ? "- " + entry.qtdeCriancas + " crianças" : ""
         }`;
         return {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco,
-          dataInicio: entry.dataInicio,
-          dias: entry.dias,
-          modalidade: entry.modalidade,
-          periodo: entry.periodo,
-          resort: entry.resort,
-          totalPessoas: entry.totalPessoas,
-          qtdeCriancas: entry.qtdeCriancas,
-          idadesCriancas: entry.idadesCriancas,
-          nivel: entry.nivel,
+          nome: `${servicoSelecionado.nome} de ${descricao}`,
+          preco: entry.subtotal || 0,
+          entries: entry,
         };
       });
 
       setCarrinho((prev) => [...prev, ...novos]);
       setClassEntries([]);
-    }
-
-    if (servicoSelecionado.slug === "aulas-ski") {
-      if (!opcaoSelecionada || !dataSelecionada) {
-        toast.error("Selecione a data e o pacote!");
-        return;
-      }
-      const pacote = pacotesSki.find((p) => p.id === opcaoSelecionada);
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${pacote?.nome || ""}`,
-          preco: pacote?.preco || 0,
-          data: dataSelecionada,
-        },
-      ]);
     }
 
     if (servicoSelecionado.slug === "equip-ski") {
@@ -235,130 +234,122 @@ function Carrinho() {
       ]);
     }
 
-    if (servicoSelecionado.slug === "equip-snow") {
-      if (
-        !snowEquipamentoSelecionado ||
-        !snowCategoria ||
-        !snowTamanho ||
-        snowDias < 1
-      ) {
-        toast.error("Preencha todas as informações do equipamento de Snowboard!");
-        return;
-      }
-      const equipamento = snowboardEquipamentos.find(
-        (e) => e.id === snowEquipamentoSelecionado
-      );
-      const precoBase = equipamento?.preco?.[snowCategoria] || 0;
+    if (servicoSelecionado.slug === "transfer") {
       setCarrinho((prev) => [
         ...prev,
         {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${equipamento?.nome || ""}`,
-          preco: precoBase * snowDias,
-          dias: snowDias,
-          categoria: snowCategoria,
-          tamanho: snowTamanho,
+          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
+          preco: 0,
         },
       ]);
     }
 
-    if (servicoSelecionado.slug === "ski-pass") {
-      if (skiPassEntries.length === 0) {
-        toast.error("Adicione pelo menos um passe antes de concluir.");
-        return;
-      }
-
-      for (let i = 0; i < skiPassEntries.length; i += 1) {
-        const e = skiPassEntries[i];
-        console.log("Validando entrada de ski pass:", e);
-
-        if (e.tipo === "family") {
-          const qtdeAdultos = e.esquiadores.adultos?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
-          const qtdeDataNascAdultos = e.esquiadores.adultos?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
-          
-          const qtdeCriancas = e.esquiadores.criancas?.map((a) => a.nome).filter((nome => nome.length > 0)).length || 0;
-          const qtdeDataNascCriancas = e.esquiadores.criancas?.map((a) => a.dataNasc).filter((data => data.length > 0)).length || 0;
-          console.log(`Family Pass (#${i + 1}): ${qtdeAdultos} adultos, ${qtdeCriancas} crianças`);
-          if (qtdeAdultos < 2 || qtdeCriancas < 1) {
-            toast.error(
-              `Passe Family (#${i + 1}) requer mínimo 2 adultos e 1 criança.`
-            );
-            return;
-          }
-          const allFilled = qtdeAdultos === qtdeDataNascAdultos && qtdeCriancas === qtdeDataNascCriancas;
-
-          if (!allFilled) {
-            toast.error(
-              `Preencha nome e data de nascimento de todos os participantes do Family (#${
-                i + 1
-              }).`
-            );
-            return;
-          }
-        } else if (e.tipo === "adulto") {
-          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
-            toast.error(`Passe Adulto (#${i + 1}) precisa de todos os dados preenchidos.`);
-            return;
-          }
-        } else if (e.tipo === "crianca") {
-          if (!(e.esquiadores.nome.length > 0) || !(e.esquiadores.dataNasc.length > 0)) {
-            toast.error(`Passe Criança (#${i + 1}) precisa de todos os dados preenchidos.`);
-            return;
-          }
-        }
-      }
-
-      const novos = skiPassEntries.map((e) => {
-        const preco =
-          calcularPrecoParaEntrada(e) +
-          (e.seguro
-            ? 3.5 *
-              ((e.adultos?.length || 0) + (e.criancas?.length || 0)) *
-              Math.max(1, Number(e.dias) || 1)
-            : 0);
-        const descricao = `${
-          e.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
-        } - ${e.dias} dias - ${e.tipo}${e.seguro ? " + Seguro" : ""}`;
-        return {
+    if (servicoSelecionado.slug === "concierge") {
+      setCarrinho((prev) => [
+        ...prev,
+        {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${descricao}`,
-          preco,
-          dataInicio: e.dataInicio,
-          dias: e.dias,
-          tipo: e.tipo,
-          adultos: e.adultos ? [...e.adultos] : [],
-          criancas: e.criancas ? [...e.criancas] : [],
-          area: e.area,
-          seguro: e.seguro,
-        };
-      });
-
-      setCarrinho((prev) => [...prev, ...novos]);
-      setSkiPassEntries([]);
+          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
+          preco: 0,
+        },
+      ]);
     }
 
-    // reset modal genérico
-    setServicoSelecionado(null);
-    setOpcaoSelecionada(null);
-    setDataSelecionada("");
-    setEquipamentoSelecionado("");
-    setSnowEquipamentoSelecionado("");
-    setQuantidade(1);
     setMostrarModal(false);
-    setDias(1);
-    setCategoria("");
-    setTamanho("");
-    setSnowCategoria("");
-    setSnowTamanho("");
-    setSnowDias(1);
-    setSkiPassTotal(0);
-    setSkiPassDataInicio("");
-    setClassEntries([]);
+  };
+
+  const formatarDetalhesItem = (item) => {
+    // 1. Inicia a descrição com o nome principal e preço
+    let detalhes = `*${item.nome
+      .trim()
+      .replace(/\s+/g, " ")}:* € ${item.preco.toLocaleString("pt-BR")}`;
+
+    // 2. Extrai e formata os detalhes específicos por slug
+    const entry = item.entries;
+
+    if (!entry) {
+      return detalhes; // Retorna apenas nome/preço se não houver detalhes
+    }
+
+    switch (item.slug) {
+      case "aulas":
+        detalhes += `\n  - Modalidade: ${entry.modalidade.toUpperCase()}`;
+        detalhes += `\n  - Resort: ${entry.resort} (${entry.regiao})`;
+        detalhes += `\n  - Duração: ${entry.dias} dias (${
+          entry.periodo === "halfday" ? "Half Day" : "Full Day"
+        })`;
+        detalhes += `\n  - Pessoas: ${entry.qtdeAdultos} Adulto(s) / ${entry.qtdeCriancas} Criança(s)`;
+        detalhes += `\n  - Nível: ${entry.nivel}`;
+        detalhes += `\n  - Data Início: ${entry.dataInicio}`;
+        break;
+
+      case "ski-pass":
+        detalhes += `\n  - Área: ${
+          entry.area === "courchevel" ? "Courchevel" : "Les 3 Vallées"
+        }`;
+        detalhes += `\n  - Duração: ${entry.dias} dias`;
+        detalhes += `\n  - Tipo: ${entry.tipo.toUpperCase()}`;
+
+        // Adiciona detalhes do esquiador (se houver)
+        if (entry.esquiadores && entry.esquiadores.nome) {
+          detalhes += `\n  - Esquiador: ${entry.esquiadores.nome}`;
+        } else if (entry.esquiadores && entry.esquiadores.adultos) {
+          // Lógica para passes Family ou Multi-pessoa
+          const totalEsquiadores =
+            entry.esquiadores.adultos.length +
+            entry.esquiadores.criancas.length;
+          detalhes += `\n  - Total Esquiadores: ${totalEsquiadores}`;
+        }
+        break;
+
+      // Adicione cases para "equip-ski", "transfer", etc., se necessário
+
+      default:
+        // Para outros slugs, apenas retorna o básico
+        break;
+    }
+
+    return detalhes;
+  };
+
+  const enviarWhatsApp = () => {
+    const numeroTelefone = "5511910011691";
+
+    console.log("Carrinho ao enviar para WhatsApp:", carrinho);
+
+    // 1. Constrói a lista de itens no carrinho
+    const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
+
+    const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+
+    // 2. Constrói a mensagem completa
+    const mensagemPadrao =
+      `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
+      `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
+      `${itensLista}\n\n` +
+      `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
+      `Aguardamos a confirmação dos detalhes!`;
+
+    // 3. Codifica a mensagem e constrói o link
+    const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
+      mensagemPadrao
+    )}`;
+
+    // 4. Abre o link em uma nova aba
+    window.open(linkWhatsApp, "_blank");
   };
 
   const removerDoCarrinho = (id) =>
     setCarrinho((prev) => prev.filter((_, index) => index !== id));
   const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+
+  const addedServiceSlugs = useMemo(() => {
+    // Cria um Set (conjunto) para buscas rápidas.
+    // Usamos item.id para rastrear de qual serviço o item veio.
+    const slugs = carrinho.map((item) => item.slug);
+    return new Set(slugs);
+  }, [carrinho]);
 
   return (
     <>
@@ -368,13 +359,26 @@ function Carrinho() {
             <ModalSkiPass
               skiPassEntries={skiPassEntries}
               setSkiPassEntries={setSkiPassEntries}
+              setSkiPassTotalCarrinho={handleAtualizarCarrinho}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
-          ) : servicoSelecionado?.slug === "aulas-ski" ? (
+          ) : servicoSelecionado?.slug === "aulas" ? (
             <ModalAulasSki
               classEntries={classEntries}
               setClassEntries={setClassEntries}
+              classTotal={classTotal}
+              setClassTotal={setClassTotal}
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
+          ) : servicoSelecionado?.slug === "transfer" ? (
+            <ModalTransfer
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
+          ) : servicoSelecionado?.slug === "concierge" ? (
+            <ModalConsierge 
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
@@ -406,6 +410,8 @@ function Carrinho() {
         </div>
       )}
 
+      <Header titulo="Monte sua Trip!"></Header>
+
       <div className="carrinho-container">
         <div className="carrinho-servicos">
           <div className="lista-servicos">
@@ -417,44 +423,70 @@ function Carrinho() {
                 <div className="card-servico">
                   <p className="servico-nome">{servico.nome}</p>
                 </div>
-                <button
-                  onClick={() => abrirModal(servico)}
-                  className="btn-adicionar"
-                >
-                  Adicionar
-                </button>
+                {addedServiceSlugs.has(servico.slug) ? (
+                  <button
+                    onClick={() => abrirModal(servico)}
+                    className="btn-check"
+                  >
+                    <span className="material-symbols-outlined">check</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => abrirModal(servico)}
+                    className="btn-adicionar"
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </div>
 
         <div className="carrinho-inferior">
+          <div className="carrinho-lista">
+            <ul className="lista-carrinho">
+              <li className="item-carrinho titulo">
+                <span className="carrinho-info">Serviço</span>
+                <span className="carrinho-preco">Preço</span>
+                <span className="carrinho-remover"></span>
+              </li>
+              {carrinho.length > 0 ? (
+                carrinho.map((item, index) => (
+                  <li key={index} className="item-carrinho">
+                    <span className="carrinho-info">{item.nome}</span>
+                    {item.slug === "transfer" || item.slug === "concierge" ? (
+                      <span className="carrinho-preco">
+                        à consultar
+                      </span>
+                    ) : (
+                      <span className="carrinho-preco">
+                        € {(item.preco || 0).toFixed(2).replace(".", ",")}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => removerDoCarrinho(index)}
+                      className="btn-remover"
+                    >
+                      X
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <span className="carrinho-info">Seu carrinho está vazio.</span>
+              )}
+            </ul>
+          </div>
+
           <div className="carrinho-detalhes">
             <h2 className="carrinho-dias">8 Dias</h2>
             <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
             <div className="carrinho-total">
-              Total: R$ {total.toLocaleString("pt-BR")}
+              Total: € {total.toFixed(2).replace(".", ",")}
             </div>
-            <button className="carrinho-reservar">Reserve agora!</button>
-          </div>
-
-          <div className="carrinho-lista">
-            <ul className="lista-carrinho">
-              {carrinho.map((item, index) => (
-                <li key={index} className="item-carrinho">
-                  <span className="carrinho-info">{item.nome}</span>
-                  <span className="carrinho-preco">
-                    R$ {(item.preco || 0).toLocaleString("pt-BR")}
-                  </span>
-                  <button
-                    onClick={() => removerDoCarrinho(index)}
-                    className="btn-remover"
-                  >
-                    X
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <button className="carrinho-reservar" onClick={enviarWhatsApp}>
+              Reserve agora!
+            </button>
           </div>
         </div>
       </div>

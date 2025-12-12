@@ -3,12 +3,14 @@ import { toast } from "react-toastify";
 
 import tabelaImg from "../img/tabela-ski.jpg";
 
-import "react-toastify/dist/ReactToastify.css";     
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/ModalCommon.css";
 import "../styles/ModalSkiPass.css";
 
 const ModalSkiPass = ({
   skiPassEntries,
   setSkiPassEntries,
+  setSkiPassTotalCarrinho,
   concluirModal,
   setMostrarModal,
 }) => {
@@ -17,7 +19,7 @@ const ModalSkiPass = ({
   const [dias, setDias] = useState(1);
   const [seguro, setSeguro] = useState(true);
   const [tipoSkiPass, setTipoSkiPass] = useState("");
-  const [skiPassTotal, setSkiPassTotal] = useState(0);
+  const [skiPassTotal, setSkiPassTotal] =useState(0);
 
   const jsonBasePorTipoSkiPass = new Map();
   jsonBasePorTipoSkiPass.set("family", {
@@ -39,26 +41,37 @@ const ModalSkiPass = ({
   };
 
   const addChildEntry = (index) => {
-    console.log("Adicionando criança na entrada", index);
-    console.log("Entrada atual:", skiPassEntries[index]);
-    let newEsquiadores = { ...skiPassEntries[index].esquiadores };
-    newEsquiadores.criancas = [
-      ...skiPassEntries[index].esquiadores.criancas,
-      { nome: "", dataNasc: "" },
-      { nome: "", dataNasc: "" },
-      { nome: "", dataNasc: "" },
-    ];
-    skiPassEntries[index].esquiadores = newEsquiadores;
-    console.log("Novos esquiadores:", skiPassEntries[index]);
-    updateSkiPassEntry(index, skiPassEntries);
+    setSkiPassEntries((prev) => {
+      const newEntries = [...prev];
+
+      const entry = newEntries[index];
+
+      const newCriancas = [
+        ...entry.esquiadores.criancas,
+        { nome: "", dataNasc: "" },
+        { nome: "", dataNasc: "" },
+        { nome: "", dataNasc: "" },
+      ];
+
+      newEntries[index] = {
+        ...entry,
+        esquiadores: {
+          ...entry.esquiadores,
+          criancas: newCriancas,
+        },
+      };
+
+      return newEntries;
+    });
   };
 
   const addSkiPassEntry = () => {
-    if(dataInicio === "" || tipoSkiPass === "") {
-      toast.error("Por favor, selecione a Data de Início e o Tipo de Passe antes de adicionar.");
+    if (dataInicio === "" || tipoSkiPass === "") {
+      toast.error(
+        "Por favor, selecione a Data de Início e o Tipo de Passe antes de adicionar."
+      );
       return;
     }
-
     setSkiPassEntries((prev) => [
       ...prev,
       {
@@ -111,19 +124,34 @@ const ModalSkiPass = ({
     return 0;
   };
 
-  useEffect(() => {
+  const atualizaPrecoTotal = () => {
     const total = skiPassEntries.reduce((acc, entry) => {
       let preco = calcularPrecoParaEntrada(entry);
       if (seguro) {
         const pessoas =
           (entry.esquiadores?.adultos?.length || 0) +
           (entry.esquiadores?.criancas?.length || 0) +
-          (entry.esquiadores?.nome ? 1 : 0);
+          (entry.tipo === "adulto" || entry.tipo === "crianca" ? 1 : 0);
         preco += 3.5 * pessoas * Math.max(1, Number(entry.dias) || 1);
       }
       return acc + preco;
     }, 0);
     setSkiPassTotal(total);
+
+    return total;
+  };
+
+  const formatSkiPassTotal = () => {
+    return (skiPassTotal ? skiPassTotal : 0).toFixed(2).replace(".", ",");
+  }
+
+  const adicionarSkiPassNoCarrinho = () => {
+    setSkiPassTotalCarrinho(skiPassTotal);
+    concluirModal();
+  }
+
+  useEffect(() => {
+    setSkiPassTotal(atualizaPrecoTotal());
   }, [skiPassEntries, seguro, area]);
 
   return (
@@ -235,8 +263,8 @@ const ModalSkiPass = ({
                   <option value="adulto">Solo Adulto (18 - 75 anos)</option>
                   <option value="crianca">Solo Criança (5 - 18 anos)</option>
                 </select>
-                <button type="button" onClick={addSkiPassEntry}>
-                  <span class="material-symbols-outlined">add_circle</span>
+                <button type="button" onClick={() => addSkiPassEntry()}>
+                  <span className="material-symbols-outlined">add_circle</span>
                 </button>
               </div>
             </label>
@@ -245,14 +273,16 @@ const ModalSkiPass = ({
           {skiPassEntries.map((entry, idx) => (
             <div key={entry.id} className="entry-card">
               <div className="entry-top">
-                <div className="entry-number">SKI PASS {idx + 1}: {entry.tipo}</div>
+                <div className="entry-number">
+                  SKI PASS {idx + 1}: {entry.tipo}
+                </div>
                 <div className="entry-actions">
                   <button
                     type="button"
                     className="btn-small btn-remove"
                     onClick={() => removeSkiPassEntry(idx)}
                   >
-                    <span class="material-symbols-outlined">cancel</span>
+                    <span className="material-symbols-outlined">cancel</span>
                   </button>
                 </div>
               </div>
@@ -356,13 +386,13 @@ const ModalSkiPass = ({
                     ))}
                     {entry.esquiadores.criancas.length < 6 && (
                       <div className="btn-row">
-                      <button
-                        type="button"
-                        className="btn-add-children"
-                        onClick={() => addChildEntry(idx)}
-                      >
-                        Adicionar Mais Crianças
-                      </button>
+                        <button
+                          type="button"
+                          className="btn-add-children"
+                          onClick={() => addChildEntry(idx)}
+                        >
+                          Adicionar Mais Crianças
+                        </button>
                       </div>
                     )}
                   </div>
@@ -449,7 +479,7 @@ const ModalSkiPass = ({
                 className="tooltip-btn"
                 aria-describedby="tooltip-seguro"
               >
-                <span class="material-symbols-outlined help">help</span>
+                <span className="material-symbols-outlined help">help</span>
               </button>
               <div id="tooltip-seguro" role="tooltip" className="tooltip">
                 <strong>
@@ -483,8 +513,8 @@ const ModalSkiPass = ({
           </div>
 
           <div className="entries-actions">
-            <div className="ski-total">
-              TOTAL SKI PASS: € {skiPassTotal.toFixed(2).replace(".", ",")}
+            <div key={skiPassTotal} className="ski-total">
+              TOTAL SKI PASS: € {formatSkiPassTotal()}
             </div>
           </div>
 
@@ -495,7 +525,7 @@ const ModalSkiPass = ({
             >
               CANCELAR
             </button>
-            <button className="btn-confirm" onClick={concluirModal}>
+            <button className="btn-confirm" onClick={() => adicionarSkiPassNoCarrinho()}>
               ADICIONAR
             </button>
           </div>
