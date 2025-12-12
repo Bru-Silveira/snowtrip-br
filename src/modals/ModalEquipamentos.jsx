@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import "../styles/ModalEquipamentos.css";
 import logoAdd from "../img/logo-add.png";
-import skiEquipmentImg from "../img/ski-equipment.png";
-import snowboardEquipmentImg from "../img/snowboard-equipment.png";
 import helmetImg from "../img/helmet.png";
 import next from "../img/next.png";
 import back from "../img/back.png";
+import {
+  getPrecoEquipamento,
+  EQUIPAMENTOS_DISPONÍVEIS,
+  CAPACETE_ADICIONAL,
+} from "../utils/equipamentosData.js";
+import { getImagemEquipamento } from "../utils/equipamentosImagens.js";
 
 const ModalEquipamentos = ({
   servicoSelecionado = null,
@@ -15,7 +19,6 @@ const ModalEquipamentos = ({
   const [equipamentos, setEquipamentos] = useState([]);
   const [packSelecionado, setPackSelecionado] = useState(0);
   const [incluirCapacete, setIncluirCapacete] = useState(false);
-  const [dias] = useState(1);
   const [qtdePessoas] = useState(1);
   const [equipTotal, setEquipTotal] = useState(0);
   const [regiao, setRegiao] = useState("franceses");
@@ -81,55 +84,29 @@ const ModalEquipamentos = ({
     "St. Moritz": ["Centro Vila / Demais"],
   };
 
-  const packs = [
-    {
-      id: "pack-iniciante",
-      nome: "Descoberta",
-      nivel: "Nível Iniciante",
-      tipo: "ski",
-      tamanho: "150-160 cm",
-      precoBase: 45,
-      incluso: ["Skis", "Botas", "Bastões"],
-    },
-    {
-      id: "pack-sensacao",
-      nome: "Sensação",
-      nivel: "Nível Intermediário",
-      tipo: "ski",
-      tamanho: "160-170 cm",
-      precoBase: 50,
-      incluso: ["Skis", "Botas", "Bastões"],
-    },
-    {
-      id: "pack-avancado",
-      nome: "Excelência",
-      nivel: "Nível Avançado",
-      tipo: "ski",
-      tamanho: "170-180 cm",
-      precoBase: 60,
-      incluso: ["Skis", "Botas", "Bastões"],
-    },
-    {
-      id: "pack-snowboard-iniciante",
-      nome: "Pack Snowboard Iniciante",
-      nivel: "Nível Iniciante",
-      tipo: "snowboard",
-      tamanho: "150-155 cm",
-      precoBase: 50,
-      incluso: ["Snowboard", "Botas"],
-    },
-    {
-      id: "pack-snowboard-avancado",
-      nome: "Pack Snowboard Avançado",
-      nivel: "Nível Avançado",
-      tipo: "snowboard",
-      tamanho: "160-165 cm",
-      precoBase: 65,
-      incluso: ["Snowboard", "Botas"],
-    },
-  ];
+  // Obter packs disponíveis baseado em modalidade e categoria
+  const getPacksDisponíveis = () => {
+    if (!modalidade || !categoriaEquipamento) return [];
 
-  const precoCapacete = 10;
+    const equipamentos =
+      EQUIPAMENTOS_DISPONÍVEIS[modalidade]?.[categoriaEquipamento] || [];
+
+    return equipamentos.map((eq, index) => ({
+      id: `pack-${modalidade}-${categoriaEquipamento}-${index}`,
+      nome: eq.nome,
+      nivel: eq.descricao,
+      tipo: modalidade,
+      categoria: categoriaEquipamento,
+      tamanho: categoriaEquipamento === "adulto" ? "150-180 cm" : "100-150 cm",
+      nomeCompleto: eq.nome, // Usar para buscar preço no JSON
+      incluso:
+        modalidade === "ski"
+          ? ["Skis", "Botas", "Bastões"]
+          : ["Snowboard", "Botas"],
+    }));
+  };
+
+  const packsDisponiveis = getPacksDisponíveis();
 
   const handleRegioChange = (novaRegiao) => {
     setRegiao(novaRegiao);
@@ -143,21 +120,56 @@ const ModalEquipamentos = ({
   };
 
   const calcularPrecoParaEntrada = (entrada) => {
-    let total = entrada.pack.precoBase * entrada.dias * entrada.qtdePessoas;
+    // Buscar preço do equipamento no JSON usando o número de dias
+    const precoEquip = getPrecoEquipamento(
+      entrada.pack.nomeCompleto,
+      entrada.dias
+    );
+    let total = precoEquip * entrada.qtdePessoas;
 
     if (entrada.incluirCapacete) {
-      total += precoCapacete * entrada.dias * entrada.qtdePessoas;
+      // Buscar preço do capacete também
+      const precoCapaceteJSON = getPrecoEquipamento(
+        CAPACETE_ADICIONAL,
+        entrada.dias
+      );
+      total += precoCapaceteJSON * entrada.qtdePessoas;
     }
 
     return total;
   };
 
   const calcularPrecoTotal = () => {
-    const precoBase = packs[packSelecionado].precoBase * dias * qtdePessoas;
-    const precoCapaceteTotal = incluirCapacete
-      ? precoCapacete * dias * qtdePessoas
-      : 0;
-    return precoBase + precoCapaceteTotal;
+    if (packSelecionado >= packsDisponiveis.length) return 0;
+
+    const pack = packsDisponiveis[packSelecionado];
+    if (!pack) return 0;
+
+    // Calcular dias entre datas
+    if (!dataRetirada || !dataDevolucao) return 0;
+
+    const dataRet = new Date(dataRetirada);
+    const dataDev = new Date(dataDevolucao);
+    const diasCalculados = Math.ceil(
+      (dataDev - dataRet) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diasCalculados <= 0) return 0;
+
+    // Buscar preço do equipamento no JSON
+    const precoEquip = getPrecoEquipamento(pack.nomeCompleto, diasCalculados);
+    let total = precoEquip * qtdePessoas;
+
+    if (incluirCapacete) {
+      // Buscar preço do capacete também
+      const precoCapaceteJSON = getPrecoEquipamento(
+        CAPACETE_ADICIONAL,
+        diasCalculados
+      );
+      total += precoCapaceteJSON * qtdePessoas;
+    }
+
+    return total;
   };
 
   const addEquipamento = () => {
@@ -183,9 +195,15 @@ const ModalEquipamentos = ({
       return;
     }
 
+    // Validar packSelecionado
+    if (packSelecionado >= packsDisponiveis.length) {
+      alert("Selecione um equipamento válido");
+      return;
+    }
+
     const novoEquipamento = {
       id: Date.now(),
-      pack: packs[packSelecionado],
+      pack: packsDisponiveis[packSelecionado],
       incluirCapacete,
       tamanhoCapacete: "",
       dias: diasCalculados,
@@ -216,11 +234,15 @@ const ModalEquipamentos = ({
   };
 
   const proximoPack = () => {
-    setPackSelecionado((prev) => (prev + 1) % packs.length);
+    if (packsDisponiveis.length === 0) return;
+    setPackSelecionado((prev) => (prev + 1) % packsDisponiveis.length);
   };
 
   const packAnterior = () => {
-    setPackSelecionado((prev) => (prev - 1 + packs.length) % packs.length);
+    if (packsDisponiveis.length === 0) return;
+    setPackSelecionado(
+      (prev) => (prev - 1 + packsDisponiveis.length) % packsDisponiveis.length
+    );
   };
 
   useEffect(() => {
@@ -405,41 +427,52 @@ const ModalEquipamentos = ({
 
                 <div className="pack-card-header">
                   {/* IMAGEM - Aparece apenas quando modalidade é selecionada */}
-                  {modalidade && dataRetirada && dataDevolucao && (
-                    <div className="pack-image">
-                      <img
-                        src={
-                          modalidade === "ski"
-                            ? skiEquipmentImg
-                            : snowboardEquipmentImg
-                        }
-                        alt={`${modalidade} equipment`}
-                      />
-                    </div>
-                  )}
+                  {modalidade &&
+                    dataRetirada &&
+                    dataDevolucao &&
+                    packsDisponiveis.length > 0 && (
+                      <div className="pack-image">
+                        <img
+                          src={getImagemEquipamento(
+                            modalidade,
+                            categoriaEquipamento,
+                            packsDisponiveis[packSelecionado]?.nome
+                          )}
+                          alt={`${modalidade} - ${packsDisponiveis[packSelecionado]?.nome}`}
+                          crossOrigin="anonymous"
+                        />
+                      </div>
+                    )}
 
                   {/* PACK INFO - Aparece apenas quando todos os campos estão preenchidos */}
-                  {modalidade && dataRetirada && dataDevolucao && (
-                    <div className="pack-info">
-                      <h3 className="pack-nome">
-                        {packs[packSelecionado].nome}
-                      </h3>
-                      <p className="pack-nivel">
-                        {packs[packSelecionado].nivel}
-                      </p>
+                  {modalidade &&
+                    dataRetirada &&
+                    dataDevolucao &&
+                    packsDisponiveis.length > 0 && (
+                      <div className="pack-info">
+                        <h3 className="pack-nome">
+                          {packsDisponiveis[packSelecionado]?.nome}
+                        </h3>
+                        <p className="pack-nivel">
+                          {packsDisponiveis[packSelecionado]?.nivel}
+                        </p>
 
-                      <div className="pack-preco">
-                        <span className="preco-valor">
-                          € {calcularPrecoTotal().toFixed(2)}
-                        </span>
-                      </div>
+                        <div className="pack-preco">
+                          <span className="preco-valor">
+                            € {calcularPrecoTotal().toFixed(2)}
+                          </span>
+                        </div>
 
-                      <div className="pack-incluso">
-                        <p>Incluso:</p>
-                        <p>{packs[packSelecionado].incluso.join(" + ")}</p>
+                        <div className="pack-incluso">
+                          <p>Incluso:</p>
+                          <p>
+                            {packsDisponiveis[packSelecionado]?.incluso.join(
+                              " + "
+                            )}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
 
                 {/* INPUTS DENTRO DO CARD */}
@@ -492,7 +525,22 @@ const ModalEquipamentos = ({
                         <div className="capacete-info-inline">
                           <span className="capacete-preco">
                             + €{" "}
-                            {(precoCapacete * dias * qtdePessoas).toFixed(2)}
+                            {(() => {
+                              if (!dataRetirada || !dataDevolucao)
+                                return "0.00";
+                              const dataRet = new Date(dataRetirada);
+                              const dataDev = new Date(dataDevolucao);
+                              const diasCalculados = Math.ceil(
+                                (dataDev - dataRet) / (1000 * 60 * 60 * 24)
+                              );
+                              const precoCapaceteJSON = getPrecoEquipamento(
+                                CAPACETE_ADICIONAL,
+                                diasCalculados
+                              );
+                              return (precoCapaceteJSON * qtdePessoas).toFixed(
+                                2
+                              );
+                            })()}
                           </span>
 
                           <label className="toggle-switch">
