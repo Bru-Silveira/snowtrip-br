@@ -1,4 +1,4 @@
-﻿/*
+/*
   [JS Index]
 */
 
@@ -28,7 +28,7 @@
 */
 function runLuxexScripts() {
 $(function () {
-    "use strict";
+    
 
 
     $(window).on("load", function () {

@@ -11,6 +11,29 @@ import Header from "./components/Header";
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
 import ModalConsierge from "./modals/ModalConcierge";
+import { getPrecoEquipamento, CAPACETE_ADICIONAL } from "./utils/equipamentos";
+
+
+
+const calcularPrecoEquipamento = (entry) => {
+  const precoEquip = getPrecoEquipamento(
+    entry.pack.nomeCompleto,
+    entry.dias
+  );
+
+  let total = precoEquip * entry.qtdePessoas;
+
+  if (entry.incluirCapacete) {
+    const precoCapacete = getPrecoEquipamento(
+      CAPACETE_ADICIONAL,
+      entry.dias
+    );
+    total += precoCapacete * entry.qtdePessoas;
+  }
+
+  return total;
+};
+
 
 let tabelaImg;
 try {
@@ -44,6 +67,10 @@ function Carrinho() {
   // estados para aulas de ski
   const [classEntries, setClassEntries] = useState([]);
   const [classTotal, setClassTotal] = useState(0);
+
+  // estados para equipamentos
+  const [equipEntries, setEquipEntries] = useState([]);
+  const [equipTotal, setEquipTotal] = useState(0);
 
   const handleAtualizarCarrinho = (novoTotal) => {
     setSkiPassTotal(novoTotal);
@@ -180,7 +207,30 @@ function Carrinho() {
 
   }, [precoEstadia]);
 
+  useEffect(() => {
+    if (equipEntries.length === 0 || equipTotal === 0) return;
+
+    const novos = equipEntries.map((entry) => {
+      const descricao = `${entry.pack.nome} - ${entry.dias} dias - ${
+        entry.modalidade === "ski" ? "Ski" : "Snowboard"
+      }${entry.incluirCapacete ? " + Capacete" : ""}`;
+
+      return {
+        ...servicoSelecionado,
+        slug: "equip-ski",
+        nome: `${servicoSelecionado.nome} - ${descricao}`,
+        preco: calcularPrecoEquipamento(entry), // já explico abaixo
+        entries: entry,
+      };
+    });
+
+    setCarrinho((prev) => [...prev, ...novos]);
+    setEquipEntries([]);
+ }, [equipTotal]);
+
+
   const concluirModal = () => {
+    
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
@@ -313,32 +363,28 @@ function Carrinho() {
     return detalhes;
   };
 
-  const enviarWhatsApp = () => {
-    const numeroTelefone = "5511910011691";
+ const enviarWhatsApp = () => {
+  const numeroTelefone = "5511966278110";
 
-    console.log("Carrinho ao enviar para WhatsApp:", carrinho);
+  const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
+  const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
 
-    // 1. Constrói a lista de itens no carrinho
-    const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
+  const mensagemPadrao =
+    `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
+    `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
+    `${itensLista}\n\n` +
+    `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
+    `Aguardamos a confirmação dos detalhes!`;
 
-    const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+  const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
+    mensagemPadrao
+  )}`;
 
-    // 2. Constrói a mensagem completa
-    const mensagemPadrao =
-      `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
-      `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
-      `${itensLista}\n\n` +
-      `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
-      `Aguardamos a confirmação dos detalhes!`;
+  window.open(linkWhatsApp, "_blank");
+ };
 
-    // 3. Codifica a mensagem e constrói o link
-    const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
-      mensagemPadrao
-    )}`;
 
-    // 4. Abre o link em uma nova aba
-    window.open(linkWhatsApp, "_blank");
-  };
+
 
   const removerDoCarrinho = (id) =>
     setCarrinho((prev) => prev.filter((_, index) => index !== id));
@@ -351,8 +397,9 @@ function Carrinho() {
     return new Set(slugs);
   }, [carrinho]);
 
-  return (
-    <>
+    return (
+    
+     <>
       {mostrarModal && (
         <div className="modal-overlay">
           {servicoSelecionado?.slug === "ski-pass" ? (
@@ -384,31 +431,19 @@ function Carrinho() {
             />
           ) : (
             <ModalEquipamentos
-              servicoSelecionado={servicoSelecionado}
-              categoria={categoria}
-              setCategoria={setCategoria}
-              equipamentoSelecionado={equipamentoSelecionado}
-              setEquipamentoSelecionado={setEquipamentoSelecionado}
-              tamanho={tamanho}
-              setTamanho={setTamanho}
-              dias={dias}
-              setDias={setDias}
-              equipamentos={equipamentos}
-              snowCategoria={snowCategoria}
-              setSnowCategoria={setSnowCategoria}
-              snowEquipamentoSelecionado={snowEquipamentoSelecionado}
-              setSnowEquipamentoSelecionado={setSnowEquipamentoSelecionado}
-              snowTamanho={snowTamanho}
-              setSnowTamanho={setSnowTamanho}
-              snowDias={snowDias}
-              setSnowDias={setSnowDias}
-              snowboardEquipamentos={snowboardEquipamentos}
-              concluirModal={concluirModal}
-              setMostrarModal={setMostrarModal}
+                servicoSelecionado={servicoSelecionado}
+                equipEntries={equipEntries}
+                setEquipEntries={setEquipEntries}
+                setEquipTotalCarrinho={setEquipTotal}
+                concluirModal={concluirModal}
+                setMostrarModal={setMostrarModal}
             />
+
           )}
         </div>
       )}
+
+        
 
       <Header titulo="Monte sua Trip!"></Header>
 
@@ -484,14 +519,17 @@ function Carrinho() {
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
-            <button className="carrinho-reservar" onClick={enviarWhatsApp}>
-              Reserve agora!
+            <button
+            className="carrinho-reservar"
+            onClick={enviarWhatsApp} 
+            >
+            Reserve agora!
             </button>
           </div>
         </div>
       </div>
+    
     </>
   );
 }
-
 export default Carrinho;
