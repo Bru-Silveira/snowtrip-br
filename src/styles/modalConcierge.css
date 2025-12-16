@@ -1,0 +1,210 @@
+/* ModalConcierge specific styles */
+
+.concierge-intro {
+  margin-bottom: 24px;
+}
+
+.concierge-intro h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #5a5a5a;
+  margin-bottom: 12px;
+}
+
+.intro-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3d3d3d;
+  margin-bottom: 12px;
+}
+
+.intro-desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.concierge-benefits {
+  margin-bottom: 24px;
+}
+
+.concierge-benefits h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3d3d3d;
+  margin-bottom: 12px;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefits-list li {
+  font-size: 14px;
+  color: #666;
+  padding: 8px 0;
+  line-height: 1.5;
+}
+
+.benefits-list strong {
+  color: #3d3d3d;
+  font-weight: 600;
+}
+
+.concierge-price-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.price-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #d4a600;
+  text-align: center;
+}
+
+.price-period {
+  font-size: 14px;
+  color: #666;
+}
+
+.concierge-form {
+  margin-bottom: 24px;
+}
+
+.concierge-form .row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.concierge-form .col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.concierge-form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3d3d3d;
+  margin-bottom: 8px;
+}
+
+.concierge-form input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.concierge-form input:focus {
+  outline: none;
+  border-color: #d4a600;
+  box-shadow: 0 0 0 3px rgba(212, 166, 0, 0.1);
+}
+
+.preco-calculado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.preco-calculado strong {
+  font-size: 18px;
+  color: #d4a600;
+  font-weight: 700;
+}
+
+.resumo-compra {
+  width: 100%;
+}
+
+.resumo-compra h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #5a5a5a;
+  margin-bottom: 24px;
+}
+
+.resumo-card {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.resumo-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.resumo-item:last-child {
+  margin-bottom: 0;
+}
+
+.resumo-label {
+  font-weight: 600;
+  color: #3d3d3d;
+}
+
+.resumo-value {
+  color: #666;
+  text-align: right;
+}
+
+.resumo-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+  margin-top: 12px;
+  font-weight: 600;
+  color: #3d3d3d;
+}
+
+.resumo-total strong {
+  font-size: 18px;
+  color: #d4a600;
+}
+
+.resumo-inclui {
+  margin-bottom: 24px;
+}
+
+.resumo-inclui h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3d3d3d;
+  margin-bottom: 12px;
+}
+
+.resumo-inclui ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resumo-inclui li {
+  font-size: 14px;
+  color: #666;
+  padding: 6px 0;
+  line-height: 1.5;
+}
