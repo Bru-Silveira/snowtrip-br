@@ -10,30 +10,21 @@ import Header from "./components/Header";
 
 import hospedagemImg from "./img/cards/hospedagem.jpg";
 import "./Carrinho.css";
-import ModalConsierge from "./modals/ModalConcierge";
+import ModalConcierge from "./modals/ModalConcierge";
 import { getPrecoEquipamento, CAPACETE_ADICIONAL } from "./utils/equipamentos";
 
-
-
 const calcularPrecoEquipamento = (entry) => {
-  const precoEquip = getPrecoEquipamento(
-    entry.pack.nomeCompleto,
-    entry.dias
-  );
+  const precoEquip = getPrecoEquipamento(entry.pack.nomeCompleto, entry.dias);
 
   let total = precoEquip * entry.qtdePessoas;
 
   if (entry.incluirCapacete) {
-    const precoCapacete = getPrecoEquipamento(
-      CAPACETE_ADICIONAL,
-      entry.dias
-    );
+    const precoCapacete = getPrecoEquipamento(CAPACETE_ADICIONAL, entry.dias);
     total += precoCapacete * entry.qtdePessoas;
   }
 
   return total;
 };
-
 
 let tabelaImg;
 try {
@@ -72,13 +63,19 @@ function Carrinho() {
   const [equipEntries, setEquipEntries] = useState([]);
   const [equipTotal, setEquipTotal] = useState(0);
 
+  // estados para concierge
+  const [conciergeData, setConciergeData] = useState(null);
+
+  // estados para transfer
+  const [transferData, setTransferData] = useState(null);
+
   const handleAtualizarCarrinho = (novoTotal) => {
     setSkiPassTotal(novoTotal);
   };
 
   const precoEstadia = JSON.parse(sessionStorage.getItem("precoEstadia"));
   console.log("Estado Recebido no Carrinho:", precoEstadia);
-  console.log("Carrinho", carrinho)
+  console.log("Carrinho", carrinho);
   const servicos = [
     {
       id: 1,
@@ -138,7 +135,7 @@ function Carrinho() {
       setCarrinho((prev) => [...prev, servico]);
     }
   };
-  
+
   useEffect(() => {
     document.body.classList.toggle("modal-open", mostrarModal);
     return () => {
@@ -170,41 +167,43 @@ function Carrinho() {
   }, [skiPassTotal]); // Depende do estado do carrinho
 
   useEffect(() => {
-  
     const preco = precoEstadia?.total || 0;
-    const servicoBaseHospedagem = servicos.find(s => s.slug === "hospedagem");
-    const hospedagemNoCarrinho = carrinho.find(item => item.slug === "hospedagem");
+    const servicoBaseHospedagem = servicos.find((s) => s.slug === "hospedagem");
+    const hospedagemNoCarrinho = carrinho.find(
+      (item) => item.slug === "hospedagem"
+    );
 
     if (preco <= 0 || !precoEstadia?.disponivel) {
-        // Se a hospedagem está no carrinho, remove.
-        setCarrinho(prev => prev.filter(item => item.slug !== "hospedagem"));
-        return;
+      // Se a hospedagem está no carrinho, remove.
+      setCarrinho((prev) => prev.filter((item) => item.slug !== "hospedagem"));
+      return;
     }
 
     if (hospedagemNoCarrinho) {
-        // Se já existe, apenas atualiza o preço (caso tenha mudado)
-        if (hospedagemNoCarrinho.preco !== preco) {
-            setCarrinho(prev => prev.map(item => 
-                item.slug === "hospedagem" 
-                    ? { ...item, preco: preco, entries: precoEstadia } // Atualiza preço e detalhes
-                    : item
-            ));
-        }
+      // Se já existe, apenas atualiza o preço (caso tenha mudado)
+      if (hospedagemNoCarrinho.preco !== preco) {
+        setCarrinho((prev) =>
+          prev.map((item) =>
+            item.slug === "hospedagem"
+              ? { ...item, preco: preco, entries: precoEstadia } // Atualiza preço e detalhes
+              : item
+          )
+        );
+      }
     } else if (servicoBaseHospedagem) {
-        // 3. Adiciona ao carrinho se não existir
-        const novoItemHospedagem = {
-            ...servicoBaseHospedagem,
-            id: 1,
-            preco: preco,
-            // Adiciona os detalhes da estadia (check-in/out, etc.) nos entries
-            entries: precoEstadia, 
-            nome: "Hospedagem", // Mantém o nome simples ou refine com datas se precisar
-        };
-        
-        // Adiciona a hospedagem no início do carrinho
-        setCarrinho(prev => [novoItemHospedagem, ...prev]);
-    }
+      // 3. Adiciona ao carrinho se não existir
+      const novoItemHospedagem = {
+        ...servicoBaseHospedagem,
+        id: 1,
+        preco: preco,
+        // Adiciona os detalhes da estadia (check-in/out, etc.) nos entries
+        entries: precoEstadia,
+        nome: "Hospedagem", // Mantém o nome simples ou refine com datas se precisar
+      };
 
+      // Adiciona a hospedagem no início do carrinho
+      setCarrinho((prev) => [novoItemHospedagem, ...prev]);
+    }
   }, [precoEstadia]);
 
   useEffect(() => {
@@ -226,11 +225,9 @@ function Carrinho() {
 
     setCarrinho((prev) => [...prev, ...novos]);
     setEquipEntries([]);
- }, [equipTotal]);
+  }, [equipTotal]);
 
-
-  const concluirModal = () => {
-    
+  const concluirModal = (dados) => {
     if (!servicoSelecionado) {
       setMostrarModal(false);
       return;
@@ -263,45 +260,38 @@ function Carrinho() {
     }
 
     if (servicoSelecionado.slug === "equip-ski") {
-      if (!equipamentoSelecionado || !categoria || !tamanho || dias < 1) {
-        toast.error("Preencha todas as informações do equipamento!");
+      if (!dados || dados.length === 0) {
+        toast.error("Adicione pelo menos um equipamento antes de concluir.");
         return;
       }
-      const equipamento = equipamentos.find(
-        (e) => e.id === equipamentoSelecionado
-      );
-      const precoBase = equipamento?.preco?.[categoria] || 0;
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${equipamento?.nome || ""}`,
-          preco: precoBase * dias,
-          dias,
-          categoria,
-          tamanho,
-        },
-      ]);
+      // Os dados dos equipamentos já são adicionados pelo useEffect em equipTotal
+      // Aqui apenas confirmamos que há dados
     }
 
     if (servicoSelecionado.slug === "transfer") {
+      setTransferData(dados);
       setCarrinho((prev) => [
         ...prev,
         {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
-          preco: 0,
+          nome: `${servicoSelecionado.nome} - ${dados.destino} (${dados.numPessoas} pessoas)`,
+          preco: dados.preco,
+          entries: dados,
         },
       ]);
     }
 
     if (servicoSelecionado.slug === "concierge") {
+      setConciergeData(dados);
       setCarrinho((prev) => [
         ...prev,
         {
           ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - Tenho interesse!`,
-          preco: 0,
+          nome: `${servicoSelecionado.nome} - ${dados.dias} dia${
+            dados.dias > 1 ? "s" : ""
+          } (${new Date(dados.dataInicio).toLocaleDateString("pt-BR")})`,
+          preco: dados.preco,
+          entries: dados,
         },
       ]);
     }
@@ -353,7 +343,38 @@ function Carrinho() {
         }
         break;
 
-      // Adicione cases para "equip-ski", "transfer", etc., se necessário
+      case "concierge":
+        detalhes += `\n  - Data de Início: ${new Date(
+          entry.dataInicio
+        ).toLocaleDateString("pt-BR")}`;
+        detalhes += `\n  - Duração: ${entry.dias} dia${
+          entry.dias > 1 ? "s" : ""
+        }`;
+        detalhes += `\n  - Inclui: Assistência 24h, reservas, atividades e orientação local`;
+        break;
+
+      case "equip-ski":
+        detalhes += `\n  - Equipamento: ${entry.pack.nomeCompleto}`;
+        detalhes += `\n  - Modalidade: ${
+          entry.modalidade === "ski" ? "Ski" : "Snowboard"
+        }`;
+        detalhes += `\n  - Duração: ${entry.dias} dias`;
+        detalhes += `\n  - Categoria: ${entry.categoria}`;
+        detalhes += `\n  - Tamanho: ${entry.tamanho}`;
+        detalhes += `\n  - Quantidade de Pessoas: ${entry.qtdePessoas}`;
+        if (entry.incluirCapacete) {
+          detalhes += `\n  - Capacete Adicional: Sim`;
+        }
+        break;
+
+      case "transfer":
+        detalhes += `\n  - Rota: ${entry.rota}`;
+        detalhes += `\n  - Destino: ${entry.destino}`;
+        detalhes += `\n  - Passageiros: ${entry.numPessoas} pessoas`;
+        if (entry.extras && entry.extras.length > 0) {
+          detalhes += `\n  - Extras: ${entry.extras.join(", ")}`;
+        }
+        break;
 
       default:
         // Para outros slugs, apenas retorna o básico
@@ -363,28 +384,25 @@ function Carrinho() {
     return detalhes;
   };
 
- const enviarWhatsApp = () => {
-  const numeroTelefone = "5511966278110";
+  const enviarWhatsApp = () => {
+    const numeroTelefone = "5511966278110";
 
-  const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
-  const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
+    const itensLista = carrinho.map(formatarDetalhesItem).join("\n");
+    const total = carrinho.reduce((acc, item) => acc + (item.preco || 0), 0);
 
-  const mensagemPadrao =
-    `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
-    `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
-    `${itensLista}\n\n` +
-    `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
-    `Aguardamos a confirmação dos detalhes!`;
+    const mensagemPadrao =
+      `*--- 📝 NOVA SOLICITAÇÃO DE RESERVA ---*\n\n` +
+      `Olá! Gostaria de reservar minha Trip com os seguintes itens:\n\n` +
+      `${itensLista}\n\n` +
+      `*TOTAL GERAL ESTIMADO: € ${total.toLocaleString("pt-BR")}*\n\n` +
+      `Aguardamos a confirmação dos detalhes!`;
 
-  const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
-    mensagemPadrao
-  )}`;
+    const linkWhatsApp = `https://wa.me/${numeroTelefone}?text=${encodeURIComponent(
+      mensagemPadrao
+    )}`;
 
-  window.open(linkWhatsApp, "_blank");
- };
-
-
-
+    window.open(linkWhatsApp, "_blank");
+  };
 
   const removerDoCarrinho = (id) =>
     setCarrinho((prev) => prev.filter((_, index) => index !== id));
@@ -397,9 +415,8 @@ function Carrinho() {
     return new Set(slugs);
   }, [carrinho]);
 
-    return (
-    
-     <>
+  return (
+    <>
       {mostrarModal && (
         <div className="modal-overlay">
           {servicoSelecionado?.slug === "ski-pass" ? (
@@ -419,31 +436,37 @@ function Carrinho() {
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
+          ) : servicoSelecionado?.slug === "concierge" ? (
+            <ModalConcierge
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
+            />
           ) : servicoSelecionado?.slug === "transfer" ? (
             <ModalTransfer
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
-          ) : servicoSelecionado?.slug === "concierge" ? (
-            <ModalConsierge 
+          ) : servicoSelecionado?.slug === "equip-ski" ? (
+            <ModalEquipamentos
+              servicoSelecionado={servicoSelecionado}
+              equipEntries={equipEntries}
+              setEquipEntries={setEquipEntries}
+              setEquipTotalCarrinho={setEquipTotal}
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
             />
           ) : (
             <ModalEquipamentos
-                servicoSelecionado={servicoSelecionado}
-                equipEntries={equipEntries}
-                setEquipEntries={setEquipEntries}
-                setEquipTotalCarrinho={setEquipTotal}
-                concluirModal={concluirModal}
-                setMostrarModal={setMostrarModal}
+              servicoSelecionado={servicoSelecionado}
+              equipEntries={equipEntries}
+              setEquipEntries={setEquipEntries}
+              setEquipTotalCarrinho={setEquipTotal}
+              concluirModal={concluirModal}
+              setMostrarModal={setMostrarModal}
             />
-
           )}
         </div>
       )}
-
-        
 
       <Header titulo="Monte sua Trip!"></Header>
 
@@ -491,9 +514,7 @@ function Carrinho() {
                   <li key={index} className="item-carrinho">
                     <span className="carrinho-info">{item.nome}</span>
                     {item.slug === "transfer" || item.slug === "concierge" ? (
-                      <span className="carrinho-preco">
-                        à consultar
-                      </span>
+                      <span className="carrinho-preco">à consultar</span>
                     ) : (
                       <span className="carrinho-preco">
                         € {(item.preco || 0).toFixed(2).replace(".", ",")}
@@ -519,16 +540,12 @@ function Carrinho() {
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
-            <button
-            className="carrinho-reservar"
-            onClick={enviarWhatsApp} 
-            >
-            Reserve agora!
+            <button className="carrinho-reservar" onClick={enviarWhatsApp}>
+              Reserve agora!
             </button>
           </div>
         </div>
       </div>
-    
     </>
   );
 }
