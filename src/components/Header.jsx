@@ -9,14 +9,6 @@ const Header = ({titulo}) => {
 
   return (
     <>
-      <div className="preloader-bg"></div>
-      <div id="preloader">
-        <div id="preloader-status">
-          <div className="preloader-position loader">
-            <span></span>
-          </div>
-        </div>
-      </div>
       <div className="tst-line-t"></div>
       <div className="tst-line-l"></div>
       <div className="tst-line-r"></div>
