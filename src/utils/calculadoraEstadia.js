@@ -79,7 +79,8 @@ export const calcularPrecoTotal = (estadiasEncontradas) => {
         }
 
         const precoPeriodo = parseFloat(precoStr || 0);
-        precoTotal += precoPeriodo;
+        const comissao = precoPeriodo * 0.10; // 10% de comissão
+        precoTotal += precoPeriodo + comissao;
     }
 
     // Retorna o resultado final
