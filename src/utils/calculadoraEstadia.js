@@ -79,7 +79,8 @@ export const calcularPrecoTotal = (estadiasEncontradas) => {
         }
 
         const precoPeriodo = parseFloat(precoStr || 0);
-        precoTotal += precoPeriodo;
+        const comissao = precoPeriodo * 0.10; // 10% de comissão
+        precoTotal += precoPeriodo + comissao;
     }
 
     // Retorna o resultado final
@@ -87,4 +88,13 @@ export const calcularPrecoTotal = (estadiasEncontradas) => {
         total: todosDisponiveis ? precoTotal : 0,
         todosDisponiveis: todosDisponiveis
     };
+};
+
+export const calcularDiasPorPeriodo = (dataCheckInStr, dataCheckOutStr) => {
+    const checkInUsuario = startOfDay(parseISO(dataCheckInStr));
+    const checkOutUsuario = startOfDay(parseISO(dataCheckOutStr)); 
+    const diffTime = Math.abs(checkOutUsuario - checkInUsuario);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
 };

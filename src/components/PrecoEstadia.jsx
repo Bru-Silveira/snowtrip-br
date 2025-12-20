@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   encontrarEstadiasNoPeriodo,
   calcularPrecoTotal,
+  calcularDiasPorPeriodo
 } from "../utils/calculadoraEstadia.js";
 
 const PrecoEstadia = ({ sejours, dataChegada, dataPartida, adultos, criancas }) => {
@@ -48,7 +49,8 @@ const PrecoEstadia = ({ sejours, dataChegada, dataPartida, adultos, criancas }) 
     preco.dataChegada = dataChegada;
     preco.dataPartida = dataPartida;
     preco.qtdeAdultos = adultos;
-    preco.criancas = criancas;
+    preco.qtdeCriancas = criancas;
+    preco.diasPorPeriodo = calcularDiasPorPeriodo(dataChegada, dataPartida);
     sessionStorage.setItem("precoEstadia", JSON.stringify(preco));
   }
 

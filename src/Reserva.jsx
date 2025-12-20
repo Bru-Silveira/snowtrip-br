@@ -15,7 +15,7 @@ function Reserva() {
 
   useEffect(() => {
     // Fazendo a requisição para pegar o imóvel com o ID passado na URL
-    fetch('http://localhost:5000/api/imoveis')
+    fetch('http://18.116.12.206:5000/api/imoveis')
       .then(res => res.json())
       .then(data => {
         // Encontrar o imóvel que tem o ID correspondente
