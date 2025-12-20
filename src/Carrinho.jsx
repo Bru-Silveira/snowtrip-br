@@ -476,8 +476,8 @@ function Carrinho() {
           </div>
 
           <div className="carrinho-detalhes">
-            <h2 className="carrinho-dias">8 Dias</h2>
-            <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
+            {precoEstadia?.diasPorPeriodo && <h2 className="carrinho-dias">{precoEstadia?.diasPorPeriodo} Dias</h2>}
+            {precoEstadia?.qtdeAdultos && <p className="carrinho-pessoas">{precoEstadia?.qtdeAdultos} adultos e {precoEstadia?.qtdeCriancas} crianças</p>}
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>

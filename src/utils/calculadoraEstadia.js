@@ -89,3 +89,12 @@ export const calcularPrecoTotal = (estadiasEncontradas) => {
         todosDisponiveis: todosDisponiveis
     };
 };
+
+export const calcularDiasPorPeriodo = (dataCheckInStr, dataCheckOutStr) => {
+    const checkInUsuario = startOfDay(parseISO(dataCheckInStr));
+    const checkOutUsuario = startOfDay(parseISO(dataCheckOutStr)); 
+    const diffTime = Math.abs(checkOutUsuario - checkInUsuario);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+};
