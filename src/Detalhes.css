@@ -40,6 +40,12 @@ a.google-maps-link {
   font-weight: bold;
 }
 
+.carousel-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .custom-carousel {
   position: relative;
   width: 100%;
@@ -146,11 +152,19 @@ a.google-maps-link {
   line-height: 1.6;
 }
 
+/* Configuração para o conteúdo das listas */
+.services-content {
+  display: grid;
+  grid-template-columns: 1fr; /* Uma coluna no celular */
+  gap: 20px;
+}
+
 .services-container {
   width: 100%;
   margin-top: 30px;
   padding: 15px;
 }
+
 .services-title {
   color: #5f5f5f;
   text-align: left;
@@ -217,4 +231,13 @@ a.google-maps-link {
 
 .spacer-fixo {
   height: 80px; /* Ajuste conforme a altura do rodapé fixo */
+}
+
+/* Quando a tela for grande (Tablet/Desktop) */
+@media (min-width: 768px) {
+  .services-content {
+    /* Define duas colunas de tamanhos iguais (1 fração cada) */
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+  }
 }

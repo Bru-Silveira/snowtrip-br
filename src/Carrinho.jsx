@@ -124,16 +124,15 @@ function Carrinho() {
     setServicoSelecionado(servico);
 
     // Abre modal para serviços que precisam de configuração
-    if (
-      ["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(
-        servico.slug
-      )
-    ) {
-      setMostrarModal(true);
-    } else {
-      // Adiciona direto ao carrinho para outros serviços
-      setCarrinho((prev) => [...prev, servico]);
-    }
+    if (["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(servico.slug)) {
+    setMostrarModal(true);
+  } else if (servico.slug === "hospedagem") {
+    // Não faz nada ou mostra um aviso, pois o useEffect já gerencia isso
+    toast.info("A hospedagem é adicionada automaticamente com base na sua busca.");
+  } else {
+    // Adiciona apenas se não for hospedagem e não exigir modal
+    setCarrinho((prev) => [...prev, servico]);
+  }
   };
 
   useEffect(() => {
@@ -168,43 +167,38 @@ function Carrinho() {
 
   useEffect(() => {
     const preco = precoEstadia?.total || 0;
-    const servicoBaseHospedagem = servicos.find((s) => s.slug === "hospedagem");
-    const hospedagemNoCarrinho = carrinho.find(
-      (item) => item.slug === "hospedagem"
-    );
+    const servicoBaseHospedagem = servicos.find(s => s.slug === "hospedagem");
+
+    setCarrinho(prev => {
+    const hospedagemNoCarrinho = prev.find(item => item.slug === "hospedagem");
 
     if (preco <= 0 || !precoEstadia?.disponivel) {
-      // Se a hospedagem está no carrinho, remove.
-      setCarrinho((prev) => prev.filter((item) => item.slug !== "hospedagem"));
-      return;
+      return prev.filter(item => item.slug !== "hospedagem");
     }
 
     if (hospedagemNoCarrinho) {
-      // Se já existe, apenas atualiza o preço (caso tenha mudado)
       if (hospedagemNoCarrinho.preco !== preco) {
-        setCarrinho((prev) =>
-          prev.map((item) =>
-            item.slug === "hospedagem"
-              ? { ...item, preco: preco, entries: precoEstadia } // Atualiza preço e detalhes
-              : item
-          )
+        return prev.map(item => 
+          item.slug === "hospedagem" 
+            ? { ...item, preco: preco, entries: precoEstadia } 
+            : item
         );
       }
+      return prev; 
     } else if (servicoBaseHospedagem) {
-      // 3. Adiciona ao carrinho se não existir
       const novoItemHospedagem = {
         ...servicoBaseHospedagem,
         id: 1,
         preco: preco,
-        // Adiciona os detalhes da estadia (check-in/out, etc.) nos entries
-        entries: precoEstadia,
-        nome: "Hospedagem", // Mantém o nome simples ou refine com datas se precisar
+        entries: precoEstadia, 
+        nome: "Hospedagem",
       };
-
-      // Adiciona a hospedagem no início do carrinho
-      setCarrinho((prev) => [novoItemHospedagem, ...prev]);
+      return [novoItemHospedagem, ...prev];
     }
-  }, [precoEstadia]);
+    return prev;
+  });
+
+}, [precoEstadia]);
 
   useEffect(() => {
     if (equipEntries.length === 0 || equipTotal === 0) return;
@@ -535,8 +529,8 @@ function Carrinho() {
           </div>
 
           <div className="carrinho-detalhes">
-            <h2 className="carrinho-dias">8 Dias</h2>
-            <p className="carrinho-pessoas">2 adultos e 2 crianças</p>
+            {precoEstadia?.diasPorPeriodo && <h2 className="carrinho-dias">{precoEstadia?.diasPorPeriodo} Dias</h2>}
+            {precoEstadia?.qtdeAdultos && <p className="carrinho-pessoas">{precoEstadia?.qtdeAdultos} adultos e {precoEstadia?.qtdeCriancas} crianças</p>}
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
