@@ -202,31 +202,32 @@ function Detalhes() {
     <>
       <Header titulo="DETALHES HOSPEDAGEM"></Header>
       {/* Carrossel de imagens */}
-      {/* <img className="hospedagem-img" src={imovel.resumo?.image || "https://www.11-76.com/html5-images-22/luxex/luxex-3.jpg"} alt="Imagem da Hospedagem" />  */}
-      <div className="custom-carousel">
-        <button className="carousel-btn prev" onClick={prevSlide}>
-          ❮
-        </button>
-        <div className="carousel-slide">
-          <img
-            src={imagens[current]}
-            alt={`Foto ${current + 1}`}
-            className="carousel-img"
-          />
-        </div>
-        <button className="carousel-btn next" onClick={nextSlide}>
-          ❯
-        </button>
-
-        {/* Bolinhas de navegação */}
-        <div className="carousel-dots">
-          {imagens.map((_, i) => (
-            <span
-              key={i}
-              className={`dot ${i === current ? "active" : ""}`}
-              onClick={() => setCurrent(i)}
+      <div className="carousel-container">
+        <div className="custom-carousel">
+          <button className="carousel-btn prev" onClick={prevSlide}>
+            ❮
+          </button>
+          <div className="carousel-slide">
+            <img
+              src={imagens[current]}
+              alt={`Foto ${current + 1}`}
+              className="carousel-img"
             />
-          ))}
+          </div>
+          <button className="carousel-btn next" onClick={nextSlide}>
+            ❯
+          </button>
+
+          {/* Bolinhas de navegação */}
+          <div className="carousel-dots">
+            {imagens.map((_, i) => (
+              <span
+                key={i}
+                className={`dot ${i === current ? "active" : ""}`}
+                onClick={() => setCurrent(i)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -254,31 +255,34 @@ function Detalhes() {
 
       <div className="services-container">
         <h3 className="services-title">SERVIÇOS INCLUSOS</h3>
-        <ul className="service-list">
-          <li className="list-header">Serviços de Boas Vindas</li>
-          {listWelcomeServices}
-        </ul>
-        <ul className="service-list">
-          <li className="list-header">Limpeza | Roupa de Cama</li>
-          {listHousekeeping}
-        </ul>
+        <div className="services-content">
+          <ul className="service-list">
+            <li className="list-header">Serviços de Boas Vindas</li>
+            {listWelcomeServices}
+          </ul>
+          <ul className="service-list">
+            <li className="list-header">Limpeza | Roupa de Cama</li>
+            {listHousekeeping}
+          </ul>
+        </div>
       </div>
 
       <div className="services-container">
         <h3 className="services-title">ÍTENS INCLUSOS</h3>
-        <ul className="service-list">
-          <li className="list-header">Geral</li>
-          {listGeneralEquipment}
-        </ul>
-        <ul className="service-list">
-          <li className="list-header">Eletrodomésticos</li>
-          {homeAppliances}
-        </ul>
-
-        <ul className="service-list">
-          <li className="list-header">Não Inclusos</li>
-          {notIncluded}
-        </ul>
+        <div className="services-content">
+          <ul className="service-list">
+            <li className="list-header">Geral</li>
+            {listGeneralEquipment}
+          </ul>
+          <ul className="service-list">
+            <li className="list-header">Eletrodomésticos</li>
+            {homeAppliances}
+          </ul>
+          <ul className="service-list">
+            <li className="list-header">Não Inclusos</li>
+            {notIncluded}
+          </ul>
+        </div>
       </div>
 
       <div className="services-container">
@@ -288,28 +292,30 @@ function Detalhes() {
 
       <div className="services-container">
         <h3 className="services-title">LOCALIZAÇÃO</h3>
-        <ul className="service-list">
-          <li className="list-header">Distâncias</li>
-          <li>Distância do centro: {centre_distance_m}</li>
-          <li>Distância do teleférico: {telesiege_distance_m}</li>
-          <li>Distância da pista: {piste_distance_m}</li>
-          <li>Distância da escola de esqui: {ecole_ski_distance_m}</li>
-        </ul>
-        <ul className="item-description">
-          <li className="list-header">Detalhes</li>
-          <li>Latitude: {latitude}</li>
-          <li>Longitude: {longitude}</li>
-          <li>
-            <a
-              className="google-maps-link"
-              href={linkGoogleMaps}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ver no Google Maps
-            </a>
-          </li>
-        </ul>
+        <div className="services-content">
+          <ul className="service-list">
+            <li className="list-header">Distâncias</li>
+            <li>Distância do centro: {centre_distance_m}</li>
+            <li>Distância do teleférico: {telesiege_distance_m}</li>
+            <li>Distância da pista: {piste_distance_m}</li>
+            <li>Distância da escola de esqui: {ecole_ski_distance_m}</li>
+          </ul>
+          <ul className="item-description">
+            <li className="list-header">Detalhes</li>
+            <li>Latitude: {latitude}</li>
+            <li>Longitude: {longitude}</li>
+            <li>
+              <a
+                className="google-maps-link"
+                href={linkGoogleMaps}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ver no Google Maps
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
       <PrecoEstadia
         sejours={sejours}
