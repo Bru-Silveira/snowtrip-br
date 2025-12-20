@@ -1,0 +1,15 @@
+{
+  "ski": {
+    "adulto": {
+      "Descoberta": "URL_DA_IMAGEM",
+      "Sensação": "URL_DA_IMAGEM",
+      "Exelencia": "URL_DA_IMAGEM"
+    }
+  },
+  "snowboard": {
+    "adulto": {
+      "Sensação": "URL_DA_IMAGEM",
+      "Exelencia": "URL_DA_IMAGEM"
+    }
+  }
+}

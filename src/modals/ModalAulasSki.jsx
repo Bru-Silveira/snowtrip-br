@@ -11,7 +11,7 @@ const ModalAulasSki = ({
   setClassTotal,
   concluirModal,
   setMostrarModal,
-}) => {
+ }) => {
   const [regiao, setRegiao] = useState("franceses");
   const [resort, setResort] = useState("");
   const [idadesCriancasForm, setIdadesCriancasForm] = useState([]);
@@ -51,97 +51,28 @@ const ModalAulasSki = ({
     },
   ];
 
-  const precosAulas = {
-    halfday: {
-      1: { 1: 250, 2: 280, 3: 310, 4: 340, 5: 370, 6: 400 },
-      2: { 1: 300, 2: 330, 3: 360, 4: 390, 5: 420, 6: 450 },
-      3: { 1: 350, 2: 380, 3: 410, 4: 440, 5: 470, 6: 500 },
-      4: { 1: 400, 2: 430, 3: 460, 4: 490, 5: 520, 6: 550 },
-      5: { 1: 450, 2: 480, 3: 510, 4: 540, 5: 570, 6: 600 },
-    },
-    fullday: {
-      1: {
-        1: 350,
-        2: 390,
-        3: 430,
-        4: 470,
-        5: 510,
-        6: 550,
-        7: 590,
-        8: 630,
-        9: 670,
-        10: 710,
-        11: 750,
-        12: 790,
-        13: 830,
-        14: 870,
-      },
-      2: {
-        1: 420,
-        2: 460,
-        3: 500,
-        4: 540,
-        5: 580,
-        6: 620,
-        7: 660,
-        8: 700,
-        9: 740,
-        10: 780,
-        11: 820,
-        12: 860,
-        13: 900,
-        14: 940,
-      },
-      3: {
-        1: 490,
-        2: 530,
-        3: 570,
-        4: 610,
-        5: 650,
-        6: 690,
-        7: 730,
-        8: 770,
-        9: 810,
-        10: 850,
-        11: 890,
-        12: 930,
-        13: 970,
-        14: 1010,
-      },
-      4: {
-        1: 560,
-        2: 600,
-        3: 640,
-        4: 680,
-        5: 720,
-        6: 760,
-        7: 800,
-        8: 840,
-        9: 880,
-        10: 920,
-        11: 960,
-        12: 1000,
-        13: 1040,
-        14: 1080,
-      },
-      5: {
-        1: 630,
-        2: 670,
-        3: 710,
-        4: 750,
-        5: 790,
-        6: 830,
-        7: 870,
-        8: 910,
-        9: 950,
-        10: 990,
-        11: 1030,
-        12: 1070,
-        13: 1110,
-        14: 1150,
-      },
-    },
-  };
+  const PRECOS_AULAS_FIXOS = {
+  franca_3_vallees: {
+    halfday: { valor: 495, moeda: "€" },
+    fullday: { valor: 680, moeda: "€" },
+  },
+  franca_demais: {
+    halfday: { valor: 450, moeda: "€" },
+    fullday: { valor: 600, moeda: "€" },
+  },
+  suica: {
+    halfday: { valor: 480, moeda: "CHF" },
+    fullday: { valor: 650, moeda: "CHF" },
+  }, 
+ };
+
+ const resortsTresVallees = [
+  "Courchevel",
+  "Meribel",
+  "Val Thorens",
+ ];
+
+
 
   const calcularMaximoCriancas = (idx) => {
     const entry = classEntries[idx];
@@ -193,19 +124,28 @@ const ModalAulasSki = ({
   };
 
   const calcularPrecoParaEntrada = (entry) => {
-    console.log("Calculating price for entry", entry);
-    const pessoas = Math.min(5, entry.totalPessoas);
-    const diasAula = Math.min(14, entry.dias);
-    const tabelaPeriodo = precosAulas[entry.periodo];
-    
-    if (tabelaPeriodo && tabelaPeriodo[pessoas]) {
-      entry.subtotal = tabelaPeriodo[pessoas][diasAula] || 0;
-      console.log("Calculated subtotal for entry:", entry.subtotal);
-      return entry.subtotal;
-    }
-    return 0;
+  if (!entry.periodo || !entry.resort) return 0;
 
-  };
+  let tabela;
+
+  if (entry.regiao === "suicos") {
+    tabela = PRECOS_AULAS_FIXOS.suica;
+  } else if (resortsTresVallees.includes(entry.resort)) {
+    tabela = PRECOS_AULAS_FIXOS.franca_3_vallees;
+  } else {
+    tabela = PRECOS_AULAS_FIXOS.franca_demais;
+  }
+
+  const precoInfo = tabela[entry.periodo];
+
+  if (!precoInfo) return 0;
+
+  entry.subtotal = precoInfo.valor;
+  entry.moeda = precoInfo.moeda;
+
+  return precoInfo.valor;
+ };
+
 
   useEffect(() => {
     const total = classEntries.reduce((acc, entry) => {

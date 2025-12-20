@@ -21,7 +21,7 @@ function Detalhes() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/imoveis/" + id)
+    fetch("http://18.116.12.206:5000/api/imoveis/" + id)
       .then((res) => res.json())
       .then((data) => {
         console.log("Dados recebidos:", data);

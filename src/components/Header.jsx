@@ -9,14 +9,6 @@ const Header = ({titulo}) => {
 
   return (
     <>
-      <div className="preloader-bg"></div>
-      <div id="preloader">
-        <div id="preloader-status">
-          <div className="preloader-position loader">
-            <span></span>
-          </div>
-        </div>
-      </div>
       <div className="tst-line-t"></div>
       <div className="tst-line-l"></div>
       <div className="tst-line-r"></div>
@@ -82,7 +74,7 @@ const Header = ({titulo}) => {
                 </li>
                 <li>
                   <a
-                    href="http://localhost:3000/Carrinho"
+                    href="http://18.116.12.206:3000/Carrinho"
                     style={{ fontSize: 14 }}
                   >
                     Monte sua Trip

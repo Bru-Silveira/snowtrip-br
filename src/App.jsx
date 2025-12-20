@@ -36,7 +36,7 @@ function App() {
 
   useEffect(() => {
     console.log("Buscando Imóveis...")
-    fetch("http://localhost:5000/api/imoveis")
+    fetch("http://18.116.12.206:5000/api/imoveis")
       .then((res) => res.json())
       .then((data) => {
         console.log("Busca Finalizada")
@@ -186,7 +186,7 @@ function App() {
                 </li>
                 <li>
                   <a
-                    href="http://localhost:3000/Carrinho"
+                    href="http://18.116.12.206:3000/Carrinho"
                     style={{ fontSize: 14 }}
                   >
                     Monte sua Trip
