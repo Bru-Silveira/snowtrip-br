@@ -13,9 +13,13 @@ import { getImagemEquipamento } from "../utils/equipamentosImagens.js";
 
 const ModalEquipamentos = ({
   servicoSelecionado = null,
+  equipEntries = [],
+  setEquipEntries = () => {},
+  setEquipTotalCarrinho = () => {},
   concluirModal = () => {},
   setMostrarModal = () => {},
 }) => {
+
   const [equipamentos, setEquipamentos] = useState([]);
   const [packSelecionado, setPackSelecionado] = useState(0);
   const [incluirCapacete, setIncluirCapacete] = useState(false);
@@ -107,6 +111,12 @@ const ModalEquipamentos = ({
   };
 
   const packsDisponiveis = getPacksDisponíveis();
+
+  const [feedback, setFeedback] = useState({
+  mensagem: "",
+  tipo: "", // "erro" | "sucesso"
+  });
+
 
   const handleRegioChange = (novaRegiao) => {
     setRegiao(novaRegiao);
@@ -247,16 +257,41 @@ const ModalEquipamentos = ({
 
   useEffect(() => {
     const total = equipamentos.reduce(
-      (sum, eq) => sum + calcularPrecoParaEntrada(eq),
-      0
-    );
-    setEquipTotal(total);
-  }, [equipamentos]);
+    (sum, eq) => sum + calcularPrecoParaEntrada(eq),
+    0
+   );
 
-  const handleConfirm = () => {
-    concluirModal();
+   setEquipTotal(total);
+   setEquipTotalCarrinho(total);
+   setEquipEntries(equipamentos);
+ }, [equipamentos]);
+
+
+ const handleConfirm = () => {
+  // ❌ Sem equipamentos
+  if (equipamentos.length === 0) {
+    setFeedback({
+      mensagem: "Adicione pelo menos um equipamento antes de continuar.",
+      tipo: "erro",
+    });
+    return;
+  }
+ // ✅ Com equipamentos
+  setFeedback({
+    mensagem: "Equipamento adicionado com sucesso!",
+    tipo: "sucesso",
+  });
+
+  concluirModal(equipamentos);
+
+  // Fecha o modal após um pequeno delay (UX melhor)
+  setTimeout(() => {
     setMostrarModal(false);
-  };
+    setFeedback({ mensagem: "", tipo: "" });
+  }, 1200);
+ };
+
+
 
   return (
     <div className="modal-content equip-layout">
@@ -652,6 +687,13 @@ const ModalEquipamentos = ({
               ADICIONAR
             </button>
           </div>
+
+          {feedback.mensagem && (
+            <div className={`modal-feedback ${feedback.tipo}`}>
+                {feedback.mensagem}
+            </div>
+        )}
+
         </section>
       </div>
     </div>
