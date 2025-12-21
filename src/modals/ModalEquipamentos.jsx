@@ -9,7 +9,10 @@ import {
   EQUIPAMENTOS_DISPONÍVEIS,
   CAPACETE_ADICIONAL,
 } from "../utils/equipamentosData.js";
-import { getImagemEquipamento } from "../utils/equipamentosImagens.js";
+import {
+  getImagemEquipamento,
+  getBadgeEquipamento,
+} from "../utils/equipamentosImagens.js";
 
 const ModalEquipamentos = ({
   servicoSelecionado = null,
@@ -19,7 +22,6 @@ const ModalEquipamentos = ({
   concluirModal = () => {},
   setMostrarModal = () => {},
 }) => {
-
   const [equipamentos, setEquipamentos] = useState([]);
   const [packSelecionado, setPackSelecionado] = useState(0);
   const [incluirCapacete, setIncluirCapacete] = useState(false);
@@ -113,10 +115,9 @@ const ModalEquipamentos = ({
   const packsDisponiveis = getPacksDisponíveis();
 
   const [feedback, setFeedback] = useState({
-  mensagem: "",
-  tipo: "", // "erro" | "sucesso"
+    mensagem: "",
+    tipo: "", // "erro" | "sucesso"
   });
-
 
   const handleRegioChange = (novaRegiao) => {
     setRegiao(novaRegiao);
@@ -257,41 +258,38 @@ const ModalEquipamentos = ({
 
   useEffect(() => {
     const total = equipamentos.reduce(
-    (sum, eq) => sum + calcularPrecoParaEntrada(eq),
-    0
-   );
+      (sum, eq) => sum + calcularPrecoParaEntrada(eq),
+      0
+    );
 
-   setEquipTotal(total);
-   setEquipTotalCarrinho(total);
-   setEquipEntries(equipamentos);
- }, [equipamentos]);
+    setEquipTotal(total);
+    setEquipTotalCarrinho(total);
+    setEquipEntries(equipamentos);
+  }, [equipamentos]);
 
-
- const handleConfirm = () => {
-  // ❌ Sem equipamentos
-  if (equipamentos.length === 0) {
+  const handleConfirm = () => {
+    // ❌ Sem equipamentos
+    if (equipamentos.length === 0) {
+      setFeedback({
+        mensagem: "Adicione pelo menos um equipamento antes de continuar.",
+        tipo: "erro",
+      });
+      return;
+    }
+    // ✅ Com equipamentos
     setFeedback({
-      mensagem: "Adicione pelo menos um equipamento antes de continuar.",
-      tipo: "erro",
+      mensagem: "Equipamento adicionado com sucesso!",
+      tipo: "sucesso",
     });
-    return;
-  }
- // ✅ Com equipamentos
-  setFeedback({
-    mensagem: "Equipamento adicionado com sucesso!",
-    tipo: "sucesso",
-  });
 
-  concluirModal(equipamentos);
+    concluirModal(equipamentos);
 
-  // Fecha o modal após um pequeno delay (UX melhor)
-  setTimeout(() => {
-    setMostrarModal(false);
-    setFeedback({ mensagem: "", tipo: "" });
-  }, 1200);
- };
-
-
+    // Fecha o modal após um pequeno delay (UX melhor)
+    setTimeout(() => {
+      setMostrarModal(false);
+      setFeedback({ mensagem: "", tipo: "" });
+    }, 1200);
+  };
 
   return (
     <div className="modal-content equip-layout">
@@ -423,13 +421,15 @@ const ModalEquipamentos = ({
           {/* CARROSSEL DE PACKS - Aparece apenas quando Tamanho é selecionado */}
           {mostrarFormularioExpandido && categoriaEquipamento && (
             <div className="pack-carousel">
-              <button
-                type="button"
-                className="carousel-btn prev"
-                onClick={packAnterior}
-              >
-                <img src={back} alt="Anterior" className="icon" />
-              </button>
+              {modalidade && dataRetirada && dataDevolucao && (
+                <button
+                  type="button"
+                  className="carousel-btn prev"
+                  onClick={packAnterior}
+                >
+                  <img src={back} alt="Anterior" className="icon" />
+                </button>
+              )}
 
               <div className="pack-card">
                 {/* CARD HEADER - TITULO, REMOVE E TOTAL */}
@@ -466,16 +466,54 @@ const ModalEquipamentos = ({
                     dataRetirada &&
                     dataDevolucao &&
                     packsDisponiveis.length > 0 && (
-                      <div className="pack-image">
-                        <img
-                          src={getImagemEquipamento(
-                            modalidade,
-                            categoriaEquipamento,
-                            packsDisponiveis[packSelecionado]?.nome
-                          )}
-                          alt={`${modalidade} - ${packsDisponiveis[packSelecionado]?.nome}`}
-                          crossOrigin="anonymous"
-                        />
+                      <div className="pack-images-container">
+                        <div className="pack-image">
+                          <img
+                            src={getImagemEquipamento(
+                              modalidade,
+                              categoriaEquipamento,
+                              packsDisponiveis[packSelecionado]?.nome
+                            )}
+                            alt={`${modalidade} - ${packsDisponiveis[packSelecionado]?.nome}`}
+                            crossOrigin="anonymous"
+                          />
+                        </div>
+                        <div className="capacete-image-inline">
+                          <img
+                            src={helmetImg}
+                            alt="Capacete"
+                            className={incluirCapacete ? "" : "grayscale"}
+                          />
+                          <span className="capacete-preco-inline">
+                            + €{" "}
+                            {(() => {
+                              if (!dataRetirada || !dataDevolucao)
+                                return "0.00";
+                              const dataRet = new Date(dataRetirada);
+                              const dataDev = new Date(dataDevolucao);
+                              const diasCalculados = Math.ceil(
+                                (dataDev - dataRet) / (1000 * 60 * 60 * 24)
+                              );
+                              const precoCapaceteJSON = getPrecoEquipamento(
+                                CAPACETE_ADICIONAL,
+                                diasCalculados
+                              );
+                              return (precoCapaceteJSON * qtdePessoas).toFixed(
+                                2
+                              );
+                            })()}
+                          </span>
+                          <label className="toggle-switch">
+                            <input
+                              type="checkbox"
+                              checked={incluirCapacete}
+                              onChange={(e) =>
+                                setIncluirCapacete(e.target.checked)
+                              }
+                            />
+                            <span className="toggle-slider"></span>
+                          </label>
+                        </div>
                       </div>
                     )}
 
@@ -485,9 +523,26 @@ const ModalEquipamentos = ({
                     dataDevolucao &&
                     packsDisponiveis.length > 0 && (
                       <div className="pack-info">
-                        <h3 className="pack-nome">
-                          {packsDisponiveis[packSelecionado]?.nome}
-                        </h3>
+                        <div className="pack-nome-container">
+                          <h3 className="pack-nome">
+                            {packsDisponiveis[packSelecionado]?.nome}
+                          </h3>
+                          {getBadgeEquipamento(
+                            modalidade,
+                            categoriaEquipamento,
+                            packsDisponiveis[packSelecionado]?.nome
+                          ) && (
+                            <img
+                              src={getBadgeEquipamento(
+                                modalidade,
+                                categoriaEquipamento,
+                                packsDisponiveis[packSelecionado]?.nome
+                              )}
+                              alt="Badge"
+                              className="pack-nome-badge"
+                            />
+                          )}
+                        </div>
                         <p className="pack-nivel">
                           {packsDisponiveis[packSelecionado]?.nivel}
                         </p>
@@ -547,51 +602,6 @@ const ModalEquipamentos = ({
                 {/* CAPACETE E BOTÃO - Aparecem apenas quando todos os campos estão preenchidos */}
                 {modalidade && dataRetirada && dataDevolucao && (
                   <>
-                    <div className="capacete-card">
-                      <div className="capacete-card-content">
-                        <div className="capacete-image">
-                          <img
-                            src={helmetImg}
-                            alt="Capacete"
-                            className={incluirCapacete ? "" : "grayscale"}
-                          />
-                        </div>
-
-                        <div className="capacete-info-inline">
-                          <span className="capacete-preco">
-                            + €{" "}
-                            {(() => {
-                              if (!dataRetirada || !dataDevolucao)
-                                return "0.00";
-                              const dataRet = new Date(dataRetirada);
-                              const dataDev = new Date(dataDevolucao);
-                              const diasCalculados = Math.ceil(
-                                (dataDev - dataRet) / (1000 * 60 * 60 * 24)
-                              );
-                              const precoCapaceteJSON = getPrecoEquipamento(
-                                CAPACETE_ADICIONAL,
-                                diasCalculados
-                              );
-                              return (precoCapaceteJSON * qtdePessoas).toFixed(
-                                2
-                              );
-                            })()}
-                          </span>
-
-                          <label className="toggle-switch">
-                            <input
-                              type="checkbox"
-                              checked={incluirCapacete}
-                              onChange={(e) =>
-                                setIncluirCapacete(e.target.checked)
-                              }
-                            />
-                            <span className="toggle-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-
                     <button
                       type="button"
                       className="btn-adicionar-pack"
@@ -603,13 +613,15 @@ const ModalEquipamentos = ({
                 )}
               </div>
 
-              <button
-                type="button"
-                className="carousel-btn next"
-                onClick={proximoPack}
-              >
-                <img src={next} alt="Próximo" className="icon" />
-              </button>
+              {modalidade && dataRetirada && dataDevolucao && (
+                <button
+                  type="button"
+                  className="carousel-btn next"
+                  onClick={proximoPack}
+                >
+                  <img src={next} alt="Próximo" className="icon" />
+                </button>
+              )}
             </div>
           )}
 
@@ -690,10 +702,9 @@ const ModalEquipamentos = ({
 
           {feedback.mensagem && (
             <div className={`modal-feedback ${feedback.tipo}`}>
-                {feedback.mensagem}
+              {feedback.mensagem}
             </div>
-        )}
-
+          )}
         </section>
       </div>
     </div>

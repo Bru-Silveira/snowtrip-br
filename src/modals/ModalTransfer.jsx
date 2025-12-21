@@ -2,10 +2,15 @@ import { useState } from "react";
 import "../styles/ModalCommon.css";
 import "../styles/ModalTransfer.css";
 
-const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
+const ModalTransfer = ({
+  concluirModal,
+  setMostrarModal,
+  setTransferTotal,
+}) => {
   const [rota, setRota] = useState("");
   const [destino, setDestino] = useState("");
   const [numPessoas, setNumPessoas] = useState("");
+  const [dataTransfer, setDataTransfer] = useState("");
   const [extras, setExtras] = useState([]);
   const [mostrarResumo, setMostrarResumo] = useState(false);
 
@@ -179,7 +184,7 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
   };
 
   const handleAdicionar = () => {
-    if (!rota || !destino || !numPessoas) {
+    if (!rota || !destino || !numPessoas || !dataTransfer) {
       alert("Por favor, preencha todos os campos obrigatórios");
       return;
     }
@@ -188,15 +193,19 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
 
   const handleConfirmar = () => {
     const preco = calcularPreco();
-    const extrasTexto = extras.length > 0 ? ` + ${extras.join(", ")}` : "";
 
-    concluirModal({
+    const dados = {
       rota,
       destino,
       numPessoas,
+      dataTransfer,
       extras,
       preco,
-    });
+    };
+
+    setTransferTotal(preco);
+    concluirModal(dados);
+    setMostrarModal(false);
   };
 
   const preco = calcularPreco();
@@ -222,6 +231,12 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
               <div className="resumo-item">
                 <span className="resumo-label">Passageiros:</span>
                 <span className="resumo-value">{numPessoas} pessoas</span>
+              </div>
+              <div className="resumo-item">
+                <span className="resumo-label">Data:</span>
+                <span className="resumo-value">
+                  {new Date(dataTransfer).toLocaleDateString("pt-BR")}
+                </span>
               </div>
               {extras.length > 0 && (
                 <div className="resumo-item">
@@ -260,51 +275,54 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
 
       <div className="modal-body">
         <section className="modal-form">
-          <div className="form-group">
-            <label htmlFor="rota">Rota *</label>
-            <select
-              id="rota"
-              value={rota}
-              onChange={(e) => {
-                setRota(e.target.value);
-                setDestino("");
-                setExtras([]);
-              }}
-            >
-              <option value="">Selecione uma rota</option>
-              {Object.keys(rotasData).map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="row">
+            <label className="col" htmlFor="rota">
+              Rota *
+              <select
+                id="rota"
+                value={rota}
+                onChange={(e) => {
+                  setRota(e.target.value);
+                  setDestino("");
+                  setExtras([]);
+                }}
+              >
+                <option value="">Selecione uma rota</option>
+                {Object.keys(rotasData).map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          {rota && (
-            <div className="form-group">
-              <label htmlFor="destino">Destino *</label>
+            <label className="col" htmlFor="destino">
+              Destino *
               <select
                 id="destino"
                 value={destino}
                 onChange={(e) => setDestino(e.target.value)}
+                disabled={!rota}
               >
                 <option value="">Selecione um destino</option>
-                {rotasData[rota].destinos.map((d) => (
-                  <option key={d.nome} value={d.nome}>
-                    {d.nome}
-                  </option>
-                ))}
+                {rota &&
+                  rotasData[rota].destinos.map((d) => (
+                    <option key={d.nome} value={d.nome}>
+                      {d.nome}
+                    </option>
+                  ))}
               </select>
-            </div>
-          )}
+            </label>
+          </div>
 
-          {rota && destino && (
-            <div className="form-group">
-              <label htmlFor="numPessoas">Número de Passageiros *</label>
+          <div className="row">
+            <label className="col" htmlFor="numPessoas">
+              Número de Passageiros *
               <select
                 id="numPessoas"
                 value={numPessoas}
                 onChange={(e) => setNumPessoas(e.target.value)}
+                disabled={!destino}
               >
                 <option value="">Selecione</option>
                 <option value="1/2">1-2 pessoas</option>
@@ -312,14 +330,26 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
                 <option value="5/6">5-6 pessoas</option>
                 <option value="7/8">7-8 pessoas</option>
               </select>
-            </div>
-          )}
+            </label>
 
-          {rota && numPessoas && (
-            <div className="form-group">
-              <label>Extras Adicionais</label>
-              <div className="extras-list">
-                {rotasData[rota].extras.map((extra) => (
+            <label className="col" htmlFor="dataTransfer">
+              Data do Transfer *
+              <input
+                id="dataTransfer"
+                type="date"
+                value={dataTransfer}
+                onChange={(e) => setDataTransfer(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                disabled={!numPessoas}
+              />
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label>Extras Adicionais</label>
+            <div className="extras-list">
+              {rota &&
+                rotasData[rota].extras.map((extra) => (
                   <label key={extra.nome} className="checkbox-label">
                     <input
                       type="checkbox"
@@ -331,15 +361,15 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
                           setExtras(extras.filter((ex) => ex !== extra.nome));
                         }
                       }}
+                      disabled={!numPessoas}
                     />
                     <span>
                       {extra.nome} (+€{extra.preco})
                     </span>
                   </label>
                 ))}
-              </div>
             </div>
-          )}
+          </div>
 
           {preco > 0 && (
             <div className="preco-calculado">
@@ -358,7 +388,7 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
             <button
               className="btn-confirm"
               onClick={handleAdicionar}
-              disabled={!rota || !destino || !numPessoas}
+              disabled={!rota || !destino || !numPessoas || !dataTransfer}
             >
               PRÓXIMO
             </button>

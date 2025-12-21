@@ -91,7 +91,7 @@ export const EQUIPAMENTOS_DISPONÍVEIS = {
     adulto: [
       { nome: "Descoberta", descricao: "Nível Iniciante" },
       { nome: "Sensação", descricao: "Nível Intermediário" },
-      { nome: "Exelencia", descricao: "Nível Avançado" },
+      { nome: "Excelência", descricao: "Nível Avançado" },
     ],
     infantil: [
       { nome: "Mini Kid", descricao: "Infantil Pequeno" },
@@ -102,7 +102,7 @@ export const EQUIPAMENTOS_DISPONÍVEIS = {
   snowboard: {
     adulto: [
       { nome: "Sensação", descricao: "Nível Intermediário" },
-      { nome: "Exelencia", descricao: "Nível Avançado" },
+      { nome: "Excelência", descricao: "Nível Avançado" },
     ],
     infantil: [
       { nome: "Rider Junior", descricao: "Infantil" },

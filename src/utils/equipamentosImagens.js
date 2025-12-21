@@ -1,20 +1,30 @@
 import descobertaImg from "../img/equipamentos/ski/adulto/descoberta.jpg";
 import sensacaoImg from "../img/equipamentos/ski/adulto/sensacao.jpg";
 import excelenciaImg from "../img/equipamentos/ski/adulto/excelencia.jpg";
+import descobertaBadge from "../img/equipamentos/ski/adulto/descoberta-badge.svg";
+import sensacaoBadge from "../img/equipamentos/ski/adulto/sensacao-badge.svg";
+import excelenciaBadge from "../img/equipamentos/ski/adulto/excelencia-badge.svg";
 import miniKidImg from "../img/equipamentos/ski/infantil/mini-kid.jpg";
+import miniBadge from "../img/equipamentos/ski/infantil/mini-badge.svg";
+import espoirBadge from "../img/equipamentos/ski/infantil/espoir-badge.svg";
+import riderBadge from "../img/equipamentos/ski/infantil/rider-badge.svg";
 import espoirImg from "../img/equipamentos/ski/infantil/espoir.jpg";
 import riderJuniorImg from "../img/equipamentos/ski/infantil/rider-junior.jpg";
 
 import sensacaoSnowboardImg from "../img/equipamentos/snowboard/adulto/sensacao.jpg";
 import excelenciaSnowboardImg from "../img/equipamentos/snowboard/adulto/excelencia.jpg";
+import sensacaoSnowboardBadge from "../img/equipamentos/snowboard/adulto/sensacao-badge.svg";
+import excelenciaSnowboardBadge from "../img/equipamentos/snowboard/adulto/excelencia-badge.svg";
 import riderJuniorSnowboardImg from "../img/equipamentos/snowboard/infantil/rider-junior.jpg";
+import riderJuniorSnowboardBadge from "../img/equipamentos/snowboard/infantil/rider-badge.svg";
+
 
 const equipamentosImagens = {
   "ski": {
     "adulto": {
       "Descoberta": descobertaImg,
       "Sensação": sensacaoImg,
-      "Exelencia": excelenciaImg
+      "Excelência": excelenciaImg
     },
     "infantil": {
       "Mini Kid": miniKidImg,
@@ -25,10 +35,34 @@ const equipamentosImagens = {
   "snowboard": {
     "adulto": {
       "Sensação": sensacaoSnowboardImg,
-      "Exelencia": excelenciaSnowboardImg
+      "Excelência": excelenciaSnowboardImg
     },
     "infantil": {
       "Rider Junior": riderJuniorSnowboardImg
+    }
+  }
+}
+
+const equipamentoBadges = {
+  "ski": {
+    "adulto": {
+      "Descoberta": descobertaBadge,
+      "Sensação": sensacaoBadge,
+      "Excelência": excelenciaBadge
+    },
+    "infantil": {
+      "Mini Kid": miniBadge,
+      "Espoir": espoirBadge,
+      "Rider Junior": riderBadge
+    }
+  },
+  "snowboard": {
+    "adulto": {
+      "Sensação": sensacaoSnowboardBadge,
+      "Excelência": excelenciaSnowboardBadge
+    },
+    "infantil": {
+      "Rider Junior": riderJuniorSnowboardBadge
     }
   }
 }
@@ -56,6 +90,28 @@ export const getImagemEquipamento = (modalidade, categoria, nomeEquipamento) => 
     return imagem;
   } catch (error) {
     console.error("❌ Erro ao buscar imagem do equipamento:", error);
+    return null;
+  }
+};
+
+/**
+ * Busca o badge/ícone de um equipamento baseado em modalidade, categoria e nome
+ * @param {string} modalidade - 'ski' ou 'snowboard'
+ * @param {string} categoria - 'adulto' ou 'infantil'
+ * @param {string} nomeEquipamento - Nome do equipamento (ex: "Descoberta")
+ * @returns {string} URL do badge do equipamento ou null
+ */
+export const getBadgeEquipamento = (modalidade, categoria, nomeEquipamento) => {
+  try {
+    const badge = equipamentoBadges[modalidade]?.[categoria]?.[nomeEquipamento];
+    
+    if (!badge) {
+      return null;
+    }
+    
+    return badge;
+  } catch (error) {
+    console.error("❌ Erro ao buscar badge do equipamento:", error);
     return null;
   }
 };

@@ -158,14 +158,46 @@
 
 .equip-layout .pack-image {
     flex-shrink: 0;
-    width: 140px;
-    height: 200px;
+    width: 200px;
+    height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #fafafa;
     border-radius: 8px;
     padding: 12px;
+    position: relative;
+}
+
+.equip-layout .capacete-image-inline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.equip-layout .capacete-image-inline img {
+    width: 100px;
+    height: 120px;
+    object-fit: contain;
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.equip-layout .capacete-image-inline img.grayscale {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.equip-layout .capacete-preco-inline {
+    font-size: 14px;
+    font-weight: 700;
+    color: #d4a600;
+    text-align: center;
 }
 
 .equip-layout .pack-image img {
@@ -186,6 +218,32 @@
     font-weight: 700;
     color: #4a4a4a;
     margin: 0;
+    line-height: 1.2;
+}
+
+.equip-layout .pack-nome-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.equip-layout .pack-nome-badge {
+    width: 180px;
+    height: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0;
+    border: none;
+    background: transparent;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.equip-layout .pack-nome-badge:hover {
+    transform: scale(1.1);
 }
 
 .equip-layout .pack-nivel {
@@ -834,9 +892,25 @@
 
 .equip-layout .pack-card-header {
     display: flex;
+    flex-direction: column-reverse;
     gap: 24px;
     padding: 24px;
     align-items: flex-start;
+}
+
+.equip-layout .pack-images-container {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+}
+
+.equip-layout .pack-card-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 24px;
 }
 
 .modal-feedback {
