@@ -9,7 +9,10 @@ import {
   EQUIPAMENTOS_DISPONÍVEIS,
   CAPACETE_ADICIONAL,
 } from "../utils/equipamentosData.js";
-import { getImagemEquipamento } from "../utils/equipamentosImagens.js";
+import {
+  getImagemEquipamento,
+  getBadgeEquipamento,
+} from "../utils/equipamentosImagens.js";
 
 const ModalEquipamentos = ({
   servicoSelecionado = null,
@@ -520,9 +523,26 @@ const ModalEquipamentos = ({
                     dataDevolucao &&
                     packsDisponiveis.length > 0 && (
                       <div className="pack-info">
-                        <h3 className="pack-nome">
-                          {packsDisponiveis[packSelecionado]?.nome}
-                        </h3>
+                        <div className="pack-nome-container">
+                          <h3 className="pack-nome">
+                            {packsDisponiveis[packSelecionado]?.nome}
+                          </h3>
+                          {getBadgeEquipamento(
+                            modalidade,
+                            categoriaEquipamento,
+                            packsDisponiveis[packSelecionado]?.nome
+                          ) && (
+                            <img
+                              src={getBadgeEquipamento(
+                                modalidade,
+                                categoriaEquipamento,
+                                packsDisponiveis[packSelecionado]?.nome
+                              )}
+                              alt="Badge"
+                              className="pack-nome-badge"
+                            />
+                          )}
+                        </div>
                         <p className="pack-nivel">
                           {packsDisponiveis[packSelecionado]?.nivel}
                         </p>

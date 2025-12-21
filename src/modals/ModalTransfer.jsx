@@ -2,7 +2,11 @@ import { useState } from "react";
 import "../styles/ModalCommon.css";
 import "../styles/ModalTransfer.css";
 
-const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
+const ModalTransfer = ({
+  concluirModal,
+  setMostrarModal,
+  setTransferTotal,
+}) => {
   const [rota, setRota] = useState("");
   const [destino, setDestino] = useState("");
   const [numPessoas, setNumPessoas] = useState("");
@@ -190,14 +194,18 @@ const ModalTransfer = ({ concluirModal, setMostrarModal }) => {
   const handleConfirmar = () => {
     const preco = calcularPreco();
 
-    concluirModal({
+    const dados = {
       rota,
       destino,
       numPessoas,
       dataTransfer,
       extras,
       preco,
-    });
+    };
+
+    setTransferTotal(preco);
+    concluirModal(dados);
+    setMostrarModal(false);
   };
 
   const preco = calcularPreco();

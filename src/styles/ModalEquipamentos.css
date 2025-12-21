@@ -166,6 +166,7 @@
     background: #fafafa;
     border-radius: 8px;
     padding: 12px;
+    position: relative;
 }
 
 .equip-layout .capacete-image-inline {
@@ -217,6 +218,32 @@
     font-weight: 700;
     color: #4a4a4a;
     margin: 0;
+    line-height: 1.2;
+}
+
+.equip-layout .pack-nome-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.equip-layout .pack-nome-badge {
+    width: 180px;
+    height: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0;
+    border: none;
+    background: transparent;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.equip-layout .pack-nome-badge:hover {
+    transform: scale(1.1);
 }
 
 .equip-layout .pack-nivel {

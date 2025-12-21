@@ -3,7 +3,11 @@ import "../styles/modalConcierge.css";
 
 const PRECO_SEMANA = 900; // euros por semana completa
 
-const ModalConcierge = ({ concluirModal, setMostrarModal }) => {
+const ModalConcierge = ({
+  concluirModal,
+  setMostrarModal,
+  setConciergeTotal,
+}) => {
   const [dataInicio, setDataInicio] = useState("");
   const [dias, setDias] = useState(1);
   const [mostrarResumo, setMostrarResumo] = useState(false);
@@ -20,11 +24,12 @@ const ModalConcierge = ({ concluirModal, setMostrarModal }) => {
   };
 
   const handleConfirmar = () => {
-    // Passa os dados para concluirModal e depois de renderizar, fecha o modal
+    const preco = calcularPreco(dias);
+    setConciergeTotal(preco);
     concluirModal({
       dataInicio,
       dias,
-      preco: calcularPreco(dias),
+      preco,
     });
     setMostrarModal(false);
   };

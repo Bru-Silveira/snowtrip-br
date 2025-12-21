@@ -64,10 +64,12 @@ function Carrinho() {
   const [equipTotal, setEquipTotal] = useState(0);
 
   // estados para concierge
-  const [conciergeData, setConciergeData] = useState(null);
+  const [conciergeEntries, setConciergeEntries] = useState([]);
+  const [conciergeTotal, setConciergeTotal] = useState(0);
 
   // estados para transfer
-  const [transferData, setTransferData] = useState(null);
+  const [transferEntries, setTransferEntries] = useState([]);
+  const [transferTotal, setTransferTotal] = useState(0);
 
   const handleAtualizarCarrinho = (novoTotal) => {
     setSkiPassTotal(novoTotal);
@@ -124,15 +126,21 @@ function Carrinho() {
     setServicoSelecionado(servico);
 
     // Abre modal para serviços que precisam de configuração
-    if (["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(servico.slug)) {
-    setMostrarModal(true);
-  } else if (servico.slug === "hospedagem") {
-    // Não faz nada ou mostra um aviso, pois o useEffect já gerencia isso
-    toast.info("A hospedagem é adicionada automaticamente com base na sua busca.");
-  } else {
-    // Adiciona apenas se não for hospedagem e não exigir modal
-    setCarrinho((prev) => [...prev, servico]);
-  }
+    if (
+      ["ski-pass", "aulas", "equip-ski", "transfer", "concierge"].includes(
+        servico.slug
+      )
+    ) {
+      setMostrarModal(true);
+    } else if (servico.slug === "hospedagem") {
+      // Não faz nada ou mostra um aviso, pois o useEffect já gerencia isso
+      toast.info(
+        "A hospedagem é adicionada automaticamente com base na sua busca."
+      );
+    } else {
+      // Adiciona apenas se não for hospedagem e não exigir modal
+      setCarrinho((prev) => [...prev, servico]);
+    }
   };
 
   useEffect(() => {
@@ -167,38 +175,39 @@ function Carrinho() {
 
   useEffect(() => {
     const preco = precoEstadia?.total || 0;
-    const servicoBaseHospedagem = servicos.find(s => s.slug === "hospedagem");
+    const servicoBaseHospedagem = servicos.find((s) => s.slug === "hospedagem");
 
-    setCarrinho(prev => {
-    const hospedagemNoCarrinho = prev.find(item => item.slug === "hospedagem");
+    setCarrinho((prev) => {
+      const hospedagemNoCarrinho = prev.find(
+        (item) => item.slug === "hospedagem"
+      );
 
-    if (preco <= 0 || !precoEstadia?.disponivel) {
-      return prev.filter(item => item.slug !== "hospedagem");
-    }
-
-    if (hospedagemNoCarrinho) {
-      if (hospedagemNoCarrinho.preco !== preco) {
-        return prev.map(item => 
-          item.slug === "hospedagem" 
-            ? { ...item, preco: preco, entries: precoEstadia } 
-            : item
-        );
+      if (preco <= 0 || !precoEstadia?.disponivel) {
+        return prev.filter((item) => item.slug !== "hospedagem");
       }
-      return prev; 
-    } else if (servicoBaseHospedagem) {
-      const novoItemHospedagem = {
-        ...servicoBaseHospedagem,
-        id: 1,
-        preco: preco,
-        entries: precoEstadia, 
-        nome: "Hospedagem",
-      };
-      return [novoItemHospedagem, ...prev];
-    }
-    return prev;
-  });
 
-}, [precoEstadia]);
+      if (hospedagemNoCarrinho) {
+        if (hospedagemNoCarrinho.preco !== preco) {
+          return prev.map((item) =>
+            item.slug === "hospedagem"
+              ? { ...item, preco: preco, entries: precoEstadia }
+              : item
+          );
+        }
+        return prev;
+      } else if (servicoBaseHospedagem) {
+        const novoItemHospedagem = {
+          ...servicoBaseHospedagem,
+          id: 1,
+          preco: preco,
+          entries: precoEstadia,
+          nome: "Hospedagem",
+        };
+        return [novoItemHospedagem, ...prev];
+      }
+      return prev;
+    });
+  }, [precoEstadia]);
 
   useEffect(() => {
     if (equipEntries.length === 0 || equipTotal === 0) return;
@@ -212,7 +221,7 @@ function Carrinho() {
         ...servicoSelecionado,
         slug: "equip-ski",
         nome: `${servicoSelecionado.nome} - ${descricao}`,
-        preco: calcularPrecoEquipamento(entry), // já explico abaixo
+        preco: calcularPrecoEquipamento(entry),
         entries: entry,
       };
     });
@@ -220,6 +229,42 @@ function Carrinho() {
     setCarrinho((prev) => [...prev, ...novos]);
     setEquipEntries([]);
   }, [equipTotal]);
+
+  useEffect(() => {
+    if (transferEntries.length === 0 || transferTotal === 0) return;
+
+    const novos = transferEntries.map((entry) => {
+      return {
+        ...servicoSelecionado,
+        slug: "transfer",
+        nome: `${servicoSelecionado.nome} - ${entry.destino} (${entry.numPessoas} pessoas)`,
+        preco: entry.preco,
+        entries: entry,
+      };
+    });
+
+    setCarrinho((prev) => [...prev, ...novos]);
+    setTransferEntries([]);
+  }, [transferTotal, servicoSelecionado]);
+
+  useEffect(() => {
+    if (conciergeEntries.length === 0 || conciergeTotal === 0) return;
+
+    const novos = conciergeEntries.map((entry) => {
+      return {
+        ...servicoSelecionado,
+        slug: "concierge",
+        nome: `${servicoSelecionado.nome} - ${entry.dias} dia${
+          entry.dias > 1 ? "s" : ""
+        } (${new Date(entry.dataInicio).toLocaleDateString("pt-BR")})`,
+        preco: entry.preco,
+        entries: entry,
+      };
+    });
+
+    setCarrinho((prev) => [...prev, ...novos]);
+    setConciergeEntries([]);
+  }, [conciergeTotal, servicoSelecionado]);
 
   const concluirModal = (dados) => {
     if (!servicoSelecionado) {
@@ -263,31 +308,13 @@ function Carrinho() {
     }
 
     if (servicoSelecionado.slug === "transfer") {
-      setTransferData(dados);
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${dados.destino} (${dados.numPessoas} pessoas)`,
-          preco: dados.preco,
-          entries: dados,
-        },
-      ]);
+      setTransferEntries([dados]);
+      setTransferTotal(dados.preco);
     }
 
     if (servicoSelecionado.slug === "concierge") {
-      setConciergeData(dados);
-      setCarrinho((prev) => [
-        ...prev,
-        {
-          ...servicoSelecionado,
-          nome: `${servicoSelecionado.nome} - ${dados.dias} dia${
-            dados.dias > 1 ? "s" : ""
-          } (${new Date(dados.dataInicio).toLocaleDateString("pt-BR")})`,
-          preco: dados.preco,
-          entries: dados,
-        },
-      ]);
+      setConciergeEntries([dados]);
+      setConciergeTotal(dados.preco);
     }
 
     setMostrarModal(false);
@@ -434,11 +461,13 @@ function Carrinho() {
             <ModalConcierge
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
+              setConciergeTotal={setConciergeTotal}
             />
           ) : servicoSelecionado?.slug === "transfer" ? (
             <ModalTransfer
               concluirModal={concluirModal}
               setMostrarModal={setMostrarModal}
+              setTransferTotal={setTransferTotal}
             />
           ) : servicoSelecionado?.slug === "equip-ski" ? (
             <ModalEquipamentos
@@ -507,13 +536,9 @@ function Carrinho() {
                 carrinho.map((item, index) => (
                   <li key={index} className="item-carrinho">
                     <span className="carrinho-info">{item.nome}</span>
-                    {item.slug === "transfer" || item.slug === "concierge" ? (
-                      <span className="carrinho-preco">à consultar</span>
-                    ) : (
-                      <span className="carrinho-preco">
-                        € {(item.preco || 0).toFixed(2).replace(".", ",")}
-                      </span>
-                    )}
+                    <span className="carrinho-preco">
+                      € {(item.preco || 0).toFixed(2).replace(".", ",")}
+                    </span>
                     <button
                       onClick={() => removerDoCarrinho(index)}
                       className="btn-remover"
@@ -529,8 +554,17 @@ function Carrinho() {
           </div>
 
           <div className="carrinho-detalhes">
-            {precoEstadia?.diasPorPeriodo && <h2 className="carrinho-dias">{precoEstadia?.diasPorPeriodo} Dias</h2>}
-            {precoEstadia?.qtdeAdultos && <p className="carrinho-pessoas">{precoEstadia?.qtdeAdultos} adultos e {precoEstadia?.qtdeCriancas} crianças</p>}
+            {precoEstadia?.diasPorPeriodo && (
+              <h2 className="carrinho-dias">
+                {precoEstadia?.diasPorPeriodo} Dias
+              </h2>
+            )}
+            {precoEstadia?.qtdeAdultos && (
+              <p className="carrinho-pessoas">
+                {precoEstadia?.qtdeAdultos} adultos e{" "}
+                {precoEstadia?.qtdeCriancas} crianças
+              </p>
+            )}
             <div className="carrinho-total">
               Total: € {total.toFixed(2).replace(".", ",")}
             </div>
