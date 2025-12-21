@@ -1,22 +1,25 @@
 import descobertaImg from "../img/equipamentos/ski/adulto/descoberta.jpg";
 import sensacaoImg from "../img/equipamentos/ski/adulto/sensacao.jpg";
 import excelenciaImg from "../img/equipamentos/ski/adulto/excelencia.jpg";
-import descobertaBadge from "../img/equipamentos/ski/adulto/descoberta-badge.svg";
-import sensacaoBadge from "../img/equipamentos/ski/adulto/sensacao-badge.svg";
-import excelenciaBadge from "../img/equipamentos/ski/adulto/excelencia-badge.svg";
+
+import descobertaBadge from "../img/equipamentos/ski/adulto/descoberta-badge.png";
+import sensacaoBadge from "../img/equipamentos/ski/adulto/sensacao-badge.png";
+import excelenciaBadge from "../img/equipamentos/ski/adulto/excelencia-badge.png";
+
 import miniKidImg from "../img/equipamentos/ski/infantil/mini-kid.jpg";
-import miniBadge from "../img/equipamentos/ski/infantil/mini-badge.svg";
-import espoirBadge from "../img/equipamentos/ski/infantil/espoir-badge.svg";
-import riderBadge from "../img/equipamentos/ski/infantil/rider-badge.svg";
 import espoirImg from "../img/equipamentos/ski/infantil/espoir.jpg";
 import riderJuniorImg from "../img/equipamentos/ski/infantil/rider-junior.jpg";
 
+import miniBadge from "../img/equipamentos/ski/infantil/mini-badge.png";
+import espoirBadge from "../img/equipamentos/ski/infantil/espoir-badge.png";
+import riderBadge from "../img/equipamentos/ski/infantil/rider-badge.png";
+
 import sensacaoSnowboardImg from "../img/equipamentos/snowboard/adulto/sensacao.jpg";
 import excelenciaSnowboardImg from "../img/equipamentos/snowboard/adulto/excelencia.jpg";
-import sensacaoSnowboardBadge from "../img/equipamentos/snowboard/adulto/sensacao-badge.svg";
-import excelenciaSnowboardBadge from "../img/equipamentos/snowboard/adulto/excelencia-badge.svg";
+import sensacaoSnowboardBadge from "../img/equipamentos/snowboard/adulto/sensacao-badge.png";
+import excelenciaSnowboardBadge from "../img/equipamentos/snowboard/adulto/excelencia-badge.png";
 import riderJuniorSnowboardImg from "../img/equipamentos/snowboard/infantil/rider-junior.jpg";
-import riderJuniorSnowboardBadge from "../img/equipamentos/snowboard/infantil/rider-badge.svg";
+import riderJuniorSnowboardBadge from "../img/equipamentos/snowboard/infantil/rider-badge.png";
 
 
 const equipamentosImagens = {
